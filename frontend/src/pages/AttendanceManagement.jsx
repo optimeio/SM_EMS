@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import API from '../services/api';
 import LogoSpinner from '../components/LogoSpinner';
+import { exportToExcel } from '../utils/excelExport';
 import { 
   Users, 
   UserCheck, 
@@ -16,7 +17,8 @@ import {
   FileImage,
   MapPin,
   ExternalLink,
-  Building2
+  Building2,
+  Download
 } from 'lucide-react';
 
 const AttendanceManagement = () => {
@@ -92,6 +94,32 @@ const AttendanceManagement = () => {
     });
   };
 
+  const handleExportAttendanceExcel = () => {
+    const dataToExport = records.map((r) => {
+      const empName = typeof r.employee === 'object' && r.employee?.name ? r.employee.name : (r.employeeId || 'Employee');
+      const dept = r.department || r.employee?.department || 'Staff';
+      const checkInTime = r.checkIn ? new Date(r.checkIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }) : '--';
+      const checkOutTime = r.checkOut ? new Date(r.checkOut).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }) : '--';
+
+      return {
+        'Date': r.date || '',
+        'Employee ID': r.employeeId || '',
+        'Employee Name': empName,
+        'Department': dept,
+        'Status': r.status || 'Present',
+        'Check In Time': checkInTime,
+        'Check Out Time': checkOutTime,
+        'Working Hours': r.workingHours || '--',
+        'Jio Tag Address': r.location?.address || 'N/A',
+        'Latitude': r.location?.lat || '',
+        'Longitude': r.location?.lng || '',
+        'Audit Photo URL': r.photoEvidence || ''
+      };
+    });
+
+    exportToExcel(dataToExport, `Attendance_Report_${selectedDate}`, 'Attendance');
+  };
+
   return (
     <div className="space-y-6 animate-fade-in">
       
@@ -104,13 +132,24 @@ const AttendanceManagement = () => {
           </p>
         </div>
 
-        <button
-          onClick={fetchAdminAttendance}
-          className="btn-secondary text-sm shadow-xs"
-        >
-          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-          Refresh Records
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleExportAttendanceExcel}
+            className="btn-secondary text-sm flex items-center gap-2 border-emerald-300 text-emerald-800 bg-emerald-50 hover:bg-emerald-100 font-bold"
+            title="Download Attendance Report as Excel spreadsheet"
+          >
+            <Download className="w-4 h-4 text-emerald-600" />
+            Export Excel
+          </button>
+
+          <button
+            onClick={fetchAdminAttendance}
+            className="btn-secondary text-sm shadow-xs"
+          >
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            Refresh Records
+          </button>
+        </div>
       </div>
 
       {/* Summary KPI Cards Grid — Compact Run Beyond Style with Hover Highlight */}

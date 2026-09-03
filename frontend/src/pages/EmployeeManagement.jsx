@@ -4,6 +4,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import API from '../services/api';
 import LogoSpinner from '../components/LogoSpinner';
 import IDCardModal from '../components/IDCardModal';
+import { exportToExcel } from '../utils/excelExport';
 import { 
   Users, 
   Search, 
@@ -18,6 +19,7 @@ import {
   Eye,
   CheckSquare,
   Mail,
+  Download,
   Phone,
   Calendar,
   Trash2,
@@ -304,6 +306,24 @@ const EmployeeManagement = () => {
     }
   };
 
+  const handleExportExcel = () => {
+    const dataToExport = filteredEmployees.map((emp) => ({
+      'Employee ID': emp.employeeId || '',
+      'Name': emp.name || '',
+      'Department': emp.department || '',
+      'Designation': emp.designation || '',
+      'Email': emp.email || '',
+      'Phone': emp.phone || '',
+      'Blood Group': emp.bloodGroup || '',
+      'Date of Joining': emp.joiningDate ? new Date(emp.joiningDate).toLocaleDateString() : '',
+      'Date of Birth': emp.dateOfBirth ? new Date(emp.dateOfBirth).toLocaleDateString() : '',
+      'Status': emp.status || 'Active',
+      'Total Points': emp.points || 0
+    }));
+
+    exportToExcel(dataToExport, `Employee_Directory_${selectedDept || 'All'}`, 'Employees');
+  };
+
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Page Header */}
@@ -314,6 +334,15 @@ const EmployeeManagement = () => {
         </div>
 
         <div className="flex items-center gap-2">
+          <button
+            onClick={handleExportExcel}
+            className="btn-secondary text-sm flex items-center gap-2 border-emerald-300 text-emerald-800 bg-emerald-50 hover:bg-emerald-100 font-bold"
+            title="Download Employee Records as Excel spreadsheet"
+          >
+            <Download className="w-4 h-4 text-emerald-600" />
+            Export Excel
+          </button>
+
           <button
             onClick={() => setShowCredentialsModal(true)}
             className="btn-secondary text-sm flex items-center gap-2 border-slate-300 text-slate-700 hover:bg-slate-100"
