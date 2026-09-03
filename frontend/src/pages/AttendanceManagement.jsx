@@ -117,7 +117,7 @@ const AttendanceManagement = () => {
       };
     });
 
-    exportToExcel(dataToExport, `Attendance_Report_${selectedDate}`, 'Attendance');
+    exportToExcel(dataToExport, `Attendance_Report_${filterDate || 'Today'}`, 'Attendance');
   };
 
   return (
