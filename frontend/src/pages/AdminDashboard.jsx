@@ -221,7 +221,7 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* Live Attendance Table */}
+        {/* Live Attendance View */}
         {filteredAttendance.length === 0 ? (
           <div className="text-center py-12 space-y-2 bg-slate-50/50 rounded-2xl border-2 border-dashed border-slate-300">
             <UserCheck className="w-10 h-10 text-slate-300 mx-auto" />
@@ -229,95 +229,168 @@ const AdminDashboard = () => {
             <p className="text-xs text-slate-500">Employees will appear here automatically when they check in with Jio Tag photo verification.</p>
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-xl border-2 border-slate-200">
-            <table className="w-full text-left border-collapse text-sm">
-              <thead>
-                <tr className="border-b-2 border-slate-300 bg-slate-100/90 text-xs font-extrabold uppercase text-slate-600 tracking-wider">
-                  <th className="p-3.5 pl-4 border-r border-slate-200">Employee</th>
-                  <th className="p-3.5 border-r border-slate-200">Department</th>
-                  <th className="p-3.5 border-r border-slate-200">Check In</th>
-                  <th className="p-3.5 border-r border-slate-200">Location (Jio Tag Address)</th>
-                  <th className="p-3.5 border-r border-slate-200">Check Out</th>
-                  <th className="p-3.5 border-r border-slate-200">Working Hours</th>
-                  <th className="p-3.5 pr-4 text-right">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y-2 divide-slate-200 bg-white">
-                {filteredAttendance.map((record) => {
-                  const empName = record.employee?.name || 'Employee';
-                  const empId = record.employeeId || 'EMP';
-                  const dept = record.department || record.employee?.department || 'Staff';
-                  const checkInTime = record.checkIn ? new Date(record.checkIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }) : '--';
-                  const checkOutTime = record.checkOut ? new Date(record.checkOut).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }) : '--';
+          <div>
+            {/* Mobile Card List View for Today's Attendance (Under 1024px Screen Width) */}
+            <div className="block lg:hidden space-y-3">
+              {filteredAttendance.map((record) => {
+                const empName = record.employee?.name || 'Employee';
+                const empId = record.employeeId || 'EMP';
+                const dept = record.department || record.employee?.department || 'Staff';
+                const checkInTime = record.checkIn ? new Date(record.checkIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }) : '--';
+                const checkOutTime = record.checkOut ? new Date(record.checkOut).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }) : '--';
 
-                  return (
-                    <tr key={record._id} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="p-3.5 pl-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-full bg-slate-900 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-2xs">
-                            {empName.charAt(0)}
-                          </div>
-                          <div>
-                            <span className="font-bold text-slate-900 block leading-snug">{empName}</span>
-                            <span className="text-xs font-mono text-slate-400">{empId}</span>
+                return (
+                  <div key={record._id} className="bg-white rounded-2xl p-4 border-2 border-slate-300 shadow-xs space-y-3">
+                    {/* Header: Employee Info + Status Badge */}
+                    <div className="flex items-center justify-between gap-2 pb-3 border-b border-slate-200">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-slate-900 text-white font-extrabold text-sm flex items-center justify-center shrink-0 shadow-2xs">
+                          {empName.charAt(0)}
+                        </div>
+                        <div>
+                          <span className="font-extrabold text-slate-900 text-sm block leading-snug">{empName}</span>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <span className="text-xs font-mono font-bold text-slate-400">{empId}</span>
+                            <span className="text-slate-300">•</span>
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                              <Building2 className="w-3 h-3 text-slate-500" />
+                              {dept}
+                            </span>
                           </div>
                         </div>
-                      </td>
+                      </div>
 
-                      <td className="p-3.5">
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
-                          <Building2 className="w-3 h-3 text-slate-500" />
-                          {dept}
-                        </span>
-                      </td>
-
-                      <td className="p-3.5 font-bold text-emerald-700 text-xs tabular-nums">
-                        {checkInTime}
-                      </td>
-
-                      <td className="p-3.5">
-                        {record.location?.address ? (
-                          <div className="flex items-start gap-1.5 max-w-xs text-xs text-slate-700 font-medium leading-relaxed bg-slate-50 p-2 rounded-xl border border-slate-200/80">
-                            <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0 mt-0.5" />
-                            <span>{record.location.address}</span>
-                          </div>
-                        ) : (
-                          <span className="text-xs text-slate-400 font-normal italic">Location not tagged</span>
-                        )}
-                      </td>
-
-                      <td className="p-3.5 font-medium text-slate-700 text-xs tabular-nums">
-                        {record.checkOut ? (
-                          <span className="text-slate-700 font-bold">{checkOutTime}</span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 text-emerald-600 font-bold text-xs">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
-                            Active Now
-                          </span>
-                        )}
-                      </td>
-
-                      <td className="p-3.5 font-medium text-slate-700 text-xs tabular-nums">
-                        {record.workingHours || '--'}
-                      </td>
-
-                      <td className="p-3.5 pr-4 text-right">
+                      <div>
                         {record.status === 'Present' ? (
-                          <span className="badge-success">
+                          <span className="badge-success text-xs">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                             Present
                           </span>
                         ) : (
-                          <span className="badge-neutral">
+                          <span className="badge-neutral text-xs">
                             Checked Out
                           </span>
                         )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                      </div>
+                    </div>
+
+                    {/* Middle: Check In / Check Out Grid */}
+                    <div className="grid grid-cols-2 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200/80 text-xs">
+                      <div>
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Check In</span>
+                        <span className="font-extrabold text-emerald-700 tabular-nums text-sm">{checkInTime}</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Check Out</span>
+                        <span className="font-extrabold text-slate-700 tabular-nums text-sm">
+                          {record.checkOut ? checkOutTime : <span className="text-emerald-600 font-bold">Active Now</span>}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Bottom: Jio Tag Address */}
+                    {record.location?.address && (
+                      <div className="flex items-start gap-2 text-xs text-slate-700 bg-slate-50 p-2.5 rounded-xl border border-slate-200/80">
+                        <MapPin className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
+                        <span className="leading-relaxed font-medium">{record.location.address}</span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Desktop Table View (Hidden on mobile, visible on lg screens) */}
+            <div className="hidden lg:block overflow-x-auto rounded-xl border-2 border-slate-200">
+              <table className="w-full text-left border-collapse text-sm">
+                <thead>
+                  <tr className="border-b-2 border-slate-300 bg-slate-100/90 text-xs font-extrabold uppercase text-slate-600 tracking-wider">
+                    <th className="p-3.5 pl-4 border-r border-slate-200">Employee</th>
+                    <th className="p-3.5 border-r border-slate-200">Department</th>
+                    <th className="p-3.5 border-r border-slate-200">Check In</th>
+                    <th className="p-3.5 border-r border-slate-200">Location (Jio Tag Address)</th>
+                    <th className="p-3.5 border-r border-slate-200">Check Out</th>
+                    <th className="p-3.5 border-r border-slate-200">Working Hours</th>
+                    <th className="p-3.5 pr-4 text-right">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y-2 divide-slate-200 bg-white">
+                  {filteredAttendance.map((record) => {
+                    const empName = record.employee?.name || 'Employee';
+                    const empId = record.employeeId || 'EMP';
+                    const dept = record.department || record.employee?.department || 'Staff';
+                    const checkInTime = record.checkIn ? new Date(record.checkIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }) : '--';
+                    const checkOutTime = record.checkOut ? new Date(record.checkOut).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }) : '--';
+
+                    return (
+                      <tr key={record._id} className="hover:bg-slate-50/80 transition-colors">
+                        <td className="p-3.5 pl-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-9 h-9 rounded-full bg-slate-900 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-2xs">
+                              {empName.charAt(0)}
+                            </div>
+                            <div>
+                              <span className="font-bold text-slate-900 block leading-snug">{empName}</span>
+                              <span className="text-xs font-mono text-slate-400">{empId}</span>
+                            </div>
+                          </div>
+                        </td>
+
+                        <td className="p-3.5">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                            <Building2 className="w-3 h-3 text-slate-500" />
+                            {dept}
+                          </span>
+                        </td>
+
+                        <td className="p-3.5 font-bold text-emerald-700 text-xs tabular-nums">
+                          {checkInTime}
+                        </td>
+
+                        <td className="p-3.5">
+                          {record.location?.address ? (
+                            <div className="flex items-start gap-1.5 max-w-xs text-xs text-slate-700 font-medium leading-relaxed bg-slate-50 p-2 rounded-xl border border-slate-200/80">
+                              <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0 mt-0.5" />
+                              <span>{record.location.address}</span>
+                            </div>
+                          ) : (
+                            <span className="text-xs text-slate-400 font-normal italic">Location not tagged</span>
+                          )}
+                        </td>
+
+                        <td className="p-3.5 font-medium text-slate-700 text-xs tabular-nums">
+                          {record.checkOut ? (
+                            <span className="text-slate-700 font-bold">{checkOutTime}</span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 text-emerald-600 font-bold text-xs">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
+                              Active Now
+                            </span>
+                          )}
+                        </td>
+
+                        <td className="p-3.5 font-medium text-slate-700 text-xs tabular-nums">
+                          {record.workingHours || '--'}
+                        </td>
+
+                        <td className="p-3.5 pr-4 text-right">
+                          {record.status === 'Present' ? (
+                            <span className="badge-success">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                              Present
+                            </span>
+                          ) : (
+                            <span className="badge-neutral">
+                              Checked Out
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>

@@ -372,65 +372,78 @@ const AttendanceManagement = () => {
               </table>
             </div>
 
-            {/* Mobile & Tablet Responsive List Cards View (Zero Horizontal Scroll!) */}
-            <div className="block lg:hidden p-3.5 space-y-3">
+            {/* Mobile Card List View (Under 1024px Screen Width) */}
+            <div className="block lg:hidden space-y-3.5 p-3 sm:p-4">
               {records.map((r) => {
                 const empName = typeof r.employee === 'object' && r.employee?.name ? r.employee.name : (r.employeeId || 'Employee');
                 const initialChar = typeof empName === 'string' && empName.length > 0 ? empName.charAt(0).toUpperCase() : 'E';
                 const photo = r.employee?.profilePhoto;
+                const dept = r.department || r.employee?.department || 'Staff';
 
                 return (
-                  <div key={r._id} className="p-4 bg-slate-50/80 border border-slate-200/80 rounded-xl space-y-3 hover:border-slate-300 transition-all">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2.5">
+                  <div key={r._id} className="p-4 bg-white border-2 border-slate-300 rounded-2xl space-y-3.5 shadow-xs hover:border-slate-400 transition-all">
+                    {/* Top Row: Employee Avatar + Info + Status Badge */}
+                    <div className="flex items-center justify-between gap-2 pb-3 border-b border-slate-200">
+                      <div className="flex items-center gap-3">
                         {photo ? (
-                          <img src={photo} alt={empName} className="w-9 h-9 rounded-full object-cover border border-slate-200 shrink-0 shadow-2xs" />
+                          <img src={photo} alt={empName} className="w-10 h-10 rounded-full object-cover border-2 border-slate-200 shrink-0 shadow-2xs" />
                         ) : (
-                          <div className="w-9 h-9 rounded-full bg-slate-900 text-white font-bold flex items-center justify-center text-xs shrink-0 shadow-2xs">
+                          <div className="w-10 h-10 rounded-full bg-slate-900 text-white font-extrabold text-sm flex items-center justify-center shrink-0 shadow-2xs">
                             {initialChar}
                           </div>
                         )}
                         <div>
-                          <div className="font-bold text-sm text-slate-900 leading-tight">{empName}</div>
-                          <div className="font-mono text-xs text-slate-500 mt-0.5">{r.employeeId} • {r.department}</div>
+                          <div className="font-extrabold text-sm text-slate-900 leading-snug">{empName}</div>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <span className="font-mono text-xs font-bold text-slate-400">{r.employeeId}</span>
+                            <span className="text-slate-300">•</span>
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                              <Building2 className="w-3 h-3 text-slate-500" />
+                              {dept}
+                            </span>
+                          </div>
                         </div>
                       </div>
 
-                      <span className={r.status === 'Present' ? 'badge-success text-xs' : 'badge-neutral text-xs'}>
+                      <span className={r.status === 'Present' ? 'badge-success text-xs shrink-0' : 'badge-neutral text-xs shrink-0'}>
+                        {r.status === 'Present' && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>}
                         {r.status}
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-2 text-xs bg-white p-2.5 rounded-lg border border-slate-200/60">
+                    {/* Middle Row: Check In / Check Out / Hours */}
+                    <div className="grid grid-cols-3 gap-2 text-xs bg-slate-50 p-3 rounded-xl border border-slate-200/80">
                       <div>
-                        <span className="text-[10px] text-slate-400 font-bold uppercase block">Check In</span>
-                        <span className="font-bold text-emerald-700 font-mono text-xs">{formatTime(r.checkIn)}</span>
+                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Check In</span>
+                        <span className="font-extrabold text-emerald-700 font-mono text-xs mt-0.5 block">{formatTime(r.checkIn)}</span>
                       </div>
                       <div>
-                        <span className="text-[10px] text-slate-400 font-bold uppercase block">Check Out</span>
-                        <span className="font-bold text-slate-700 font-mono text-xs">{formatTime(r.checkOut)}</span>
+                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Check Out</span>
+                        <span className="font-extrabold text-slate-700 font-mono text-xs mt-0.5 block">{formatTime(r.checkOut)}</span>
                       </div>
                       <div>
-                        <span className="text-[10px] text-slate-400 font-bold uppercase block">Hours</span>
-                        <span className="font-bold text-indigo-700 font-mono text-xs">{r.workingHours || '--'}</span>
+                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Hours</span>
+                        <span className="font-extrabold text-indigo-700 font-mono text-xs mt-0.5 block">{r.workingHours || '--'}</span>
                       </div>
                     </div>
 
+                    {/* Bottom Row: Jio Tag Address */}
                     {r.location?.address && (
                       <a
                         href={r.location?.lat ? `https://www.google.com/maps?q=${r.location.lat},${r.location.lng}` : '#'}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-start gap-2 text-xs text-slate-700 font-medium leading-relaxed bg-white p-2.5 rounded-xl border border-slate-200/80 hover:border-slate-300 transition-all group"
+                        className="flex items-start gap-2 text-xs text-slate-700 font-medium leading-relaxed bg-slate-50 p-2.5 rounded-xl border border-slate-200/80 hover:bg-slate-100 transition-all group"
                       >
                         <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0 mt-0.5" />
                         <span className="group-hover:text-slate-900 leading-normal">{r.location.address}</span>
+                        <ExternalLink className="w-3 h-3 text-slate-400 group-hover:text-slate-700 shrink-0 ml-auto mt-0.5" />
                       </a>
                     )}
 
                     <button
                       onClick={() => openPhotoModal(r)}
-                      className="btn-secondary text-xs w-full py-2 flex items-center justify-center gap-1.5 bg-white"
+                      className="btn-secondary text-xs w-full py-2.5 flex items-center justify-center gap-1.5 bg-white font-bold border-2 border-slate-300"
                     >
                       <Eye className="w-3.5 h-3.5 text-slate-600" />
                       View Photo Evidence
