@@ -1,5 +1,16 @@
 DirectoryIndex index.html
 
+# Force browser to always re-fetch index.html for instant update delivery without manual cache clearing
+<FilesMatch "index\.html$">
+  FileETag None
+  <IfModule mod_headers.c>
+    Header unset ETag
+    Header set Cache-Control "max-age=0, no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "Wed, 11 Jan 1984 05:00:00 GMT"
+  </IfModule>
+</FilesMatch>
+
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
