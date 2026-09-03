@@ -15,6 +15,7 @@ import {
   ChevronRight,
   ChevronLeft,
   ExternalLink,
+  CreditCard,
   Calendar
 } from 'lucide-react';
 import logoImg from '../assets/sm_groups_logo.png';
