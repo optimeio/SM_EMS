@@ -20,7 +20,12 @@ import {
   ArrowRight,
   ChevronLeft,
   Download,
-  PenTool
+  PenTool,
+  Megaphone,
+  Headphones,
+  Code2,
+  Target,
+  Cpu
 } from 'lucide-react';
 
 const CANVA_EDIT_URL = 'https://canva.link/rmuleulxpdvg2nd';
@@ -144,37 +149,29 @@ const IDCardsPage = () => {
   return (
     <div className="space-y-6 animate-fade-in">
       
-      {/* Page Header */}
+      {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200/80">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Corporate Digital ID Cards</h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Manage employee identity badges, Canva templates, and security QR code assets.
-          </p>
+          <p className="text-sm text-slate-500 mt-1">Manage employee identity badges, Canva templates, and security QR code assets.</p>
         </div>
 
-        <div className="flex items-center gap-3">
-          {isAdmin ? (
-            <>
-              <a
-                href={CANVA_EDIT_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-primary text-sm"
-              >
-                <ExternalLink className="w-4 h-4" />
-                Edit Canva Design
-              </a>
-              <span className="text-xs font-semibold text-slate-700 bg-slate-100 px-3 py-2 rounded-xl border border-slate-200/60 tabular-nums">
-                {employees.length} Badges
-              </span>
-            </>
-          ) : (
-            <span className="badge-success text-xs py-1.5 px-3">
-              Verified Active Employee Badge
+        {isAdmin && (
+          <div className="flex items-center gap-2">
+            <a
+              href={CANVA_EDIT_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary text-sm shadow-md"
+            >
+              <ExternalLink className="w-4 h-4" />
+              Edit Canva Design
+            </a>
+            <span className="btn-secondary text-sm bg-white cursor-default">
+              {employees.length} Badges
             </span>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* Canva Notice Banner (Admin Only) */}
@@ -321,12 +318,12 @@ const IDCardsPage = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-base font-bold text-slate-900 uppercase tracking-wider">Departments</h2>
-              <p className="text-xs text-slate-500 mt-0.5">Select a department to view employee ID badges</p>
+              <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Departments</h2>
+              <p className="text-xs text-slate-500 mt-0.5 font-medium">Select a department to view employee ID badges</p>
             </div>
             <button
               onClick={() => setSelectedDept('All')}
-              className="text-xs font-semibold text-slate-700 hover:text-slate-900 underline"
+              className="text-xs font-bold text-slate-700 hover:text-slate-900 underline"
             >
               View All ({employees.length})
             </button>
@@ -335,31 +332,32 @@ const IDCardsPage = () => {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             {departments.map((dept) => {
               const count = employees.filter((e) => e.department === dept).length;
+              const style = getDepartmentBadgeStyle(dept);
               return (
                 <div
                   key={dept}
                   onClick={() => setSelectedDept(dept)}
-                  className="card-saas p-6 hover:border-slate-300 cursor-pointer group space-y-4 flex flex-col justify-between"
+                  className={`rounded-2xl p-6 border cursor-pointer group space-y-4 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${style.bg}`}
                 >
                   <div className="flex items-center justify-between">
-                    <div className="w-11 h-11 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center border border-slate-200/80">
-                      <Building2 className="w-5.5 h-5.5" />
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border shadow-2xs transition-transform group-hover:scale-105 ${style.iconBg}`}>
+                      {getDepartmentIcon(dept)}
                     </div>
-                    <span className="text-xs font-semibold text-slate-700 bg-slate-100 px-3 py-1 rounded-full border border-slate-200/60 tabular-nums">
+                    <span className={`text-xs font-extrabold px-3 py-1 rounded-full border tabular-nums shadow-2xs ${style.badge}`}>
                       {count} Members
                     </span>
                   </div>
 
                   <div>
-                    <h3 className="text-lg font-bold text-slate-900 group-hover:text-slate-800">
+                    <h3 className={`text-lg font-bold text-slate-900 transition-colors ${style.text}`}>
                       {dept}
                     </h3>
-                    <p className="text-xs text-slate-500 mt-1">
+                    <p className="text-xs text-slate-500 mt-1 leading-relaxed font-normal">
                       Explore identity badges for {dept}
                     </p>
                   </div>
 
-                  <div className="pt-2 flex items-center gap-1.5 text-xs font-semibold text-slate-800 group-hover:text-slate-900">
+                  <div className={`pt-2 flex items-center gap-1.5 text-xs font-bold text-slate-800 transition-colors ${style.text}`}>
                     <span>Explore Badges</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>
