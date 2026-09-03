@@ -293,13 +293,13 @@ const EmployeeManagement = () => {
 
   const getDepartmentBadgeStyle = (dept) => {
     switch (dept) {
-      case 'Marketing': return { bg: 'bg-rose-50 border-rose-200/80', iconBg: 'bg-rose-100/70 border-rose-200', text: 'group-hover:text-rose-700', badge: 'bg-rose-100/60 text-rose-800 border-rose-200/60' };
-      case 'Telecalling': return { bg: 'bg-amber-50 border-amber-200/80', iconBg: 'bg-amber-100/70 border-amber-200', text: 'group-hover:text-amber-800', badge: 'bg-amber-100/60 text-amber-900 border-amber-200/60' };
-      case 'IT': return { bg: 'bg-indigo-50 border-indigo-200/80', iconBg: 'bg-indigo-100/70 border-indigo-200', text: 'group-hover:text-indigo-700', badge: 'bg-indigo-100/60 text-indigo-800 border-indigo-200/60' };
-      case 'Sales': return { bg: 'bg-emerald-50 border-emerald-200/80', iconBg: 'bg-emerald-100/70 border-emerald-200', text: 'group-hover:text-emerald-700', badge: 'bg-emerald-100/60 text-emerald-800 border-emerald-200/60' };
-      case 'HR': return { bg: 'bg-purple-50 border-purple-200/80', iconBg: 'bg-purple-100/70 border-purple-200', text: 'group-hover:text-purple-700', badge: 'bg-purple-100/60 text-purple-800 border-purple-200/60' };
-      case 'Engineering': return { bg: 'bg-sky-50 border-sky-200/80', iconBg: 'bg-sky-100/70 border-sky-200', text: 'group-hover:text-sky-700', badge: 'bg-sky-100/60 text-sky-800 border-sky-200/60' };
-      default: return { bg: 'bg-slate-50 border-slate-200/80', iconBg: 'bg-slate-100 border-slate-200', text: 'group-hover:text-slate-900', badge: 'bg-slate-100 text-slate-700 border-slate-200' };
+      case 'Marketing': return { topBar: 'bg-rose-500', iconBg: 'bg-rose-50 border-rose-200 text-rose-600', text: 'group-hover:text-rose-600', badge: 'bg-rose-50 text-rose-800 border-rose-200', arrowBg: 'bg-rose-50 group-hover:bg-rose-100' };
+      case 'Telecalling': return { topBar: 'bg-amber-500', iconBg: 'bg-amber-50 border-amber-200 text-amber-600', text: 'group-hover:text-amber-700', badge: 'bg-amber-50 text-amber-900 border-amber-200', arrowBg: 'bg-amber-50 group-hover:bg-amber-100' };
+      case 'IT': return { topBar: 'bg-indigo-500', iconBg: 'bg-indigo-50 border-indigo-200 text-indigo-600', text: 'group-hover:text-indigo-600', badge: 'bg-indigo-50 text-indigo-800 border-indigo-200', arrowBg: 'bg-indigo-50 group-hover:bg-indigo-100' };
+      case 'Sales': return { topBar: 'bg-emerald-500', iconBg: 'bg-emerald-50 border-emerald-200 text-emerald-600', text: 'group-hover:text-emerald-600', badge: 'bg-emerald-50 text-emerald-800 border-emerald-200', arrowBg: 'bg-emerald-50 group-hover:bg-emerald-100' };
+      case 'HR': return { topBar: 'bg-purple-500', iconBg: 'bg-purple-50 border-purple-200 text-purple-600', text: 'group-hover:text-purple-600', badge: 'bg-purple-50 text-purple-800 border-purple-200', arrowBg: 'bg-purple-50 group-hover:bg-purple-100' };
+      case 'Engineering': return { topBar: 'bg-sky-500', iconBg: 'bg-sky-50 border-sky-200 text-sky-600', text: 'group-hover:text-sky-600', badge: 'bg-sky-50 text-sky-800 border-sky-200', arrowBg: 'bg-sky-50 group-hover:bg-sky-100' };
+      default: return { topBar: 'bg-slate-500', iconBg: 'bg-slate-50 border-slate-200 text-slate-600', text: 'group-hover:text-slate-900', badge: 'bg-slate-50 text-slate-700 border-slate-200', arrowBg: 'bg-slate-50 group-hover:bg-slate-100' };
     }
   };
 
@@ -403,29 +403,33 @@ const EmployeeManagement = () => {
                 <div
                   key={dept}
                   onClick={() => setSelectedDept(dept)}
-                  className={`rounded-2xl p-6 border cursor-pointer group space-y-4 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${style.bg}`}
+                  className="bg-white rounded-2xl border-2 border-slate-300 p-6 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer group relative overflow-hidden flex flex-col justify-between"
                 >
-                  <div className="flex items-center justify-between">
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border shadow-2xs transition-transform group-hover:scale-105 ${style.iconBg}`}>
+                  <div className={`absolute top-0 left-0 right-0 h-1.5 ${style.topBar}`}></div>
+
+                  <div className="flex items-center justify-between pt-1">
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border-2 shadow-sm transition-transform duration-300 group-hover:scale-110 ${style.iconBg}`}>
                       {getDepartmentIcon(dept)}
                     </div>
-                    <span className={`text-xs font-extrabold px-3 py-1 rounded-full border tabular-nums shadow-2xs ${style.badge}`}>
+                    <span className={`text-xs font-black px-3.5 py-1 rounded-full border-2 tabular-nums shadow-xs ${style.badge}`}>
                       {count} Members
                     </span>
                   </div>
 
-                  <div>
-                    <h3 className={`text-lg font-bold text-slate-900 transition-colors ${style.text}`}>
+                  <div className="my-4">
+                    <h3 className={`text-xl font-black text-slate-900 transition-colors ${style.text}`}>
                       {dept}
                     </h3>
-                    <p className="text-xs text-slate-500 mt-1 leading-relaxed font-normal">
-                      Personnel directory & profile management
+                    <p className="text-xs text-slate-500 mt-1 font-medium leading-relaxed">
+                      Personnel directory, identity badges & role permissions
                     </p>
                   </div>
 
-                  <div className={`pt-2 flex items-center gap-1.5 text-xs font-bold text-slate-800 transition-colors ${style.text}`}>
+                  <div className="pt-3 border-t-2 border-slate-100 flex items-center justify-between text-xs font-extrabold text-slate-700 group-hover:text-slate-900">
                     <span>Explore Department</span>
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    <div className={`p-1.5 rounded-xl border border-slate-200 group-hover:border-slate-300 transition-colors ${style.arrowBg}`}>
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </div>
                   </div>
                 </div>
               );
