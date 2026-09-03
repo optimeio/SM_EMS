@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { Lock, Mail, AlertCircle, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import logoImg from '../assets/sm_groups_logo.png';
 
 const Login = () => {
