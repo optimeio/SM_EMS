@@ -52,39 +52,39 @@
     @apply bg-[#ED1C24] hover:bg-[#D1171E] text-white font-bold py-2.5 px-4 rounded-xl text-base sm:text-sm shadow-sm hover:shadow-md transition-all duration-200 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-red-500/20 inline-flex items-center justify-center gap-2;
   }
 
-  /* Input fields */
+  /* Input fields with crisp 2px border */
   .input-field, .input-saas {
-    @apply bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 rounded-xl px-4 py-2.5 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200 shadow-sm;
+    @apply bg-white border-2 border-slate-300 text-slate-900 placeholder:text-slate-400 rounded-xl px-4 py-2.5 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all duration-200 shadow-sm;
   }
 
-  /* Ultra-Premium Light SaaS Cards with Subtle Glassmorphism */
+  /* Premium High-Contrast Cards with Thick Crisp Borders */
   .card, .card-saas {
-    @apply bg-white/95 backdrop-blur-sm rounded-2xl border border-slate-200/90 p-4 sm:p-6 shadow-[0_2px_10px_-2px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_25px_-5px_rgba(0,0,0,0.06)] hover:border-slate-300 transition-all duration-300;
+    @apply bg-white rounded-2xl border-2 border-slate-300 p-4 sm:p-6 shadow-sm hover:shadow-md hover:border-slate-400 transition-all duration-300;
   }
 
   .card-hover {
-    @apply hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[0_10px_30px_-8px_rgba(0,0,0,0.08)];
+    @apply hover:-translate-y-0.5 hover:border-slate-500 hover:shadow-md;
   }
 
   /* High-Contrast Premium Status Badges */
   .badge-success {
-    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-50/90 text-emerald-800 border border-emerald-200/80 shadow-sm;
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-50 text-emerald-800 border-2 border-emerald-300 shadow-sm;
   }
   
   .badge-warning {
-    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-amber-50/90 text-amber-900 border border-amber-200/80 shadow-sm;
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-amber-50 text-amber-900 border-2 border-amber-300 shadow-sm;
   }
   
   .badge-danger {
-    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-rose-50/90 text-rose-800 border border-rose-200/80 shadow-sm;
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-rose-50 text-rose-800 border-2 border-rose-300 shadow-sm;
   }
 
   .badge-neutral {
-    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-slate-100 text-slate-700 border border-slate-200/80 shadow-sm;
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-slate-100 text-slate-700 border-2 border-slate-300 shadow-sm;
   }
 
   .badge-info {
-    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-sky-50/90 text-sky-800 border border-sky-200/80 shadow-sm;
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-sky-50 text-sky-800 border-2 border-sky-300 shadow-sm;
   }
 }
 

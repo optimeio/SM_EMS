@@ -171,7 +171,7 @@ const AttendanceManagement = () => {
       </div>
 
       {/* Filter Bar */}
-      <div className="card-saas p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 border border-slate-200/80">
+      <div className="card-saas p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 border-2 border-slate-300 shadow-sm">
         <div className="space-y-1">
           <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Filter Date</label>
           <input
@@ -225,7 +225,7 @@ const AttendanceManagement = () => {
       </div>
 
       {/* Main Attendance Table — Zero Horizontal Scroll Design */}
-      <div className="card-saas p-0 overflow-hidden border border-slate-200/80">
+      <div className="card-saas p-0 overflow-hidden border-2 border-slate-300 shadow-sm">
         {loading ? (
           <div className="flex justify-center py-16">
             <RefreshCw className="w-8 h-8 animate-spin text-slate-700" />
@@ -242,16 +242,16 @@ const AttendanceManagement = () => {
             <div className="hidden lg:block w-full">
               <table className="w-full text-left border-collapse text-sm table-fixed">
                 <thead>
-                  <tr className="border-b border-slate-200/80 bg-slate-50/90 text-xs font-bold uppercase text-slate-500 tracking-wider">
-                    <th className="p-3.5 pl-5 w-[24%]">Employee & Department</th>
-                    <th className="p-3.5 w-[14%]">Date</th>
-                    <th className="p-3.5 w-[20%]">Check In / Out</th>
-                    <th className="p-3.5 w-[20%]">Jio Tag Location</th>
-                    <th className="p-3.5 w-[11%]">Status</th>
+                  <tr className="border-b-2 border-slate-300 bg-slate-100 text-xs font-extrabold uppercase text-slate-600 tracking-wider">
+                    <th className="p-3.5 pl-5 w-[24%] border-r border-slate-200">Employee & Department</th>
+                    <th className="p-3.5 w-[14%] border-r border-slate-200">Date</th>
+                    <th className="p-3.5 w-[20%] border-r border-slate-200">Check In / Out</th>
+                    <th className="p-3.5 w-[20%] border-r border-slate-200">Jio Tag Location</th>
+                    <th className="p-3.5 w-[11%] border-r border-slate-200">Status</th>
                     <th className="p-3.5 pr-5 w-[11%] text-right">Evidence</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 font-normal">
+                <tbody className="divide-y-2 divide-slate-200 bg-white font-normal">
                   {records.map((r) => {
                     const empName = typeof r.employee === 'object' && r.employee?.name ? r.employee.name : (r.employeeId || 'Employee');
                     const initialChar = typeof empName === 'string' && empName.length > 0 ? empName.charAt(0).toUpperCase() : 'E';

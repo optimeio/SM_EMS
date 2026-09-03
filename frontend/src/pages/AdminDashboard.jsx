@@ -105,19 +105,19 @@ const AdminDashboard = () => {
       {/* Top Row: Attendance & Workforce KPI Summary Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
         {/* Card 1: Today's Present Attendance */}
-        <div className="rounded-2xl p-5 border border-emerald-200/80 bg-gradient-to-br from-white via-emerald-50/20 to-emerald-100/30 space-y-2 hover:-translate-y-1 hover:shadow-lg hover:shadow-emerald-500/5 transition-all duration-300 group min-w-0">
+        <div className="rounded-2xl p-5 border-2 border-emerald-300/90 bg-gradient-to-br from-white via-emerald-50/30 to-emerald-100/40 space-y-2 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group min-w-0">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-extrabold text-emerald-800 uppercase tracking-wider block truncate">Present Today</span>
-            <div className="p-2.5 bg-emerald-100/80 text-emerald-700 rounded-xl border border-emerald-200/80 shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+            <span className="text-[11px] font-extrabold text-emerald-900 uppercase tracking-wider block truncate">Present Today</span>
+            <div className="p-2.5 bg-emerald-100 text-emerald-800 rounded-xl border-2 border-emerald-300 shrink-0 shadow-sm group-hover:scale-105 transition-transform">
               <UserCheck className="w-4.5 h-4.5" />
             </div>
           </div>
           <div>
             <div className="text-2xl sm:text-3xl font-black text-slate-900 tabular-nums truncate">
               {attendanceSummary?.presentCount || 0}
-              <span className="text-xs sm:text-sm font-semibold text-slate-400 ml-1">/ {attendanceSummary?.totalEmployees || stats?.activeEmployees || 0}</span>
+              <span className="text-xs sm:text-sm font-semibold text-slate-500 ml-1">/ {attendanceSummary?.totalEmployees || stats?.activeEmployees || 0}</span>
             </div>
-            <div className="flex items-center gap-1.5 mt-2 text-xs text-emerald-700 font-extrabold">
+            <div className="flex items-center gap-1.5 mt-2 text-xs text-emerald-800 font-extrabold">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
               <span>
                 {attendanceSummary?.totalEmployees ? Math.round(((attendanceSummary.presentCount || 0) / attendanceSummary.totalEmployees) * 100) : 0}% Checked In
@@ -127,10 +127,10 @@ const AdminDashboard = () => {
         </div>
 
         {/* Card 2: Currently Active / Working */}
-        <div className="rounded-2xl p-5 border border-sky-200/80 bg-gradient-to-br from-white via-sky-50/20 to-sky-100/30 space-y-2 hover:-translate-y-1 hover:shadow-lg hover:shadow-sky-500/5 transition-all duration-300 group min-w-0">
+        <div className="rounded-2xl p-5 border-2 border-sky-300/90 bg-gradient-to-br from-white via-sky-50/30 to-sky-100/40 space-y-2 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group min-w-0">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-extrabold text-sky-800 uppercase tracking-wider block truncate">Currently Working</span>
-            <div className="p-2.5 bg-sky-100/80 text-sky-700 rounded-xl border border-sky-200/80 shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+            <span className="text-[11px] font-extrabold text-sky-900 uppercase tracking-wider block truncate">Currently Working</span>
+            <div className="p-2.5 bg-sky-100 text-sky-800 rounded-xl border-2 border-sky-300 shrink-0 shadow-sm group-hover:scale-105 transition-transform">
               <Clock className="w-4.5 h-4.5" />
             </div>
           </div>
@@ -138,15 +138,15 @@ const AdminDashboard = () => {
             <div className="text-2xl sm:text-3xl font-black text-slate-900 tabular-nums truncate">
               {attendanceSummary?.workingCount || 0}
             </div>
-            <p className="text-xs text-sky-700 font-extrabold mt-2 truncate">Active on Duty</p>
+            <p className="text-xs text-sky-800 font-extrabold mt-2 truncate">Active on Duty</p>
           </div>
         </div>
 
         {/* Card 3: Checked Out */}
-        <div className="rounded-2xl p-5 border border-purple-200/80 bg-gradient-to-br from-white via-purple-50/20 to-purple-100/30 space-y-2 hover:-translate-y-1 hover:shadow-lg hover:shadow-purple-500/5 transition-all duration-300 group min-w-0">
+        <div className="rounded-2xl p-5 border-2 border-purple-300/90 bg-gradient-to-br from-white via-purple-50/30 to-purple-100/40 space-y-2 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group min-w-0">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-extrabold text-purple-800 uppercase tracking-wider block truncate">Checked Out</span>
-            <div className="p-2.5 bg-purple-100/80 text-purple-700 rounded-xl border border-purple-200/80 shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+            <span className="text-[11px] font-extrabold text-purple-900 uppercase tracking-wider block truncate">Checked Out</span>
+            <div className="p-2.5 bg-purple-100 text-purple-800 rounded-xl border-2 border-purple-300 shrink-0 shadow-sm group-hover:scale-105 transition-transform">
               <CheckCircle2 className="w-4.5 h-4.5" />
             </div>
           </div>
@@ -154,58 +154,58 @@ const AdminDashboard = () => {
             <div className="text-2xl sm:text-3xl font-black text-slate-900 tabular-nums truncate">
               {attendanceSummary?.checkedOutCount || 0}
             </div>
-            <p className="text-xs text-purple-700 font-extrabold mt-2 truncate">Shift completed</p>
+            <p className="text-xs text-purple-800 font-extrabold mt-2 truncate">Shift completed</p>
           </div>
         </div>
 
         {/* Card 4: Tasks Done */}
-        <div className="rounded-2xl p-5 border border-amber-200/80 bg-gradient-to-br from-white via-amber-50/20 to-amber-100/30 space-y-2 hover:-translate-y-1 hover:shadow-lg hover:shadow-amber-500/5 transition-all duration-300 group min-w-0">
+        <div className="rounded-2xl p-5 border-2 border-amber-300/90 bg-gradient-to-br from-white via-amber-50/30 to-amber-100/40 space-y-2 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group min-w-0">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-extrabold text-amber-800 uppercase tracking-wider block truncate">Tasks Done</span>
-            <div className="p-2.5 bg-amber-100/80 text-amber-700 rounded-xl border border-amber-200/80 shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+            <span className="text-[11px] font-extrabold text-amber-900 uppercase tracking-wider block truncate">Tasks Done</span>
+            <div className="p-2.5 bg-amber-100 text-amber-800 rounded-xl border-2 border-amber-300 shrink-0 shadow-sm group-hover:scale-105 transition-transform">
               <CheckSquare className="w-4.5 h-4.5" />
             </div>
           </div>
           <div>
             <div className="text-2xl sm:text-3xl font-black text-slate-900 tabular-nums truncate">
               {stats?.completedTasks || 0}
-              <span className="text-xs sm:text-sm font-semibold text-slate-400 ml-1">/ {stats?.totalTasks || 0}</span>
+              <span className="text-xs sm:text-sm font-semibold text-slate-500 ml-1">/ {stats?.totalTasks || 0}</span>
             </div>
-            <p className="text-xs text-amber-700 font-extrabold mt-2 truncate">Completed tasks</p>
+            <p className="text-xs text-amber-800 font-extrabold mt-2 truncate">Completed tasks</p>
           </div>
         </div>
       </div>
 
       {/* Main Live Today's Attendance Table Card */}
-      <div className="card-saas p-5 space-y-4 border border-slate-200/80">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-slate-100">
+      <div className="card-saas p-5 space-y-4 border-2 border-slate-300 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b-2 border-slate-200">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 bg-indigo-50 text-indigo-700 rounded-xl border border-indigo-200/60">
+            <div className="p-2 bg-indigo-50 text-indigo-700 rounded-xl border-2 border-indigo-200">
               <UserCheck className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-slate-900 tracking-tight">Today's Attendance Status</h2>
-              <p className="text-xs text-slate-500 mt-0.5">{todayFormatted} — Real-time employee check-ins</p>
+              <h2 className="text-base font-extrabold text-slate-900 tracking-tight">Today's Attendance Status</h2>
+              <p className="text-xs text-slate-500 font-medium mt-0.5">{todayFormatted} — Real-time employee check-ins</p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="flex bg-slate-100 p-1 rounded-xl text-xs font-semibold">
+            <div className="flex bg-slate-100 p-1 rounded-xl text-xs font-semibold border border-slate-200">
               <button
                 onClick={() => setAttendanceFilter('All')}
-                className={`px-3 py-1.5 rounded-lg transition-all ${attendanceFilter === 'All' ? 'bg-white text-slate-900 shadow-2xs font-bold' : 'text-slate-600 hover:text-slate-900'}`}
+                className={`px-3 py-1.5 rounded-lg transition-all ${attendanceFilter === 'All' ? 'bg-white text-slate-900 shadow-sm font-bold border border-slate-200' : 'text-slate-600 hover:text-slate-900'}`}
               >
                 All ({attendanceRecords.length})
               </button>
               <button
                 onClick={() => setAttendanceFilter('Present')}
-                className={`px-3 py-1.5 rounded-lg transition-all ${attendanceFilter === 'Present' ? 'bg-white text-slate-900 shadow-2xs font-bold' : 'text-slate-600 hover:text-slate-900'}`}
+                className={`px-3 py-1.5 rounded-lg transition-all ${attendanceFilter === 'Present' ? 'bg-white text-slate-900 shadow-sm font-bold border border-slate-200' : 'text-slate-600 hover:text-slate-900'}`}
               >
                 Working ({attendanceSummary?.workingCount || 0})
               </button>
               <button
                 onClick={() => setAttendanceFilter('Checked Out')}
-                className={`px-3 py-1.5 rounded-lg transition-all ${attendanceFilter === 'Checked Out' ? 'bg-white text-slate-900 shadow-2xs font-bold' : 'text-slate-600 hover:text-slate-900'}`}
+                className={`px-3 py-1.5 rounded-lg transition-all ${attendanceFilter === 'Checked Out' ? 'bg-white text-slate-900 shadow-sm font-bold border border-slate-200' : 'text-slate-600 hover:text-slate-900'}`}
               >
                 Checked Out ({attendanceSummary?.checkedOutCount || 0})
               </button>
@@ -213,7 +213,7 @@ const AdminDashboard = () => {
 
             <Link
               to="/admin/attendance"
-              className="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 pl-2 border-l border-slate-200"
+              className="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 pl-2 border-l-2 border-slate-300"
             >
               Full Log <ArrowRight className="w-3.5 h-3.5" />
             </Link>
@@ -222,26 +222,26 @@ const AdminDashboard = () => {
 
         {/* Live Attendance Table */}
         {filteredAttendance.length === 0 ? (
-          <div className="text-center py-12 space-y-2 bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
+          <div className="text-center py-12 space-y-2 bg-slate-50/50 rounded-2xl border-2 border-dashed border-slate-300">
             <UserCheck className="w-10 h-10 text-slate-300 mx-auto" />
             <h3 className="text-sm font-bold text-slate-700">No attendance check-ins recorded for today yet</h3>
             <p className="text-xs text-slate-500">Employees will appear here automatically when they check in with Jio Tag photo verification.</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto rounded-xl border-2 border-slate-200">
             <table className="w-full text-left border-collapse text-sm">
               <thead>
-                <tr className="border-b border-slate-200/80 bg-slate-50/80 text-xs font-bold uppercase text-slate-500 tracking-wider">
-                  <th className="p-3.5 pl-4">Employee</th>
-                  <th className="p-3.5">Department</th>
-                  <th className="p-3.5">Check In</th>
-                  <th className="p-3.5">Location (Jio Tag Address)</th>
-                  <th className="p-3.5">Check Out</th>
-                  <th className="p-3.5">Working Hours</th>
+                <tr className="border-b-2 border-slate-300 bg-slate-100/90 text-xs font-extrabold uppercase text-slate-600 tracking-wider">
+                  <th className="p-3.5 pl-4 border-r border-slate-200">Employee</th>
+                  <th className="p-3.5 border-r border-slate-200">Department</th>
+                  <th className="p-3.5 border-r border-slate-200">Check In</th>
+                  <th className="p-3.5 border-r border-slate-200">Location (Jio Tag Address)</th>
+                  <th className="p-3.5 border-r border-slate-200">Check Out</th>
+                  <th className="p-3.5 border-r border-slate-200">Working Hours</th>
                   <th className="p-3.5 pr-4 text-right">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y-2 divide-slate-200 bg-white">
                 {filteredAttendance.map((record) => {
                   const empName = record.employee?.name || 'Employee';
                   const empId = record.employeeId || 'EMP';
