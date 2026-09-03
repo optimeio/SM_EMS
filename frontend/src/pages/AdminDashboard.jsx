@@ -235,6 +235,7 @@ const AdminDashboard = () => {
                   <th className="p-3.5 pl-4">Employee</th>
                   <th className="p-3.5">Department</th>
                   <th className="p-3.5">Check In</th>
+                  <th className="p-3.5">Location (Jio Tag Address)</th>
                   <th className="p-3.5">Check Out</th>
                   <th className="p-3.5">Working Hours</th>
                   <th className="p-3.5 pr-4 text-right">Status</th>
@@ -269,12 +270,18 @@ const AdminDashboard = () => {
                         </span>
                       </td>
 
-                      <td className="p-3.5 font-medium text-slate-700 text-xs tabular-nums">
-                        <span className="text-emerald-700 font-bold">{checkInTime}</span>
-                        {record.location?.address && (
-                          <span className="text-slate-400 text-[11px] block truncate max-w-[140px]" title={record.location.address}>
-                            📍 {record.location.address}
-                          </span>
+                      <td className="p-3.5 font-bold text-emerald-700 text-xs tabular-nums">
+                        {checkInTime}
+                      </td>
+
+                      <td className="p-3.5">
+                        {record.location?.address ? (
+                          <div className="flex items-start gap-1.5 max-w-xs text-xs text-slate-700 font-medium leading-relaxed bg-slate-50 p-2 rounded-xl border border-slate-200/80">
+                            <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0 mt-0.5" />
+                            <span>{record.location.address}</span>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-slate-400 font-normal italic">Location not tagged</span>
                         )}
                       </td>
 
