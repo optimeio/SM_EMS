@@ -28,7 +28,7 @@ const AdminDashboard = () => {
   const [attendanceSummary, setAttendanceSummary] = useState(null);
   const [attendanceRecords, setAttendanceRecords] = useState([]);
   const [attendanceFilter, setAttendanceFilter] = useState('All');
-  const [cardStyle, setCardStyle] = useState('style1');
+  const [cardStyle, setCardStyle] = useState('varA');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -108,283 +108,283 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* Card Design Switcher Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 bg-slate-100/90 rounded-2xl border-2 border-slate-300 shadow-xs">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold text-xs">
+      {/* Card Design Selector Controls — 4 Solid Color Block Variations */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-slate-100/90 rounded-2xl border-2 border-slate-300 shadow-xs">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-xl bg-slate-900 text-white flex items-center justify-center font-black text-xs shadow-xs">
             🎨
           </div>
           <div>
-            <span className="text-xs font-extrabold text-slate-900 uppercase tracking-wider block leading-tight">Card Design Options</span>
-            <span className="text-[11px] text-slate-500 font-medium">Click an option below to test live card styles</span>
+            <span className="text-xs font-black text-slate-900 uppercase tracking-wider block leading-tight">Solid Color Block Card Variations</span>
+            <span className="text-[11px] text-slate-600 font-bold">Select a variation below to choose your favorite solid color block theme</span>
           </div>
         </div>
 
         <div className="flex flex-wrap bg-white p-1 rounded-xl border-2 border-slate-300 text-xs font-bold shadow-2xs">
           <button
-            onClick={() => setCardStyle('style1')}
-            className={`px-3 py-1.5 rounded-lg transition-all ${cardStyle === 'style1' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
+            onClick={() => setCardStyle('var1')}
+            className={`px-3 py-1.5 rounded-lg transition-all ${cardStyle === 'var1' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
           >
-            Option 1: Modern Progress (Light Gradient)
+            Var 1: Deep Jewel Solid Blocks (Screenshot Style)
           </button>
           <button
-            onClick={() => setCardStyle('style2')}
-            className={`px-3 py-1.5 rounded-lg transition-all ${cardStyle === 'style2' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
+            onClick={() => setCardStyle('var2')}
+            className={`px-3 py-1.5 rounded-lg transition-all ${cardStyle === 'var2' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
           >
-            Option 2: Executive Glass Pill (Clean White)
+            Var 2: Vibrant Electric Gradient Fills
           </button>
           <button
-            onClick={() => setCardStyle('style3')}
-            className={`px-3 py-1.5 rounded-lg transition-all ${cardStyle === 'style3' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
+            onClick={() => setCardStyle('var3')}
+            className={`px-3 py-1.5 rounded-lg transition-all ${cardStyle === 'var3' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
           >
-            Option 3: Vibrant Soft Dual-Tone (Rich Light Pastel)
+            Var 3: Medium Vibrant Solid Blocks
+          </button>
+          <button
+            onClick={() => setCardStyle('var4')}
+            className={`px-3 py-1.5 rounded-lg transition-all ${cardStyle === 'var4' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
+          >
+            Var 4: Executive Dark Charcoal Fills + Glowing Icons
           </button>
         </div>
       </div>
 
       {/* Top Row: Attendance & Workforce KPI Summary Cards */}
-      {cardStyle === 'style1' && (
-        /* STYLE 1: Modern Left-Accent Bar Cards with Progress Trackers (Linear / Stripe style) */
+      {cardStyle === 'var1' && (
+        /* VARIATION 1: Deep Jewel Solid Blocks (The exact style in screenshot!) */
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Present Today */}
-          <div className="bg-gradient-to-br from-white via-emerald-50/40 to-emerald-100/30 rounded-2xl p-5 border-2 border-emerald-300/90 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
-            <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-emerald-500 rounded-l-full"></div>
-            <div className="pl-2 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-extrabold text-emerald-900 uppercase tracking-wider">Present Today</span>
-                <div className="p-2.5 bg-emerald-500 text-white rounded-xl shadow-xs group-hover:scale-105 transition-transform">
-                  <UserCheck className="w-4.5 h-4.5" />
-                </div>
-              </div>
-              <div>
-                <div className="text-3xl font-black text-slate-900 tabular-nums">
-                  {attendanceSummary?.presentCount || 0}
-                  <span className="text-sm font-semibold text-slate-400 ml-1">/ {attendanceSummary?.totalEmployees || stats?.activeEmployees || 0}</span>
-                </div>
-                <div className="flex items-center justify-between mt-2 text-xs text-emerald-800 font-extrabold">
-                  <span className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-                    Live Checked In
-                  </span>
-                  <span>{presentPercent}%</span>
-                </div>
-                <div className="w-full bg-emerald-200/60 rounded-full h-2 mt-1.5 overflow-hidden">
-                  <div className="bg-emerald-500 h-full rounded-full transition-all duration-500" style={{ width: `${Math.max(presentPercent, 5)}%` }}></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Currently Working */}
-          <div className="bg-gradient-to-br from-white via-sky-50/40 to-sky-100/30 rounded-2xl p-5 border-2 border-sky-300/90 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
-            <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-sky-500 rounded-l-full"></div>
-            <div className="pl-2 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-extrabold text-sky-900 uppercase tracking-wider">Currently Working</span>
-                <div className="p-2.5 bg-sky-500 text-white rounded-xl shadow-xs group-hover:scale-105 transition-transform">
-                  <Clock className="w-4.5 h-4.5" />
-                </div>
-              </div>
-              <div>
-                <div className="text-3xl font-black text-slate-900 tabular-nums">
-                  {attendanceSummary?.workingCount || 0}
-                </div>
-                <div className="flex items-center justify-between mt-2 text-xs text-sky-800 font-extrabold">
-                  <span>Active on Duty</span>
-                  <span>{workingPercent}%</span>
-                </div>
-                <div className="w-full bg-sky-200/60 rounded-full h-2 mt-1.5 overflow-hidden">
-                  <div className="bg-sky-500 h-full rounded-full transition-all duration-500" style={{ width: `${Math.max(workingPercent, 5)}%` }}></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Checked Out */}
-          <div className="bg-gradient-to-br from-white via-purple-50/40 to-purple-100/30 rounded-2xl p-5 border-2 border-purple-300/90 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
-            <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-purple-500 rounded-l-full"></div>
-            <div className="pl-2 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-extrabold text-purple-900 uppercase tracking-wider">Checked Out</span>
-                <div className="p-2.5 bg-purple-500 text-white rounded-xl shadow-xs group-hover:scale-105 transition-transform">
-                  <CheckCircle2 className="w-4.5 h-4.5" />
-                </div>
-              </div>
-              <div>
-                <div className="text-3xl font-black text-slate-900 tabular-nums">
-                  {attendanceSummary?.checkedOutCount || 0}
-                </div>
-                <div className="flex items-center justify-between mt-2 text-xs text-purple-800 font-extrabold">
-                  <span>Shift Completed</span>
-                  <span>{checkedOutPercent}%</span>
-                </div>
-                <div className="w-full bg-purple-200/60 rounded-full h-2 mt-1.5 overflow-hidden">
-                  <div className="bg-purple-500 h-full rounded-full transition-all duration-500" style={{ width: `${Math.max(checkedOutPercent, 5)}%` }}></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Tasks Done */}
-          <div className="bg-gradient-to-br from-white via-amber-50/40 to-amber-100/30 rounded-2xl p-5 border-2 border-amber-300/90 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
-            <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-amber-500 rounded-l-full"></div>
-            <div className="pl-2 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-extrabold text-amber-900 uppercase tracking-wider">Tasks Done</span>
-                <div className="p-2.5 bg-amber-500 text-white rounded-xl shadow-xs group-hover:scale-105 transition-transform">
-                  <CheckSquare className="w-4.5 h-4.5" />
-                </div>
-              </div>
-              <div>
-                <div className="text-3xl font-black text-slate-900 tabular-nums">
-                  {stats?.completedTasks || 0}
-                  <span className="text-sm font-semibold text-slate-400 ml-1">/ {stats?.totalTasks || 0}</span>
-                </div>
-                <div className="flex items-center justify-between mt-2 text-xs text-amber-800 font-extrabold">
-                  <span>Completed Tasks</span>
-                  <span>{taskPercent}%</span>
-                </div>
-                <div className="w-full bg-amber-200/60 rounded-full h-2 mt-1.5 overflow-hidden">
-                  <div className="bg-amber-500 h-full rounded-full transition-all duration-500" style={{ width: `${Math.max(taskPercent, 5)}%` }}></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {cardStyle === 'style2' && (
-        /* STYLE 2: Executive Modern Glassmorphic Cards with Pill Badges (Apple / Vercel style) */
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white rounded-2xl p-5 border-2 border-slate-300 shadow-sm space-y-4 hover:-translate-y-1 transition-all">
+          <div className="bg-[#064E3B] text-white rounded-2xl p-5 border-2 border-emerald-800 shadow-md space-y-3 hover:-translate-y-1 hover:shadow-lg transition-all group">
             <div className="flex items-center justify-between">
-              <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-900 border border-emerald-300">
-                Present Today
-              </span>
-              <div className="w-9 h-9 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-200">
-                <UserCheck className="w-5 h-5" />
-              </div>
-            </div>
-            <div>
-              <span className="text-3xl font-black text-slate-900 tabular-nums">{attendanceSummary?.presentCount || 0}</span>
-              <span className="text-sm font-semibold text-slate-400 ml-1">/ {attendanceSummary?.totalEmployees || stats?.activeEmployees || 0}</span>
-              <p className="text-xs text-emerald-700 font-bold mt-1">↑ {presentPercent}% checked in today</p>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl p-5 border-2 border-slate-300 shadow-sm space-y-4 hover:-translate-y-1 transition-all">
-            <div className="flex items-center justify-between">
-              <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-sky-100 text-sky-900 border border-sky-300">
-                Currently Working
-              </span>
-              <div className="w-9 h-9 rounded-full bg-sky-50 text-sky-700 flex items-center justify-center border border-sky-200">
-                <Clock className="w-5 h-5" />
-              </div>
-            </div>
-            <div>
-              <span className="text-3xl font-black text-slate-900 tabular-nums">{attendanceSummary?.workingCount || 0}</span>
-              <p className="text-xs text-sky-700 font-bold mt-1">Active on duty shift</p>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl p-5 border-2 border-slate-300 shadow-sm space-y-4 hover:-translate-y-1 transition-all">
-            <div className="flex items-center justify-between">
-              <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-purple-100 text-purple-900 border border-purple-300">
-                Checked Out
-              </span>
-              <div className="w-9 h-9 rounded-full bg-purple-50 text-purple-700 flex items-center justify-center border border-purple-200">
-                <CheckCircle2 className="w-5 h-5" />
-              </div>
-            </div>
-            <div>
-              <span className="text-3xl font-black text-slate-900 tabular-nums">{attendanceSummary?.checkedOutCount || 0}</span>
-              <p className="text-xs text-purple-700 font-bold mt-1">Completed today's shift</p>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl p-5 border-2 border-slate-300 shadow-sm space-y-4 hover:-translate-y-1 transition-all">
-            <div className="flex items-center justify-between">
-              <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-amber-100 text-amber-900 border border-amber-300">
-                Tasks Done
-              </span>
-              <div className="w-9 h-9 rounded-full bg-amber-50 text-amber-700 flex items-center justify-center border border-amber-200">
-                <CheckSquare className="w-5 h-5" />
-              </div>
-            </div>
-            <div>
-              <span className="text-3xl font-black text-slate-900 tabular-nums">{stats?.completedTasks || 0}</span>
-              <span className="text-sm font-semibold text-slate-400 ml-1">/ {stats?.totalTasks || 0}</span>
-              <p className="text-xs text-amber-700 font-bold mt-1">Total completed tasks</p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {cardStyle === 'style3' && (
-        /* STYLE 3: Vibrant Soft Dual-Tone Light Pastel Cards (Rich Premium Light Theme) */
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Present Today */}
-          <div className="bg-gradient-to-br from-emerald-100/90 via-emerald-50 to-teal-100/80 rounded-2xl p-5 border-2 border-emerald-300 shadow-sm space-y-3 hover:-translate-y-1 hover:shadow-md transition-all group">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-black text-emerald-950 uppercase tracking-wider">Present Today</span>
-              <div className="p-2.5 bg-emerald-600 text-white rounded-xl shadow-xs group-hover:scale-105 transition-transform">
+              <span className="text-xs font-black text-emerald-200 uppercase tracking-wider">Present Today</span>
+              <div className="p-2.5 bg-emerald-800/80 text-emerald-300 rounded-xl border border-emerald-600/50 group-hover:scale-105 transition-transform">
                 <UserCheck className="w-4.5 h-4.5" />
               </div>
             </div>
             <div>
-              <div className="text-3xl font-black text-slate-950 tabular-nums">
+              <div className="text-3xl font-black text-white tabular-nums">
                 {attendanceSummary?.presentCount || 0}
-                <span className="text-sm font-bold text-emerald-800 ml-1">/ {attendanceSummary?.totalEmployees || stats?.activeEmployees || 0}</span>
+                <span className="text-sm font-bold text-emerald-300 ml-1">/ {attendanceSummary?.totalEmployees || stats?.activeEmployees || 0}</span>
               </div>
-              <div className="flex items-center gap-1.5 mt-2 text-xs text-emerald-900 font-black">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-ping"></span>
-                <span>{presentPercent}% Checked In Today</span>
-              </div>
+              <p className="text-xs text-emerald-200 font-extrabold mt-2 flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                Checked In today
+              </p>
             </div>
           </div>
 
           {/* Currently Working */}
-          <div className="bg-gradient-to-br from-sky-100/90 via-sky-50 to-blue-100/80 rounded-2xl p-5 border-2 border-sky-300 shadow-sm space-y-3 hover:-translate-y-1 hover:shadow-md transition-all group">
+          <div className="bg-[#0C4A6E] text-white rounded-2xl p-5 border-2 border-sky-800 shadow-md space-y-3 hover:-translate-y-1 hover:shadow-lg transition-all group">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-black text-sky-950 uppercase tracking-wider">Currently Working</span>
-              <div className="p-2.5 bg-sky-600 text-white rounded-xl shadow-xs group-hover:scale-105 transition-transform">
+              <span className="text-xs font-black text-sky-200 uppercase tracking-wider">Currently Working</span>
+              <div className="p-2.5 bg-sky-800/80 text-sky-300 rounded-xl border border-sky-600/50 group-hover:scale-105 transition-transform">
                 <Clock className="w-4.5 h-4.5" />
               </div>
             </div>
             <div>
-              <div className="text-3xl font-black text-slate-950 tabular-nums">{attendanceSummary?.workingCount || 0}</div>
-              <p className="text-xs text-sky-900 font-black mt-2">Active on Duty Shift</p>
+              <div className="text-3xl font-black text-white tabular-nums">{attendanceSummary?.workingCount || 0}</div>
+              <p className="text-xs text-sky-200 font-extrabold mt-2">Active on duty shift</p>
             </div>
           </div>
 
           {/* Checked Out */}
-          <div className="bg-gradient-to-br from-purple-100/90 via-purple-50 to-indigo-100/80 rounded-2xl p-5 border-2 border-purple-300 shadow-sm space-y-3 hover:-translate-y-1 hover:shadow-md transition-all group">
+          <div className="bg-[#4C1D95] text-white rounded-2xl p-5 border-2 border-purple-800 shadow-md space-y-3 hover:-translate-y-1 hover:shadow-lg transition-all group">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-black text-purple-950 uppercase tracking-wider">Checked Out</span>
-              <div className="p-2.5 bg-purple-600 text-white rounded-xl shadow-xs group-hover:scale-105 transition-transform">
+              <span className="text-xs font-black text-purple-200 uppercase tracking-wider">Checked Out</span>
+              <div className="p-2.5 bg-purple-800/80 text-purple-300 rounded-xl border border-purple-600/50 group-hover:scale-105 transition-transform">
                 <CheckCircle2 className="w-4.5 h-4.5" />
               </div>
             </div>
             <div>
-              <div className="text-3xl font-black text-slate-950 tabular-nums">{attendanceSummary?.checkedOutCount || 0}</div>
-              <p className="text-xs text-purple-900 font-black mt-2">Shift Completed Today</p>
+              <div className="text-3xl font-black text-white tabular-nums">{attendanceSummary?.checkedOutCount || 0}</div>
+              <p className="text-xs text-purple-200 font-extrabold mt-2">Shift completed</p>
             </div>
           </div>
 
           {/* Tasks Done */}
-          <div className="bg-gradient-to-br from-amber-100/90 via-amber-50 to-orange-100/80 rounded-2xl p-5 border-2 border-amber-300 shadow-sm space-y-3 hover:-translate-y-1 hover:shadow-md transition-all group">
+          <div className="bg-[#0F172A] text-white rounded-2xl p-5 border-2 border-slate-700 shadow-md space-y-3 hover:-translate-y-1 hover:shadow-lg transition-all group">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-black text-amber-950 uppercase tracking-wider">Tasks Done</span>
-              <div className="p-2.5 bg-amber-600 text-white rounded-xl shadow-xs group-hover:scale-105 transition-transform">
+              <span className="text-xs font-black text-slate-300 uppercase tracking-wider">Tasks Done</span>
+              <div className="p-2.5 bg-slate-800 text-amber-400 rounded-xl border border-slate-600 group-hover:scale-105 transition-transform">
                 <CheckSquare className="w-4.5 h-4.5" />
               </div>
             </div>
             <div>
-              <div className="text-3xl font-black text-slate-950 tabular-nums">
+              <div className="text-3xl font-black text-white tabular-nums">
                 {stats?.completedTasks || 0}
-                <span className="text-sm font-bold text-amber-800 ml-1">/ {stats?.totalTasks || 0}</span>
+                <span className="text-sm font-semibold text-slate-400 ml-1">/ {stats?.totalTasks || 0}</span>
               </div>
-              <p className="text-xs text-amber-900 font-black mt-2">Total Tasks Completed</p>
+              <p className="text-xs text-amber-400 font-extrabold mt-2">Completed tasks</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {cardStyle === 'var2' && (
+        /* VARIATION 2: Vibrant Electric Gradient Fills */
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-900 text-white rounded-2xl p-5 border-2 border-emerald-400/60 shadow-lg space-y-3 hover:-translate-y-1 transition-all group">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-black text-emerald-100 uppercase tracking-wider">Present Today</span>
+              <div className="p-2.5 bg-white/20 text-white backdrop-blur-md rounded-xl border border-white/30 group-hover:scale-105 transition-transform">
+                <UserCheck className="w-4.5 h-4.5" />
+              </div>
+            </div>
+            <div>
+              <div className="text-3xl font-black text-white tabular-nums">{attendanceSummary?.presentCount || 0} <span className="text-sm font-semibold text-emerald-200">/ {attendanceSummary?.totalEmployees || stats?.activeEmployees || 0}</span></div>
+              <p className="text-xs text-emerald-100 font-black mt-2">⚡ {presentPercent}% Checked In</p>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-br from-sky-600 via-sky-700 to-indigo-900 text-white rounded-2xl p-5 border-2 border-sky-400/60 shadow-lg space-y-3 hover:-translate-y-1 transition-all group">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-black text-sky-100 uppercase tracking-wider">Currently Working</span>
+              <div className="p-2.5 bg-white/20 text-white backdrop-blur-md rounded-xl border border-white/30 group-hover:scale-105 transition-transform">
+                <Clock className="w-4.5 h-4.5" />
+              </div>
+            </div>
+            <div>
+              <div className="text-3xl font-black text-white tabular-nums">{attendanceSummary?.workingCount || 0}</div>
+              <p className="text-xs text-sky-100 font-black mt-2">⚡ Active on Duty Shift</p>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-br from-purple-600 via-purple-700 to-pink-900 text-white rounded-2xl p-5 border-2 border-purple-400/60 shadow-lg space-y-3 hover:-translate-y-1 transition-all group">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-black text-purple-100 uppercase tracking-wider">Checked Out</span>
+              <div className="p-2.5 bg-white/20 text-white backdrop-blur-md rounded-xl border border-white/30 group-hover:scale-105 transition-transform">
+                <CheckCircle2 className="w-4.5 h-4.5" />
+              </div>
+            </div>
+            <div>
+              <div className="text-3xl font-black text-white tabular-nums">{attendanceSummary?.checkedOutCount || 0}</div>
+              <p className="text-xs text-purple-100 font-black mt-2">⚡ Shift Completed</p>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-br from-amber-500 via-amber-600 to-orange-900 text-white rounded-2xl p-5 border-2 border-amber-400/60 shadow-lg space-y-3 hover:-translate-y-1 transition-all group">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-black text-amber-100 uppercase tracking-wider">Tasks Done</span>
+              <div className="p-2.5 bg-white/20 text-white backdrop-blur-md rounded-xl border border-white/30 group-hover:scale-105 transition-transform">
+                <CheckSquare className="w-4.5 h-4.5" />
+              </div>
+            </div>
+            <div>
+              <div className="text-3xl font-black text-white tabular-nums">{stats?.completedTasks || 0} <span className="text-sm font-semibold text-amber-200">/ {stats?.totalTasks || 0}</span></div>
+              <p className="text-xs text-amber-100 font-black mt-2">⚡ Total Tasks Completed</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {cardStyle === 'var3' && (
+        /* VARIATION 3: Medium Vibrant Solid Color Blocks */
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-[#059669] text-white rounded-2xl p-5 border-2 border-emerald-700 shadow-md space-y-3 hover:-translate-y-1 transition-all group">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-black uppercase tracking-wider text-emerald-100">Present Today</span>
+              <div className="p-2.5 bg-emerald-800/90 text-white rounded-xl group-hover:scale-105 transition-transform">
+                <UserCheck className="w-4.5 h-4.5" />
+              </div>
+            </div>
+            <div>
+              <div className="text-3xl font-black text-white tabular-nums">{attendanceSummary?.presentCount || 0} <span className="text-sm font-semibold text-emerald-200">/ {attendanceSummary?.totalEmployees || stats?.activeEmployees || 0}</span></div>
+              <p className="text-xs text-emerald-100 font-extrabold mt-2">Checked in today</p>
+            </div>
+          </div>
+
+          <div className="bg-[#0284C7] text-white rounded-2xl p-5 border-2 border-sky-700 shadow-md space-y-3 hover:-translate-y-1 transition-all group">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-black uppercase tracking-wider text-sky-100">Currently Working</span>
+              <div className="p-2.5 bg-sky-800/90 text-white rounded-xl group-hover:scale-105 transition-transform">
+                <Clock className="w-4.5 h-4.5" />
+              </div>
+            </div>
+            <div>
+              <div className="text-3xl font-black text-white tabular-nums">{attendanceSummary?.workingCount || 0}</div>
+              <p className="text-xs text-sky-100 font-extrabold mt-2">Active on duty shift</p>
+            </div>
+          </div>
+
+          <div className="bg-[#7C3AED] text-white rounded-2xl p-5 border-2 border-purple-700 shadow-md space-y-3 hover:-translate-y-1 transition-all group">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-black uppercase tracking-wider text-purple-100">Checked Out</span>
+              <div className="p-2.5 bg-purple-800/90 text-white rounded-xl group-hover:scale-105 transition-transform">
+                <CheckCircle2 className="w-4.5 h-4.5" />
+              </div>
+            </div>
+            <div>
+              <div className="text-3xl font-black text-white tabular-nums">{attendanceSummary?.checkedOutCount || 0}</div>
+              <p className="text-xs text-purple-100 font-extrabold mt-2">Shift completed</p>
+            </div>
+          </div>
+
+          <div className="bg-[#D97706] text-white rounded-2xl p-5 border-2 border-amber-700 shadow-md space-y-3 hover:-translate-y-1 transition-all group">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-black uppercase tracking-wider text-amber-100">Tasks Done</span>
+              <div className="p-2.5 bg-amber-800/90 text-white rounded-xl group-hover:scale-105 transition-transform">
+                <CheckSquare className="w-4.5 h-4.5" />
+              </div>
+            </div>
+            <div>
+              <div className="text-3xl font-black text-white tabular-nums">{stats?.completedTasks || 0} <span className="text-sm font-semibold text-amber-200">/ {stats?.totalTasks || 0}</span></div>
+              <p className="text-xs text-amber-100 font-extrabold mt-2">Completed tasks</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {cardStyle === 'var4' && (
+        /* VARIATION 4: Dark Charcoal Fills + Neon Glowing Accent Rings */
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-slate-900 text-white rounded-2xl p-5 border-2 border-emerald-500/80 shadow-[0_0_15px_rgba(16,185,129,0.15)] space-y-3 hover:-translate-y-1 transition-all group">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-black text-emerald-400 uppercase tracking-wider">Present Today</span>
+              <div className="p-2.5 bg-emerald-950 text-emerald-400 rounded-xl border border-emerald-500/50 group-hover:scale-105 transition-transform">
+                <UserCheck className="w-4.5 h-4.5" />
+              </div>
+            </div>
+            <div>
+              <div className="text-3xl font-black text-white tabular-nums">{attendanceSummary?.presentCount || 0} <span className="text-sm font-semibold text-slate-400">/ {attendanceSummary?.totalEmployees || stats?.activeEmployees || 0}</span></div>
+              <p className="text-xs text-emerald-400 font-extrabold mt-2">Live Checked In</p>
+            </div>
+          </div>
+
+          <div className="bg-slate-900 text-white rounded-2xl p-5 border-2 border-sky-500/80 shadow-[0_0_15px_rgba(14,165,233,0.15)] space-y-3 hover:-translate-y-1 transition-all group">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-black text-sky-400 uppercase tracking-wider">Currently Working</span>
+              <div className="p-2.5 bg-sky-950 text-sky-400 rounded-xl border border-sky-500/50 group-hover:scale-105 transition-transform">
+                <Clock className="w-4.5 h-4.5" />
+              </div>
+            </div>
+            <div>
+              <div className="text-3xl font-black text-white tabular-nums">{attendanceSummary?.workingCount || 0}</div>
+              <p className="text-xs text-sky-400 font-extrabold mt-2">Active on Duty</p>
+            </div>
+          </div>
+
+          <div className="bg-slate-900 text-white rounded-2xl p-5 border-2 border-purple-500/80 shadow-[0_0_15px_rgba(168,85,247,0.15)] space-y-3 hover:-translate-y-1 transition-all group">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-black text-purple-400 uppercase tracking-wider">Checked Out</span>
+              <div className="p-2.5 bg-purple-950 text-purple-400 rounded-xl border border-purple-500/50 group-hover:scale-105 transition-transform">
+                <CheckCircle2 className="w-4.5 h-4.5" />
+              </div>
+            </div>
+            <div>
+              <div className="text-3xl font-black text-white tabular-nums">{attendanceSummary?.checkedOutCount || 0}</div>
+              <p className="text-xs text-purple-400 font-extrabold mt-2">Shift Completed</p>
+            </div>
+          </div>
+
+          <div className="bg-slate-900 text-white rounded-2xl p-5 border-2 border-amber-500/80 shadow-[0_0_15px_rgba(245,158,11,0.15)] space-y-3 hover:-translate-y-1 transition-all group">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-black text-amber-400 uppercase tracking-wider">Tasks Done</span>
+              <div className="p-2.5 bg-amber-950 text-amber-400 rounded-xl border border-amber-500/50 group-hover:scale-105 transition-transform">
+                <CheckSquare className="w-4.5 h-4.5" />
+              </div>
+            </div>
+            <div>
+              <div className="text-3xl font-black text-white tabular-nums">{stats?.completedTasks || 0} <span className="text-sm font-semibold text-slate-400">/ {stats?.totalTasks || 0}</span></div>
+              <p className="text-xs text-amber-400 font-extrabold mt-2">Completed Tasks</p>
             </div>
           </div>
         </div>
