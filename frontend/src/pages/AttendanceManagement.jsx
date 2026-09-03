@@ -304,12 +304,12 @@ const AttendanceManagement = () => {
                               href={r.location?.lat ? `https://www.google.com/maps?q=${r.location.lat},${r.location.lng}` : '#'}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-800 text-xs font-medium border border-slate-200/80 hover:border-slate-300 transition-all shadow-2xs group cursor-pointer max-w-full truncate"
-                              title={`Full Address: ${r.location.address}\nClick to view on Google Maps`}
+                              className="flex items-start gap-1.5 p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-medium leading-relaxed border border-slate-200/80 hover:border-slate-300 transition-all shadow-2xs group cursor-pointer"
+                              title="Click to open exact location in Google Maps"
                             >
-                              <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0 group-hover:scale-110 transition-transform" />
-                              <span className="truncate text-slate-700 font-medium">{r.location.address}</span>
-                              <ExternalLink className="w-3 h-3 text-slate-400 group-hover:text-slate-700 shrink-0 ml-0.5" />
+                              <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0 mt-0.5" />
+                              <span className="whitespace-normal break-words font-medium text-slate-700 group-hover:text-slate-900">{r.location.address}</span>
+                              <ExternalLink className="w-3 h-3 text-slate-400 group-hover:text-slate-700 shrink-0 ml-auto mt-0.5" />
                             </a>
                           ) : (
                             <span className="text-xs text-slate-400 font-normal italic">Location not tagged</span>
