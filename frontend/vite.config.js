@@ -5,4 +5,24 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   base: '/',
   plugins: [react()],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('lucide-react')) {
+              return 'vendor-icons';
+            }
+            if (id.includes('qrcode')) {
+              return 'vendor-qrcode';
+            }
+            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router-dom')) {
+              return 'vendor-react';
+            }
+            return 'vendor-misc';
+          }
+        }
+      }
+    }
+  }
 })

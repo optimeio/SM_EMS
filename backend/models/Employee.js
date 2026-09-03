@@ -76,6 +76,9 @@ const employeeSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
+employeeSchema.index({ status: 1 });
+employeeSchema.index({ department: 1 });
+
 // Hash password before saving
 employeeSchema.pre('save', async function () {
   if (!this.isModified('password')) {
