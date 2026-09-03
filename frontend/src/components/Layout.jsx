@@ -67,8 +67,8 @@ const Layout = ({ children }) => {
           {/* Header Branding */}
           <div className={`flex items-center ${isCollapsed ? 'flex-col gap-2 justify-center' : 'justify-between'} pb-4 mb-4 border-b border-slate-100`}>
             <div className="flex items-center gap-3 overflow-hidden">
-              <div className="w-13 h-13 rounded-2xl bg-white border border-slate-200 p-1 flex items-center justify-center shrink-0 shadow-sm hover:shadow-md transition-all">
-                <img src={logoImg} alt="THE SM GROUPS" className="w-full h-full object-contain" />
+              <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 p-1 flex items-center justify-center shrink-0 shadow-sm hover:shadow-md transition-all">
+                <img src={logoImg} alt="THE SM GROUPS" className="w-10 h-10 object-contain" />
               </div>
               {!isCollapsed && (
                 <div className="truncate">
@@ -198,7 +198,7 @@ const Layout = ({ children }) => {
       <header className="md:hidden bg-white border-b border-slate-200/80 px-4 py-3 sticky top-0 z-40 flex items-center justify-between shadow-xs">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 bg-white border border-slate-200 rounded-2xl p-1 shadow-sm flex items-center justify-center shrink-0">
-            <img src={logoImg} alt="THE SM GROUPS" className="w-full h-full object-contain" />
+            <img src={logoImg} alt="THE SM GROUPS" className="w-10 h-10 object-contain" />
           </div>
           <div>
             <span className="font-extrabold text-base text-slate-900 tracking-tight block leading-none">THE SM GROUPS</span>
