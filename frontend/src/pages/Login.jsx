@@ -53,7 +53,7 @@ const Login = () => {
           {/* Brand Header Inside Login Card */}
           <div className="text-center space-y-3">
             <div className="w-28 h-28 bg-white p-3 rounded-3xl border-2 border-slate-200/90 shadow-md inline-flex items-center justify-center">
-              <img src="./sm_groups_logo.png" alt="THE SM GROUPS" className="w-full h-full object-contain" />
+              <img src="/sm_groups_logo.png" alt="THE SM GROUPS" className="w-full h-full object-contain" />
             </div>
 
             <div className="space-y-1">

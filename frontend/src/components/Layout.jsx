@@ -67,7 +67,7 @@ const Layout = ({ children }) => {
           <div className={`flex items-center ${isCollapsed ? 'flex-col gap-2 justify-center' : 'justify-between'} pb-4 mb-4 border-b border-slate-100`}>
             <div className="flex items-center gap-3 overflow-hidden">
               <div className="w-10 h-10 rounded-xl bg-white border border-slate-300 p-1.5 flex items-center justify-center shrink-0 shadow-2xs">
-                <img src="./sm_groups_logo.png" alt="THE SM GROUPS" className="w-full h-full object-contain" />
+                <img src="/sm_groups_logo.png" alt="THE SM GROUPS" className="w-full h-full object-contain" />
               </div>
               {!isCollapsed && (
                 <div className="truncate">
@@ -197,7 +197,7 @@ const Layout = ({ children }) => {
       <header className="md:hidden bg-white border-b border-slate-200/80 px-4 py-3 sticky top-0 z-40 flex items-center justify-between shadow-2xs">
         <div className="flex items-center gap-2.5">
           <div className="w-10 h-10 bg-white border border-slate-300 rounded-xl p-1.5 shadow-2xs flex items-center justify-center shrink-0">
-            <img src="./sm_groups_logo.png" alt="THE SM GROUPS" className="w-full h-full object-contain" />
+            <img src="/sm_groups_logo.png" alt="THE SM GROUPS" className="w-full h-full object-contain" />
           </div>
           <div>
             <span className="font-extrabold text-base text-slate-900 tracking-tight block leading-none">THE SM GROUPS</span>
@@ -233,7 +233,7 @@ const Layout = ({ children }) => {
           <div className="bg-white px-4 py-3 border-b border-slate-200 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 bg-white border border-slate-200 rounded-lg p-1 flex items-center justify-center shrink-0">
-                <img src="./sm_groups_logo.png" alt="THE SM GROUPS" className="w-full h-full object-contain" />
+                <img src="/sm_groups_logo.png" alt="THE SM GROUPS" className="w-full h-full object-contain" />
               </div>
               <span className="font-extrabold text-base text-slate-900">THE SM GROUPS</span>
             </div>
