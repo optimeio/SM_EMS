@@ -1,0 +1,42 @@
+# Dependency directories
+node_modules/
+jspm_packages/
+web_modules/
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+.nuxt/
+
+# Environment variables
+.env
+backend/.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE configurations
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Agent files
+.gemini/
+.agents/
+scratch/
+
+# Uploads
+backend/uploads/
+
+
