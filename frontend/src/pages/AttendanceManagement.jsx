@@ -114,49 +114,59 @@ const AttendanceManagement = () => {
 
       {/* Summary KPI Cards Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
-        <div className="card-saas p-4 space-y-1.5 hover:border-slate-300 transition-all">
+        <div className="rounded-2xl p-4 sm:p-5 border border-slate-200/90 bg-gradient-to-br from-white to-slate-50/50 space-y-1.5 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group">
           <div className="flex items-center justify-between text-slate-500">
-            <span className="text-[11px] font-bold uppercase tracking-wider">Total Active</span>
-            <Users className="w-4 h-4 text-slate-600" />
+            <span className="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">Total Active</span>
+            <div className="p-2 bg-slate-100 text-slate-700 rounded-xl border border-slate-200/80 group-hover:scale-105 transition-transform">
+              <Users className="w-4 h-4" />
+            </div>
           </div>
-          <p className="text-2xl font-black text-slate-900 tabular-nums">{summary.totalEmployees || 0}</p>
-          <span className="text-xs text-slate-500 font-medium">Active Staff</span>
+          <p className="text-2xl sm:text-3xl font-black text-slate-900 tabular-nums">{summary.totalEmployees || 0}</p>
+          <span className="text-xs text-slate-500 font-semibold">Active Staff</span>
         </div>
 
-        <div className="card-saas p-4 space-y-1.5 border-emerald-200/80 bg-emerald-50/40 hover:border-emerald-300 transition-all">
+        <div className="rounded-2xl p-4 sm:p-5 border border-emerald-200/80 bg-gradient-to-br from-white via-emerald-50/20 to-emerald-100/30 space-y-1.5 hover:-translate-y-1 hover:shadow-lg hover:shadow-emerald-500/5 transition-all duration-300 group">
           <div className="flex items-center justify-between text-emerald-700">
-            <span className="text-[11px] font-bold uppercase tracking-wider">Present</span>
-            <UserCheck className="w-4 h-4 text-emerald-600" />
+            <span className="text-[11px] font-extrabold text-emerald-800 uppercase tracking-wider">Present</span>
+            <div className="p-2 bg-emerald-100/80 text-emerald-700 rounded-xl border border-emerald-200/80 group-hover:scale-105 transition-transform">
+              <UserCheck className="w-4 h-4" />
+            </div>
           </div>
-          <p className="text-2xl font-black text-emerald-800 tabular-nums">{summary.presentCount || 0}</p>
-          <span className="text-xs text-emerald-700 font-bold">Checked In Today</span>
+          <p className="text-2xl sm:text-3xl font-black text-emerald-800 tabular-nums">{summary.presentCount || 0}</p>
+          <span className="text-xs text-emerald-700 font-extrabold">Checked In Today</span>
         </div>
 
-        <div className="card-saas p-4 space-y-1.5 border-rose-200/80 bg-rose-50/40 hover:border-rose-300 transition-all">
+        <div className="rounded-2xl p-4 sm:p-5 border border-rose-200/80 bg-gradient-to-br from-white via-rose-50/20 to-rose-100/30 space-y-1.5 hover:-translate-y-1 hover:shadow-lg hover:shadow-rose-500/5 transition-all duration-300 group">
           <div className="flex items-center justify-between text-rose-700">
-            <span className="text-[11px] font-bold uppercase tracking-wider">Absent</span>
-            <UserX className="w-4 h-4 text-rose-600" />
+            <span className="text-[11px] font-extrabold text-rose-800 uppercase tracking-wider">Absent</span>
+            <div className="p-2 bg-rose-100/80 text-rose-700 rounded-xl border border-rose-200/80 group-hover:scale-105 transition-transform">
+              <UserX className="w-4 h-4" />
+            </div>
           </div>
-          <p className="text-2xl font-black text-rose-800 tabular-nums">{summary.absentCount || 0}</p>
-          <span className="text-xs text-rose-700 font-bold">Not Checked In</span>
+          <p className="text-2xl sm:text-3xl font-black text-rose-800 tabular-nums">{summary.absentCount || 0}</p>
+          <span className="text-xs text-rose-700 font-extrabold">Not Checked In</span>
         </div>
 
-        <div className="card-saas p-4 space-y-1.5 border-amber-200/80 bg-amber-50/40 hover:border-amber-300 transition-all">
+        <div className="rounded-2xl p-4 sm:p-5 border border-amber-200/80 bg-gradient-to-br from-white via-amber-50/20 to-amber-100/30 space-y-1.5 hover:-translate-y-1 hover:shadow-lg hover:shadow-amber-500/5 transition-all duration-300 group">
           <div className="flex items-center justify-between text-amber-700">
-            <span className="text-[11px] font-bold uppercase tracking-wider">On Shift</span>
-            <Clock className="w-4 h-4 text-amber-600" />
+            <span className="text-[11px] font-extrabold text-amber-800 uppercase tracking-wider">On Shift</span>
+            <div className="p-2 bg-amber-100/80 text-amber-700 rounded-xl border border-amber-200/80 group-hover:scale-105 transition-transform">
+              <Clock className="w-4 h-4" />
+            </div>
           </div>
-          <p className="text-2xl font-black text-amber-800 tabular-nums">{summary.workingCount || 0}</p>
-          <span className="text-xs text-amber-700 font-bold">Currently Working</span>
+          <p className="text-2xl sm:text-3xl font-black text-amber-800 tabular-nums">{summary.workingCount || 0}</p>
+          <span className="text-xs text-amber-700 font-extrabold">Currently Working</span>
         </div>
 
-        <div className="card-saas p-4 space-y-1.5 bg-slate-50 border-slate-200 hover:border-slate-300 transition-all">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-[11px] font-bold uppercase tracking-wider">Checked Out</span>
-            <LogOut className="w-4 h-4 text-slate-700" />
+        <div className="rounded-2xl p-4 sm:p-5 border border-purple-200/80 bg-gradient-to-br from-white via-purple-50/20 to-purple-100/30 space-y-1.5 hover:-translate-y-1 hover:shadow-lg hover:shadow-purple-500/5 transition-all duration-300 group">
+          <div className="flex items-center justify-between text-purple-700">
+            <span className="text-[11px] font-extrabold text-purple-800 uppercase tracking-wider">Checked Out</span>
+            <div className="p-2 bg-purple-100/80 text-purple-700 rounded-xl border border-purple-200/80 group-hover:scale-105 transition-transform">
+              <LogOut className="w-4 h-4 text-purple-700" />
+            </div>
           </div>
-          <p className="text-2xl font-black text-slate-900 tabular-nums">{summary.checkedOutCount || 0}</p>
-          <span className="text-xs text-slate-500 font-medium">Shift Completed</span>
+          <p className="text-2xl sm:text-3xl font-black text-purple-900 tabular-nums">{summary.checkedOutCount || 0}</p>
+          <span className="text-xs text-purple-700 font-extrabold">Shift Completed</span>
         </div>
       </div>
 

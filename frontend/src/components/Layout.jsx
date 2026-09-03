@@ -67,13 +67,13 @@ const Layout = ({ children }) => {
           {/* Header Branding */}
           <div className={`flex items-center ${isCollapsed ? 'flex-col gap-2 justify-center' : 'justify-between'} pb-4 mb-4 border-b border-slate-100`}>
             <div className="flex items-center gap-3 overflow-hidden">
-              <div className="w-10 h-10 rounded-xl bg-white border border-slate-300 p-1.5 flex items-center justify-center shrink-0 shadow-2xs">
+              <div className="w-13 h-13 rounded-2xl bg-white border border-slate-200 p-1 flex items-center justify-center shrink-0 shadow-sm hover:shadow-md transition-all">
                 <img src={logoImg} alt="THE SM GROUPS" className="w-full h-full object-contain" />
               </div>
               {!isCollapsed && (
                 <div className="truncate">
-                  <h1 className="font-bold text-slate-900 text-sm tracking-tight leading-none truncate">THE SM GROUPS</h1>
-                  <span className="text-[10px] text-slate-400 font-medium">Enterprise Suite</span>
+                  <h1 className="font-extrabold text-slate-900 text-base tracking-tight leading-none truncate">THE SM GROUPS</h1>
+                  <span className="text-xs text-slate-400 font-semibold mt-0.5 block">Enterprise Suite</span>
                 </div>
               )}
             </div>
@@ -195,14 +195,14 @@ const Layout = ({ children }) => {
       </aside>
 
       {/* Mobile Header Bar */}
-      <header className="md:hidden bg-white border-b border-slate-200/80 px-4 py-3 sticky top-0 z-40 flex items-center justify-between shadow-2xs">
-        <div className="flex items-center gap-2.5">
-          <div className="w-10 h-10 bg-white border border-slate-300 rounded-xl p-1.5 shadow-2xs flex items-center justify-center shrink-0">
+      <header className="md:hidden bg-white border-b border-slate-200/80 px-4 py-3 sticky top-0 z-40 flex items-center justify-between shadow-xs">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 bg-white border border-slate-200 rounded-2xl p-1 shadow-sm flex items-center justify-center shrink-0">
             <img src={logoImg} alt="THE SM GROUPS" className="w-full h-full object-contain" />
           </div>
           <div>
             <span className="font-extrabold text-base text-slate-900 tracking-tight block leading-none">THE SM GROUPS</span>
-            <span className="text-[11px] text-slate-500 font-bold block mt-0.5">Enterprise Portal</span>
+            <span className="text-xs text-slate-500 font-bold block mt-0.5">Enterprise Portal</span>
           </div>
         </div>
 
