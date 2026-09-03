@@ -90,9 +90,9 @@ const TaskManagement = () => {
 
   const [formError, setFormError] = useState(null);
 
-  const fetchInitialData = async () => {
+  const fetchInitialData = async (silent = false) => {
     try {
-      setLoading(true);
+      if (!silent && tasks.length === 0) setLoading(true);
       const [tasksRes, empRes] = await Promise.all([
         API.get('/tasks'),
         API.get('/employees')

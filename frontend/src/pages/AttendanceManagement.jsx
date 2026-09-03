@@ -47,9 +47,9 @@ const AttendanceManagement = () => {
 
   const departments = ['Marketing', 'Telecalling', 'IT'];
 
-  const fetchAdminAttendance = async () => {
+  const fetchAdminAttendance = async (silent = false) => {
     try {
-      setLoading(true);
+      if (!silent && records.length === 0) setLoading(true);
       setError(null);
 
       const params = {
