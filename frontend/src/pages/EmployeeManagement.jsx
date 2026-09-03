@@ -30,7 +30,12 @@ import {
   EyeOff,
   ShieldCheck,
   Copy,
-  Building2
+  Building2,
+  Megaphone,
+  Headphones,
+  Code2,
+  Target,
+  Cpu
 } from 'lucide-react';
 
 const EmployeeManagement = () => {
@@ -274,6 +279,30 @@ const EmployeeManagement = () => {
     }
   };
 
+  const getDepartmentIcon = (dept) => {
+    switch (dept) {
+      case 'Marketing': return <Megaphone className="w-5.5 h-5.5 text-rose-600" />;
+      case 'Telecalling': return <Headphones className="w-5.5 h-5.5 text-amber-600" />;
+      case 'IT': return <Code2 className="w-5.5 h-5.5 text-indigo-600" />;
+      case 'Sales': return <Target className="w-5.5 h-5.5 text-emerald-600" />;
+      case 'HR': return <Users className="w-5.5 h-5.5 text-purple-600" />;
+      case 'Engineering': return <Cpu className="w-5.5 h-5.5 text-sky-600" />;
+      default: return <Building2 className="w-5.5 h-5.5 text-slate-700" />;
+    }
+  };
+
+  const getDepartmentBadgeStyle = (dept) => {
+    switch (dept) {
+      case 'Marketing': return { bg: 'bg-rose-50 border-rose-200/80', iconBg: 'bg-rose-100/70 border-rose-200', text: 'group-hover:text-rose-700', badge: 'bg-rose-100/60 text-rose-800 border-rose-200/60' };
+      case 'Telecalling': return { bg: 'bg-amber-50 border-amber-200/80', iconBg: 'bg-amber-100/70 border-amber-200', text: 'group-hover:text-amber-800', badge: 'bg-amber-100/60 text-amber-900 border-amber-200/60' };
+      case 'IT': return { bg: 'bg-indigo-50 border-indigo-200/80', iconBg: 'bg-indigo-100/70 border-indigo-200', text: 'group-hover:text-indigo-700', badge: 'bg-indigo-100/60 text-indigo-800 border-indigo-200/60' };
+      case 'Sales': return { bg: 'bg-emerald-50 border-emerald-200/80', iconBg: 'bg-emerald-100/70 border-emerald-200', text: 'group-hover:text-emerald-700', badge: 'bg-emerald-100/60 text-emerald-800 border-emerald-200/60' };
+      case 'HR': return { bg: 'bg-purple-50 border-purple-200/80', iconBg: 'bg-purple-100/70 border-purple-200', text: 'group-hover:text-purple-700', badge: 'bg-purple-100/60 text-purple-800 border-purple-200/60' };
+      case 'Engineering': return { bg: 'bg-sky-50 border-sky-200/80', iconBg: 'bg-sky-100/70 border-sky-200', text: 'group-hover:text-sky-700', badge: 'bg-sky-100/60 text-sky-800 border-sky-200/60' };
+      default: return { bg: 'bg-slate-50 border-slate-200/80', iconBg: 'bg-slate-100 border-slate-200', text: 'group-hover:text-slate-900', badge: 'bg-slate-100 text-slate-700 border-slate-200' };
+    }
+  };
+
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Page Header */}
@@ -297,7 +326,7 @@ const EmployeeManagement = () => {
               resetForm();
               setShowAddModal(true);
             }}
-            className="btn-primary text-sm"
+            className="btn-primary text-sm shadow-md"
           >
             <Plus className="w-4 h-4" />
             Add Employee
@@ -306,7 +335,7 @@ const EmployeeManagement = () => {
       </div>
 
       {/* Controls Filter Bar */}
-      <div className="card-saas grid grid-cols-1 md:grid-cols-4 gap-3 p-4">
+      <div className="card-saas grid grid-cols-1 md:grid-cols-4 gap-3 p-4 border border-slate-200/80">
         <div className="md:col-span-2 relative">
           <Search className="w-4.5 h-4.5 text-slate-400 absolute left-3.5 top-3" />
           <input
@@ -314,7 +343,7 @@ const EmployeeManagement = () => {
             placeholder="Search by employee name, ID (EMP001), or email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="input-saas w-full pl-10 text-sm"
+            className="input-saas w-full pl-10 text-sm py-2"
           />
         </div>
 
@@ -322,7 +351,7 @@ const EmployeeManagement = () => {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="input-saas w-full text-sm"
+            className="input-saas w-full text-sm py-2 font-medium"
           >
             <option value="All">All Statuses</option>
             <option value="Active">Active Only</option>
@@ -334,7 +363,7 @@ const EmployeeManagement = () => {
           <select
             value={departmentFilter}
             onChange={(e) => setDepartmentFilter(e.target.value)}
-            className="input-saas w-full text-sm"
+            className="input-saas w-full text-sm py-2 font-medium"
           >
             <option value="All">All Departments</option>
             {departments.map((dept) => (
@@ -355,45 +384,46 @@ const EmployeeManagement = () => {
           <div className="flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-4">
             <button
               onClick={() => setSelectedDept('All')}
-              className="btn-secondary text-sm bg-white shadow-sm flex items-center justify-center sm:justify-start gap-2 w-full sm:w-auto"
+              className="btn-secondary text-sm bg-white shadow-xs flex items-center justify-center sm:justify-start gap-2 w-full sm:w-auto hover:bg-slate-100"
             >
               <Users className="w-4 h-4 text-slate-500" />
               View All Employees ({employees.length})
             </button>
             <div className="text-center sm:text-right">
-              <h2 className="text-base font-bold text-slate-900 uppercase tracking-wider">Departments</h2>
-              <p className="text-xs text-slate-500 mt-0.5">Select a department to explore employee records</p>
+              <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Departments</h2>
+              <p className="text-xs text-slate-500 mt-0.5 font-medium">Select a department to explore employee records</p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             {departments.map((dept) => {
               const count = employees.filter((e) => e.department === dept).length;
+              const style = getDepartmentBadgeStyle(dept);
               return (
                 <div
                   key={dept}
                   onClick={() => setSelectedDept(dept)}
-                  className="card-saas p-6 hover:border-slate-300 cursor-pointer group space-y-4 flex flex-col justify-between"
+                  className={`rounded-2xl p-6 border cursor-pointer group space-y-4 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${style.bg}`}
                 >
                   <div className="flex items-center justify-between">
-                    <div className="w-11 h-11 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center border border-slate-200/80">
-                      <Building2 className="w-5 h-5" />
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border shadow-2xs transition-transform group-hover:scale-105 ${style.iconBg}`}>
+                      {getDepartmentIcon(dept)}
                     </div>
-                    <span className="text-xs font-semibold text-slate-700 bg-slate-100 px-3 py-1 rounded-full border border-slate-200/60 tabular-nums">
+                    <span className={`text-xs font-extrabold px-3 py-1 rounded-full border tabular-nums shadow-2xs ${style.badge}`}>
                       {count} Members
                     </span>
                   </div>
 
                   <div>
-                    <h3 className="text-lg font-bold text-slate-900 group-hover:text-slate-800">
+                    <h3 className={`text-lg font-bold text-slate-900 transition-colors ${style.text}`}>
                       {dept}
                     </h3>
-                    <p className="text-xs text-slate-500 mt-1">
+                    <p className="text-xs text-slate-500 mt-1 leading-relaxed font-normal">
                       Personnel directory & profile management
                     </p>
                   </div>
 
-                  <div className="pt-2 flex items-center gap-1.5 text-xs font-semibold text-slate-800 group-hover:text-slate-900">
+                  <div className={`pt-2 flex items-center gap-1.5 text-xs font-bold text-slate-800 transition-colors ${style.text}`}>
                     <span>Explore Department</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>
