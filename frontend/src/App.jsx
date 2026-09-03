@@ -29,12 +29,11 @@ const EmployeeAttendance = lazy(() => import('./pages/EmployeeAttendance'));
 // Common / Shared Pages
 const IDCardsPage = lazy(() => import('./pages/IDCardsPage'));
 
-// Fallback Loading Indicator
+import LogoSpinner from './components/LogoSpinner';
+
+// Fallback Page Loader with Full-Screen Bull Preloader
 const PageLoader = () => (
-  <div className="min-h-[400px] flex flex-col items-center justify-center space-y-3 py-16 animate-fade-in">
-    <div className="animate-spin rounded-full h-9 w-9 border-3 border-indigo-600 border-t-transparent"></div>
-    <span className="text-xs font-semibold text-slate-400">Loading module...</span>
-  </div>
+  <LogoSpinner fullScreen={true} label="Opening page module..." />
 );
 
 function App() {

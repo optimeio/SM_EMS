@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useSearchParams } from 'react-router-dom';
 import API from '../services/api';
+import LogoSpinner from '../components/LogoSpinner';
 import { 
   CheckSquare, 
   Plus, 
@@ -29,6 +30,7 @@ const TaskManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [priorityFilter, setPriorityFilter] = useState('All');
+  const [deptFilter, setDeptFilter] = useState('All');
 
   // Modals state
   const [showAddModal, setShowAddModal] = useState(false);
@@ -193,8 +195,9 @@ const TaskManagement = () => {
 
     const matchesStatus = statusFilter === 'All' || t.status === statusFilter;
     const matchesPriority = priorityFilter === 'All' || t.priority === priorityFilter;
+    const matchesDept = deptFilter === 'All' || (t.assignedTo?.department && t.assignedTo.department === deptFilter);
 
-    return matchesSearch && matchesStatus && matchesPriority;
+    return matchesSearch && matchesStatus && matchesPriority && matchesDept;
   });
 
   const totalTasks = tasks.length;
@@ -223,52 +226,68 @@ const TaskManagement = () => {
         </button>
       </div>
 
-      {/* Stats Summary Bar */}
+      {/* Stats Summary Bar — Run Beyond Style with Hover Highlight */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div className="card-saas p-4 border border-slate-200/80 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center shrink-0">
-            <Layers className="w-5 h-5 text-indigo-600" />
+        {/* Total Tasks */}
+        <div className="bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200/90 hover:border-indigo-500 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group flex flex-col justify-between cursor-pointer min-w-0">
+          <div className="flex items-center justify-between gap-1">
+            <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider truncate group-hover:text-indigo-600 transition-colors">Total Tasks</span>
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center shadow-2xs shrink-0 group-hover:scale-110 transition-transform">
+              <Layers className="w-4 h-4 sm:w-5 sm:h-5" />
+            </div>
           </div>
-          <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Total Tasks</span>
-            <span className="text-xl font-extrabold text-slate-900">{totalTasks}</span>
-          </div>
-        </div>
-
-        <div className="card-saas p-4 border border-slate-200/80 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center shrink-0">
-            <Clock className="w-5 h-5 text-amber-600" />
-          </div>
-          <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Pending</span>
-            <span className="text-xl font-extrabold text-amber-700">{pendingTasks}</span>
+          <div className="mt-2 sm:mt-2.5">
+            <span className="text-xl sm:text-3xl font-black text-slate-900 tabular-nums tracking-tight">{totalTasks}</span>
+            <p className="text-[10px] sm:text-[11px] font-semibold text-slate-400 mt-0.5 truncate">Total assigned tasks</p>
           </div>
         </div>
 
-        <div className="card-saas p-4 border border-slate-200/80 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center shrink-0">
-            <Sparkles className="w-5 h-5 text-sky-600" />
+        {/* Pending */}
+        <div className="bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200/90 hover:border-amber-500 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group flex flex-col justify-between cursor-pointer min-w-0">
+          <div className="flex items-center justify-between gap-1">
+            <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider truncate group-hover:text-amber-600 transition-colors">Pending</span>
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-amber-500 text-white flex items-center justify-center shadow-2xs shrink-0 group-hover:scale-110 transition-transform">
+              <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
+            </div>
           </div>
-          <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">In Progress</span>
-            <span className="text-xl font-extrabold text-sky-700">{inProgressTasks}</span>
+          <div className="mt-2 sm:mt-2.5">
+            <span className="text-xl sm:text-3xl font-black text-slate-900 tabular-nums tracking-tight">{pendingTasks}</span>
+            <p className="text-[10px] sm:text-[11px] font-semibold text-slate-400 mt-0.5 truncate">Awaiting action</p>
           </div>
         </div>
 
-        <div className="card-saas p-4 border border-slate-200/80 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0">
-            <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+        {/* In Progress */}
+        <div className="bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200/90 hover:border-sky-500 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group flex flex-col justify-between cursor-pointer min-w-0">
+          <div className="flex items-center justify-between gap-1">
+            <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider truncate group-hover:text-sky-600 transition-colors">In Progress</span>
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-sky-500 text-white flex items-center justify-center shadow-2xs shrink-0 group-hover:scale-110 transition-transform">
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
+            </div>
           </div>
-          <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Completed</span>
-            <span className="text-xl font-extrabold text-emerald-700">{completedTasks}</span>
+          <div className="mt-2 sm:mt-2.5">
+            <span className="text-xl sm:text-3xl font-black text-slate-900 tabular-nums tracking-tight">{inProgressTasks}</span>
+            <p className="text-[10px] sm:text-[11px] font-semibold text-slate-400 mt-0.5 truncate">Currently active</p>
+          </div>
+        </div>
+
+        {/* Completed */}
+        <div className="bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200/90 hover:border-emerald-500 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group flex flex-col justify-between cursor-pointer min-w-0">
+          <div className="flex items-center justify-between gap-1">
+            <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider truncate group-hover:text-emerald-600 transition-colors">Completed</span>
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-2xs shrink-0 group-hover:scale-110 transition-transform">
+              <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5" />
+            </div>
+          </div>
+          <div className="mt-2 sm:mt-2.5">
+            <span className="text-xl sm:text-3xl font-black text-slate-900 tabular-nums tracking-tight">{completedTasks}</span>
+            <p className="text-[10px] sm:text-[11px] font-semibold text-slate-400 mt-0.5 truncate">Successfully delivered</p>
           </div>
         </div>
       </div>
 
-      {/* Filter Bar */}
-      <div className="card-saas grid grid-cols-1 md:grid-cols-4 gap-4 p-4 border border-slate-200/80">
-        <div className="md:col-span-2 relative">
+      {/* Filter Bar with Department Filter */}
+      <div className="card-saas grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 p-4 border border-slate-200/80">
+        <div className="sm:col-span-2 relative">
           <Search className="w-4.5 h-4.5 text-slate-400 absolute left-3.5 top-3" />
           <input
             type="text"
@@ -277,6 +296,19 @@ const TaskManagement = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="input-saas w-full pl-10 text-sm py-2"
           />
+        </div>
+
+        <div>
+          <select
+            value={deptFilter}
+            onChange={(e) => setDeptFilter(e.target.value)}
+            className="input-saas w-full text-sm py-2 font-medium"
+          >
+            <option value="All">All Departments</option>
+            <option value="Marketing">Marketing</option>
+            <option value="Telecalling">Telecalling</option>
+            <option value="IT">IT</option>
+          </select>
         </div>
 
         <div>
@@ -310,9 +342,7 @@ const TaskManagement = () => {
 
       {/* Task Cards Grid */}
       {loading ? (
-        <div className="flex justify-center py-16">
-          <div className="animate-spin rounded-full h-8 w-8 border-2 border-slate-900 border-t-transparent"></div>
-        </div>
+        <LogoSpinner label="Syncing enterprise tasks..." />
       ) : filteredTasks.length === 0 ? (
         <div className="card-saas text-center py-16 space-y-3 border border-slate-200/80">
           <CheckSquare className="w-12 h-12 text-slate-300 mx-auto" />

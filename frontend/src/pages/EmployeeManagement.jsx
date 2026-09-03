@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import API from '../services/api';
+import LogoSpinner from '../components/LogoSpinner';
 import IDCardModal from '../components/IDCardModal';
 import { 
   Users, 
@@ -375,9 +376,7 @@ const EmployeeManagement = () => {
 
       {/* Department Cards or Table */}
       {loading ? (
-        <div className="flex justify-center py-16">
-          <div className="animate-spin rounded-full h-8 w-8 border-2 border-slate-900 border-t-transparent"></div>
-        </div>
+        <LogoSpinner label="Loading employee directory..." />
       ) : !selectedDept && !searchTerm ? (
         /* Department Selection Cards */
         <div className="space-y-4">
