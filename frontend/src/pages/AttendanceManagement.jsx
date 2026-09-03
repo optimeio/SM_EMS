@@ -13,7 +13,8 @@ import {
   X, 
   RefreshCw, 
   FileImage,
-  MapPin
+  MapPin,
+  ExternalLink
 } from 'lucide-react';
 
 const AttendanceManagement = () => {
