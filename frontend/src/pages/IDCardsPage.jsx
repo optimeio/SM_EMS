@@ -53,7 +53,7 @@ const IDCardsPage = () => {
     try {
       setLoading(true);
       if (isAdmin) {
-        const { data } = await API.get('/employees');
+        const { data } = await API.get('/employees?includeCards=true');
         setEmployees(data);
       } else {
         const { data } = await API.get('/employees/me');

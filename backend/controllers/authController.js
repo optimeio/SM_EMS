@@ -26,7 +26,7 @@ export const login = async (req, res) => {
     const cleanIdUpper = cleanIdentifier.toUpperCase();
 
     // 1. Parallel execution of Admin & Employee lookup using indexed fields (Fast <10ms DB query)
-    const [adminUser, empUser] = await Promise.all([
+    let [adminUser, empUser] = await Promise.all([
       Admin.findOne({
         $or: [
           { email: cleanIdLower },
@@ -42,6 +42,16 @@ export const login = async (req, res) => {
         ]
       })
     ]);
+
+    // Safety fallback if not found by exact indexed query
+    if (!adminUser && !empUser) {
+      const escaped = cleanIdentifier.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(`^${escaped}$`, 'i');
+      [adminUser, empUser] = await Promise.all([
+        Admin.findOne({ $or: [{ email: regex }, { name: regex }] }),
+        Employee.findOne({ $or: [{ email: regex }, { employeeId: regex }] })
+      ]);
+    }
 
     // 2. Check Admin match first
     if (adminUser) {

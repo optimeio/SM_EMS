@@ -10,31 +10,31 @@ import { uploadIDCardToDrive } from '../services/googleDriveService.js';
 // @access  Private/Admin
 export const getEmployees = async (req, res) => {
   try {
-    const employees = await Employee.find({}).select('-password').lean();
+    const includeCards = req.query.includeCards === 'true';
+    const selectFields = includeCards ? '-password' : '-password -idCardImage';
+    const employees = await Employee.find({}).select(selectFields).lean();
 
-    // Determine public verification base URL
-    const host = req.get('host') || '';
-    const isLocal = host.includes('localhost') || host.includes('127.0.0.1');
-    const baseUrl = process.env.FRONTEND_URL || (isLocal ? 'http://localhost:5173' : 'https://ems.thesmgroups.com');
+    // Trigger QR generation in background for any employees missing qrCodeImage (non-blocking)
+    setImmediate(async () => {
+      const host = req.get('host') || '';
+      const isLocal = host.includes('localhost') || host.includes('127.0.0.1');
+      const baseUrl = process.env.FRONTEND_URL || (isLocal ? 'http://localhost:5173' : 'https://ems.thesmgroups.com');
 
-    // Auto-generate permanent QR codes for any employees missing qrCodeImage
-    for (let emp of employees) {
-      if (!emp.qrCodeImage) {
-        try {
-          const verificationUrl = `${baseUrl}/verify/${emp.employeeId}`;
-          const qrDataUrl = await QRCode.toDataURL(verificationUrl, {
-            width: 335,
-            margin: 1,
-            color: { dark: '#000000', light: '#ffffff' },
-            errorCorrectionLevel: 'H'
-          });
-          emp.qrCodeImage = qrDataUrl;
-          await Employee.updateOne({ _id: emp._id }, { $set: { qrCodeImage: qrDataUrl } });
-        } catch (qrErr) {
-          console.error(`Failed to auto-generate QR for ${emp.employeeId}:`, qrErr.message);
+      for (let emp of employees) {
+        if (!emp.qrCodeImage) {
+          try {
+            const verificationUrl = `${baseUrl}/verify/${emp.employeeId}`;
+            const qrDataUrl = await QRCode.toDataURL(verificationUrl, {
+              width: 335,
+              margin: 1,
+              color: { dark: '#000000', light: '#ffffff' },
+              errorCorrectionLevel: 'H'
+            });
+            await Employee.updateOne({ _id: emp._id }, { $set: { qrCodeImage: qrDataUrl } });
+          } catch (qrErr) {}
         }
       }
-    }
+    });
 
     res.json(employees);
   } catch (error) {
