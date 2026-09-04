@@ -42,6 +42,14 @@ app.get('/', (req, res) => {
   res.send('API is running...');
 });
 
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', time: new Date() });
+});
+
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', time: new Date() });
+});
+
 const PORT = process.env.PORT || 5000;
 
 if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
