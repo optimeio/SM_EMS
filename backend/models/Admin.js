@@ -22,9 +22,12 @@ const adminSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Hash password before saving
-adminSchema.pre('save', async function (next) {
+adminSchema.pre('save', async function () {
   if (!this.isModified('password')) {
-    next();
+    return;
+  }
+  if (/^\$2[aby]\$/.test(this.password)) {
+    return;
   }
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
