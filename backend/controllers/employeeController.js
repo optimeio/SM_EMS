@@ -10,9 +10,32 @@ import { uploadIDCardToDrive } from '../services/googleDriveService.js';
 // @access  Private/Admin
 export const getEmployees = async (req, res) => {
   try {
-    const employees = await Employee.find({})
-      .select('-password -idCardImage -profilePhoto -qrCodeImage')
-      .lean();
+    const employees = await Employee.find({}).select('-password').lean();
+
+    // Determine public verification base URL
+    const host = req.get('host') || '';
+    const isLocal = host.includes('localhost') || host.includes('127.0.0.1');
+    const baseUrl = process.env.FRONTEND_URL || (isLocal ? 'http://localhost:5173' : 'https://ems.thesmgroups.com');
+
+    // Auto-generate permanent QR codes for any employees missing qrCodeImage
+    for (let emp of employees) {
+      if (!emp.qrCodeImage) {
+        try {
+          const verificationUrl = `${baseUrl}/verify/${emp.employeeId}`;
+          const qrDataUrl = await QRCode.toDataURL(verificationUrl, {
+            width: 335,
+            margin: 1,
+            color: { dark: '#000000', light: '#ffffff' },
+            errorCorrectionLevel: 'H'
+          });
+          emp.qrCodeImage = qrDataUrl;
+          await Employee.updateOne({ _id: emp._id }, { $set: { qrCodeImage: qrDataUrl } });
+        } catch (qrErr) {
+          console.error(`Failed to auto-generate QR for ${emp.employeeId}:`, qrErr.message);
+        }
+      }
+    }
+
     res.json(employees);
   } catch (error) {
     console.error('Get Employees Error:', error);
@@ -124,8 +147,22 @@ export const createEmployee = async (req, res) => {
       profilePhoto
     };
 
-    if (dateOfBirth) {
-      empData.dateOfBirth = dateOfBirth;
+    // Determine public verification base URL and generate permanent QR code
+    const host = req.get('host') || '';
+    const isLocal = host.includes('localhost') || host.includes('127.0.0.1');
+    const baseUrl = process.env.FRONTEND_URL || (isLocal ? 'http://localhost:5173' : 'https://ems.thesmgroups.com');
+
+    try {
+      const verificationUrl = `${baseUrl}/verify/${employeeId}`;
+      const qrDataUrl = await QRCode.toDataURL(verificationUrl, {
+        width: 335,
+        margin: 1,
+        color: { dark: '#000000', light: '#ffffff' },
+        errorCorrectionLevel: 'H'
+      });
+      empData.qrCodeImage = qrDataUrl;
+    } catch (qrErr) {
+      console.error('Failed to generate initial QR code:', qrErr.message);
     }
 
     const employee = await Employee.create(empData);
@@ -305,7 +342,9 @@ export const generateEmployeeQR = async (req, res) => {
     }
 
     // Build the public verification URL
-    const baseUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const host = req.get('host') || '';
+    const isLocal = host.includes('localhost') || host.includes('127.0.0.1');
+    const baseUrl = process.env.FRONTEND_URL || (isLocal ? 'http://localhost:5173' : 'https://ems.thesmgroups.com');
     const verificationUrl = `${baseUrl}/verify/${employee.employeeId}`;
 
     // Generate QR at exact Canva size: 335x335px, no margin, pure black/white

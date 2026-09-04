@@ -22,7 +22,7 @@ export const protect = async (req, res, next) => {
       // Check if it's admin or employee
       let user = await Admin.findById(decoded.id).select('-password').lean();
       if (!user) {
-        user = await Employee.findById(decoded.id).select('-password -idCardImage -profilePhoto -qrCodeImage').lean();
+        user = await Employee.findById(decoded.id).select('-password').lean();
       }
 
       if (!user) {

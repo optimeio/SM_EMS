@@ -130,30 +130,32 @@ const IDCardsPage = () => {
       return;
     }
 
-    try {
-      setUploadingImage(true);
-      setUploadError(null);
+    setUploadingImage(true);
+    setUploadError(null);
 
-      const reader = new FileReader();
-      reader.onloadend = async () => {
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      try {
         const base64Data = reader.result;
         await API.put(`/employees/${uploadEmp._id}`, {
           idCardImage: base64Data
         });
         setUploadSuccess(`Finished ID Card image saved for ${uploadEmp.name}!`);
+        setEmployees(prev => prev.map(emp => emp._id === uploadEmp._id ? { ...emp, idCardImage: base64Data } : emp));
         setTimeout(() => {
           setUploadSuccess(null);
           setUploadEmp(null);
           fetchEmployees();
         }, 1500);
-      };
-      reader.readAsDataURL(file);
-    } catch (err) {
-      console.error('Failed to upload ID Card image', err);
-      setUploadError('Failed to save ID Card image. Please try again.');
-    } finally {
-      setUploadingImage(false);
-    }
+      } catch (err) {
+        console.error('Failed to upload ID Card image', err);
+        setUploadError(err.response?.data?.message || 'Failed to save ID Card image. Please try again.');
+      } finally {
+        setUploadingImage(false);
+      }
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
   };
 
   const filteredEmployees = employees.filter((emp) => {
