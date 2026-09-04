@@ -111,17 +111,22 @@ export const createEmployee = async (req, res) => {
   try {
     const { name, email, phone, department, designation, dateOfBirth, joiningDate, address, emergencyContact, bloodGroup, profilePhoto } = req.body;
 
-    const customId = req.body.employeeId;
-    const query = customId ? { $or: [{ email }, { employeeId: customId }] } : { email };
+    const cleanEmail = email.trim().toLowerCase();
+    let customId = req.body.employeeId ? req.body.employeeId.trim().toUpperCase() : null;
+    if (customId && customId.includes('@')) {
+      customId = null;
+    }
+
+    const query = customId ? { $or: [{ email: cleanEmail }, { employeeId: customId }] } : { email: cleanEmail };
     const employeeExists = await Employee.findOne(query);
     if (employeeExists) {
-      if (employeeExists.email === email) {
+      if (employeeExists.email === cleanEmail) {
         return res.status(400).json({ message: 'Employee with this email already exists' });
       }
       return res.status(400).json({ message: 'Employee with this Employee ID already exists' });
     }
 
-    // Generate unique employee ID if not explicitly provided
+    // Generate unique employee ID if not explicitly provided or invalid
     let employeeId = customId;
     if (!employeeId) {
       const count = await Employee.countDocuments();
@@ -129,12 +134,12 @@ export const createEmployee = async (req, res) => {
     }
     
     // Default password for new employees (can be changed later)
-    const password = req.body.password || 'Password@123';
+    const password = (req.body.password && req.body.password.trim() !== '') ? req.body.password.trim() : 'Password@123';
 
     const empData = {
       employeeId,
-      name,
-      email,
+      name: name.trim(),
+      email: cleanEmail,
       password,
       plainTextPassword: password,
       phone: phone || '9876543210',
