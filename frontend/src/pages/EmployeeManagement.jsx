@@ -153,6 +153,8 @@ const EmployeeManagement = () => {
     }
   }, [searchParams]);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleToggleStatus = async () => {
     if (!confirmStatusEmp) return;
     const newStatus = confirmStatusEmp.status === 'Active' ? 'Inactive' : 'Active';
@@ -168,31 +170,49 @@ const EmployeeManagement = () => {
 
   const handleAddSubmit = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
     setFormError(null);
+    setIsSubmitting(true);
     try {
-      await API.post('/employees', formData);
+      clearApiCache();
+      const res = await API.post('/employees', formData);
+      clearApiCache();
       setShowAddModal(false);
       resetForm();
       setSuccessMessage('Employee successfully added!');
       setTimeout(() => setSuccessMessage(''), 3000);
-      await fetchEmployees();
+      if (res.data && res.data._id) {
+        setEmployees(prev => [res.data, ...prev.filter(emp => emp._id !== res.data._id)]);
+      }
+      fetchEmployees();
     } catch (err) {
       setFormError(err.response?.data?.message || 'Failed to add employee');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
     setFormError(null);
+    setIsSubmitting(true);
     try {
-      await API.put(`/employees/${editEmployee._id}`, formData);
+      clearApiCache();
+      const res = await API.put(`/employees/${editEmployee._id}`, formData);
+      clearApiCache();
       setEditEmployee(null);
       resetForm();
       setSuccessMessage('Employee successfully updated!');
       setTimeout(() => setSuccessMessage(''), 3000);
+      if (res.data && res.data._id) {
+        setEmployees(prev => prev.map(emp => emp._id === res.data._id ? res.data : emp));
+      }
       fetchEmployees();
     } catch (err) {
       setFormError(err.response?.data?.message || 'Failed to update employee');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -1031,13 +1051,12 @@ const EmployeeManagement = () => {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pb-3 border-b border-slate-100">
                     <div className="space-y-1">
-                      <label className="block text-xs font-semibold text-slate-700">Custom Employee ID <span className="text-slate-400 font-normal">(Optional)</span></label>
+                      <label className="block text-xs font-semibold text-slate-700">Custom Employee ID <span className="text-slate-400 font-normal">(e.g. EMP001 or custom string)</span></label>
                       <input
                         type="text"
-                        disabled={!!editEmployee}
                         value={formData.employeeId}
                         onChange={(e) => setFormData({ ...formData, employeeId: e.target.value })}
-                        className="input-saas w-full text-sm disabled:bg-slate-50 disabled:text-slate-500"
+                        className="input-saas w-full text-sm font-mono font-bold"
                         placeholder="Leave blank to auto-generate"
                       />
                     </div>
@@ -1059,10 +1078,9 @@ const EmployeeManagement = () => {
                       <input
                         type="email"
                         required
-                        disabled={!!editEmployee}
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        className="input-saas w-full text-sm disabled:bg-slate-50 disabled:text-slate-500"
+                        className="input-saas w-full text-sm font-medium"
                         placeholder="john@company.com"
                       />
                     </div>
@@ -1135,6 +1153,7 @@ const EmployeeManagement = () => {
                 <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 shrink-0 mt-4">
                   <button
                     type="button"
+                    disabled={isSubmitting}
                     onClick={() => {
                       setShowAddModal(false);
                       setEditEmployee(null);
@@ -1146,9 +1165,17 @@ const EmployeeManagement = () => {
                   </button>
                   <button 
                     type="submit" 
-                    className="btn-primary text-xs"
+                    disabled={isSubmitting}
+                    className="btn-primary text-xs flex items-center gap-2 disabled:opacity-60"
                   >
-                    {editEmployee ? 'Update Profile' : 'Register Employee'}
+                    {isSubmitting ? (
+                      <>
+                        <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>{editEmployee ? 'Saving Profile...' : 'Creating Employee...'}</span>
+                      </>
+                    ) : (
+                      <span>{editEmployee ? 'Update Profile' : 'Register Employee'}</span>
+                    )}
                   </button>
                 </div>
               </form>
