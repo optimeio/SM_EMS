@@ -133,6 +133,44 @@ const IDCardsPage = () => {
     }
   };
 
+  const compressImageForIDCard = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const maxWidth = 1200;
+          const maxHeight = 1600;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > maxWidth || height > maxHeight) {
+            if (width / height > maxWidth / maxHeight) {
+              height = Math.round((height * maxWidth) / width);
+              width = maxWidth;
+            } else {
+              width = Math.round((width * maxHeight) / height);
+              height = maxHeight;
+            }
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.88);
+          resolve(compressedDataUrl);
+        };
+        img.onerror = (err) => reject(err);
+        img.src = event.target.result;
+      };
+      reader.onerror = (err) => reject(err);
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleIDCardUpload = async (e) => {
     const file = e.target.files[0];
     if (!file || !uploadEmp) return;
@@ -142,37 +180,28 @@ const IDCardsPage = () => {
       return;
     }
 
-    if (file.size > 8 * 1024 * 1024) {
-      setUploadError('File size exceeds 8 MB.');
-      return;
-    }
-
     setUploadingImage(true);
     setUploadError(null);
 
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-      try {
-        const base64Data = reader.result;
-        await API.put(`/employees/${uploadEmp._id}`, {
-          idCardImage: base64Data
-        });
-        setUploadSuccess(`Finished ID Card image saved for ${uploadEmp.name}!`);
-        setEmployees(prev => prev.map(emp => emp._id === uploadEmp._id ? { ...emp, idCardImage: base64Data } : emp));
-        setTimeout(() => {
-          setUploadSuccess(null);
-          setUploadEmp(null);
-          fetchEmployees();
-        }, 1500);
-      } catch (err) {
-        console.error('Failed to upload ID Card image', err);
-        setUploadError(err.response?.data?.message || 'Failed to save ID Card image. Please try again.');
-      } finally {
-        setUploadingImage(false);
-      }
-    };
-    reader.readAsDataURL(file);
-    e.target.value = '';
+    try {
+      const compressedBase64 = await compressImageForIDCard(file);
+      await API.put(`/employees/${uploadEmp._id}`, {
+        idCardImage: compressedBase64
+      });
+      setUploadSuccess(`Finished ID Card image saved for ${uploadEmp.name}!`);
+      setEmployees(prev => prev.map(emp => emp._id === uploadEmp._id ? { ...emp, idCardImage: compressedBase64 } : emp));
+      setTimeout(() => {
+        setUploadSuccess(null);
+        setUploadEmp(null);
+        fetchEmployees();
+      }, 1200);
+    } catch (err) {
+      console.error('Failed to upload ID Card image', err);
+      setUploadError(err.response?.data?.message || 'Failed to save ID Card image. Please try again.');
+    } finally {
+      setUploadingImage(false);
+      e.target.value = '';
+    }
   };
 
   const filteredEmployees = employees.filter((emp) => {

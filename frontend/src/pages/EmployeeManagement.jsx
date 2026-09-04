@@ -121,7 +121,7 @@ const EmployeeManagement = () => {
     name: '',
     email: '',
     phone: '',
-    department: 'Engineering',
+    department: 'Software Development',
     designation: '',
     dateOfBirth: '',
     joiningDate: '',
@@ -183,6 +183,7 @@ const EmployeeManagement = () => {
       setTimeout(() => setSuccessMessage(''), 3000);
       if (res.data && res.data._id) {
         setEmployees(prev => [res.data, ...prev.filter(emp => emp._id !== res.data._id)]);
+        setSelectedDept('All');
       }
       fetchEmployees();
     } catch (err) {
@@ -304,7 +305,16 @@ const EmployeeManagement = () => {
     }
   };
 
+  const getNormalizedDept = (dept) => {
+    if (!dept) return 'Software Development';
+    if (dept === 'IT' || dept === 'Engineering') return 'Software Development';
+    if (dept === 'Telecalling') return 'COI (Center Of Information)';
+    if (dept === 'Marketing') return 'Sales And Marketing';
+    return dept;
+  };
+
   const filteredEmployees = employees.filter((emp) => {
+    const normDept = getNormalizedDept(emp.department);
     const matchesSearch =
       emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       emp.employeeId.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -312,8 +322,8 @@ const EmployeeManagement = () => {
       emp.designation.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesStatus = statusFilter === 'All' || emp.status === statusFilter;
-    const matchesDeptFilter = departmentFilter === 'All' || emp.department === departmentFilter;
-    const matchesSelectedDept = !selectedDept || selectedDept === 'All' || emp.department === selectedDept;
+    const matchesDeptFilter = departmentFilter === 'All' || normDept === departmentFilter || emp.department === departmentFilter;
+    const matchesSelectedDept = !selectedDept || selectedDept === 'All' || normDept === selectedDept || emp.department === selectedDept;
 
     return matchesSearch && matchesStatus && matchesDeptFilter && matchesSelectedDept;
   });
@@ -466,7 +476,7 @@ const EmployeeManagement = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             {departments.map((dept) => {
-              const count = employees.filter((e) => e.department === dept).length;
+              const count = employees.filter((e) => getNormalizedDept(e.department) === dept).length;
               const style = getDepartmentBadgeStyle(dept);
               return (
                 <div
