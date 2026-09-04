@@ -98,58 +98,58 @@ const EmployeeDashboard = () => {
       {/* Run Beyond Style KPI Grid with Hover Highlight */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Assigned */}
-        <div className="bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200/90 hover:border-indigo-500 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group flex flex-col justify-between cursor-pointer min-w-0">
+        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 hover:border-indigo-500 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group flex flex-col justify-between cursor-pointer min-w-0">
           <div className="flex items-center justify-between gap-1">
-            <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider truncate group-hover:text-indigo-600 transition-colors">Assigned</span>
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center shadow-2xs shrink-0 group-hover:scale-110 transition-transform">
+            <span className="text-xs sm:text-sm font-extrabold text-slate-500 uppercase tracking-wider truncate group-hover:text-indigo-600 transition-colors">Assigned</span>
+            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-indigo-600 text-white flex items-center justify-center shadow-2xs shrink-0 group-hover:scale-110 transition-transform">
               <ClipboardList className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
           </div>
-          <div className="mt-2 sm:mt-2.5">
-            <div className="text-xl sm:text-3xl font-black text-slate-900 tabular-nums tracking-tight">{assignedCount}</div>
-            <p className="text-[10px] sm:text-[11px] font-semibold text-slate-400 mt-0.5 truncate">Total objectives</p>
+          <div className="mt-2.5 sm:mt-3">
+            <div className="text-2xl sm:text-4xl font-black text-slate-900 tabular-nums tracking-tight">{assignedCount}</div>
+            <p className="text-xs font-semibold text-slate-500 mt-1 truncate">Total objectives</p>
           </div>
         </div>
 
         {/* Pending */}
-        <div className="bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200/90 hover:border-amber-500 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group flex flex-col justify-between cursor-pointer min-w-0">
+        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 hover:border-amber-500 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group flex flex-col justify-between cursor-pointer min-w-0">
           <div className="flex items-center justify-between gap-1">
-            <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider truncate group-hover:text-amber-600 transition-colors">Pending</span>
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-amber-500 text-white flex items-center justify-center shadow-2xs shrink-0 group-hover:scale-110 transition-transform">
+            <span className="text-xs sm:text-sm font-extrabold text-slate-500 uppercase tracking-wider truncate group-hover:text-amber-600 transition-colors">Pending</span>
+            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-amber-500 text-white flex items-center justify-center shadow-2xs shrink-0 group-hover:scale-110 transition-transform">
               <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
           </div>
-          <div className="mt-2 sm:mt-2.5">
-            <div className="text-xl sm:text-3xl font-black text-slate-900 tabular-nums tracking-tight">{pendingCount}</div>
-            <p className="text-[10px] sm:text-[11px] font-semibold text-slate-400 mt-0.5 truncate">Awaiting action</p>
+          <div className="mt-2.5 sm:mt-3">
+            <div className="text-2xl sm:text-4xl font-black text-slate-900 tabular-nums tracking-tight">{pendingCount}</div>
+            <p className="text-xs font-semibold text-slate-500 mt-1 truncate">Awaiting action</p>
           </div>
         </div>
 
         {/* Completed */}
-        <div className="bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200/90 hover:border-emerald-500 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group flex flex-col justify-between cursor-pointer min-w-0">
+        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 hover:border-emerald-500 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group flex flex-col justify-between cursor-pointer min-w-0">
           <div className="flex items-center justify-between gap-1">
-            <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider truncate group-hover:text-emerald-600 transition-colors">Completed</span>
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-2xs shrink-0 group-hover:scale-110 transition-transform">
+            <span className="text-xs sm:text-sm font-extrabold text-slate-500 uppercase tracking-wider truncate group-hover:text-emerald-600 transition-colors">Completed</span>
+            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-2xs shrink-0 group-hover:scale-110 transition-transform">
               <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
           </div>
-          <div className="mt-2 sm:mt-2.5">
-            <div className="text-xl sm:text-3xl font-black text-slate-900 tabular-nums tracking-tight">{completedCount}</div>
-            <p className="text-[10px] sm:text-[11px] font-semibold text-slate-400 mt-0.5 truncate">Tasks delivered</p>
+          <div className="mt-2.5 sm:mt-3">
+            <div className="text-2xl sm:text-4xl font-black text-slate-900 tabular-nums tracking-tight">{completedCount}</div>
+            <p className="text-xs font-semibold text-slate-500 mt-1 truncate">Tasks delivered</p>
           </div>
         </div>
 
         {/* My Points */}
-        <div className="bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200/90 hover:border-purple-500 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group flex flex-col justify-between cursor-pointer min-w-0">
+        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 hover:border-purple-500 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group flex flex-col justify-between cursor-pointer min-w-0">
           <div className="flex items-center justify-between gap-1">
-            <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider truncate group-hover:text-purple-600 transition-colors">My Points</span>
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-purple-500 text-white flex items-center justify-center shadow-2xs shrink-0 group-hover:scale-110 transition-transform">
+            <span className="text-xs sm:text-sm font-extrabold text-slate-500 uppercase tracking-wider truncate group-hover:text-purple-600 transition-colors">My Points</span>
+            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-purple-500 text-white flex items-center justify-center shadow-2xs shrink-0 group-hover:scale-110 transition-transform">
               <Award className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
           </div>
-          <div className="mt-2 sm:mt-2.5">
-            <div className="text-xl sm:text-3xl font-black text-slate-900 tabular-nums tracking-tight">{user?.totalPoints || 0} <span className="text-xs font-semibold text-slate-400">pts</span></div>
-            <p className="text-[10px] sm:text-[11px] font-semibold text-slate-400 mt-0.5 truncate">Performance score</p>
+          <div className="mt-2.5 sm:mt-3">
+            <div className="text-2xl sm:text-4xl font-black text-slate-900 tabular-nums tracking-tight">{user?.totalPoints || 0} <span className="text-xs sm:text-sm font-bold text-slate-400">pts</span></div>
+            <p className="text-xs font-semibold text-slate-500 mt-1 truncate">Performance score</p>
           </div>
         </div>
       </div>
