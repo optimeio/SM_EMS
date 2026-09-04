@@ -151,7 +151,13 @@ export const checkOut = async (req, res) => {
     const now = new Date();
     const dateStr = now.toISOString().split('T')[0];
 
-    const attendance = await Attendance.findOne({ employeeId: emp.employeeId, date: dateStr });
+    const attendance = await Attendance.findOne({ 
+      employeeId: { $regex: new RegExp(`^${emp.employeeId}$`, 'i') },
+      $or: [
+        { date: dateStr },
+        { checkOut: null, status: 'Present' }
+      ]
+    }).sort({ createdAt: -1 });
     if (!attendance) {
       return res.status(400).json({ message: 'You have not checked in today.' });
     }
@@ -203,7 +209,13 @@ export const getTodayAttendance = async (req, res) => {
     }
 
     const dateStr = new Date().toISOString().split('T')[0];
-    const attendance = await Attendance.findOne({ employeeId: emp.employeeId, date: dateStr });
+    const attendance = await Attendance.findOne({ 
+      employeeId: { $regex: new RegExp(`^${emp.employeeId}$`, 'i') },
+      $or: [
+        { date: dateStr },
+        { checkOut: null, status: 'Present' }
+      ]
+    }).sort({ createdAt: -1 });
 
     res.json({
       employee: {

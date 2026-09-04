@@ -10,28 +10,34 @@ import {
   Award, 
   QrCode,
   ArrowRight,
-  ClipboardList
+  ClipboardList,
+  LogOut
 } from 'lucide-react';
 
 const EmployeeDashboard = () => {
   const { user } = useContext(AuthContext);
   const [tasks, setTasks] = useState([]);
+  const [todayData, setTodayData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchMyTasks = async () => {
+  const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      const { data } = await API.get('/tasks/employee');
-      setTasks(data);
+      const [tasksRes, attendanceRes] = await Promise.all([
+        API.get('/tasks/employee'),
+        API.get('/attendance/today').catch(() => ({ data: { attendance: null } }))
+      ]);
+      setTasks(tasksRes.data);
+      setTodayData(attendanceRes.data?.attendance || null);
     } catch (err) {
-      console.error('Failed to load employee tasks', err);
+      console.error('Failed to load employee dashboard data', err);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchMyTasks();
+    fetchDashboardData();
   }, []);
 
   const assignedCount = tasks.length;
@@ -62,10 +68,22 @@ const EmployeeDashboard = () => {
         </div>
 
         <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
-          <Link to="/employee/attendance" className="btn-primary text-xs bg-emerald-600 hover:bg-emerald-700 focus:ring-emerald-600/20 shadow-emerald-600/10 shadow-sm border border-emerald-500/20">
-            <CheckSquare className="w-4 h-4" />
-            Check In
-          </Link>
+          {!todayData ? (
+            <Link to="/employee/attendance" className="btn-primary text-xs bg-emerald-600 hover:bg-emerald-700 focus:ring-emerald-600/20 shadow-emerald-600/10 shadow-sm border border-emerald-500/20 flex items-center gap-1.5">
+              <CheckSquare className="w-4 h-4" />
+              Check In
+            </Link>
+          ) : !todayData.checkOut ? (
+            <Link to="/employee/attendance" className="btn-primary text-xs bg-rose-600 hover:bg-rose-700 focus:ring-rose-600/20 shadow-rose-600/10 shadow-sm border border-rose-500/20 flex items-center gap-1.5">
+              <LogOut className="w-4 h-4" />
+              Check Out
+            </Link>
+          ) : (
+            <Link to="/employee/attendance" className="btn-secondary text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 flex items-center gap-1.5">
+              <CheckCircle className="w-4 h-4 text-emerald-600" />
+              Checked Out
+            </Link>
+          )}
           <Link to="/employee/tasks" className="btn-secondary text-xs bg-white">
             <CheckSquare className="w-4 h-4 text-slate-500" />
             My Tasks
