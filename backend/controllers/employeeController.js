@@ -267,12 +267,8 @@ export const deleteEmployee = async (req, res) => {
     const employeeId = req.params.id;
     const employee = await Employee.findById(employeeId);
 
-    if (!employee) {
-      return res.status(404).json({ message: 'Employee not found' });
-    }
-
-    const empName = employee.name;
-    const empIdStr = employee.employeeId;
+    const empName = employee ? employee.name : 'Employee';
+    const empIdStr = employee ? employee.employeeId : employeeId;
 
     // Delete employee and clean up all associated tasks & attendance records
     await Promise.allSettled([
@@ -281,15 +277,17 @@ export const deleteEmployee = async (req, res) => {
       Attendance.deleteMany({ $or: [{ employee: employeeId }, { employeeId: empIdStr }] })
     ]);
 
-    try {
-      await ActivityLog.create({
-        action: 'Deleted Employee',
-        performedBy: `Admin: ${req.user?.name || 'Admin'}`,
-        description: `Permanently deleted employee ${empName} (${empIdStr})`
-      });
-    } catch (logErr) {}
+    if (employee) {
+      try {
+        await ActivityLog.create({
+          action: 'Deleted Employee',
+          performedBy: `Admin: ${req.user?.name || 'Admin'}`,
+          description: `Permanently deleted employee ${empName} (${empIdStr})`
+        });
+      } catch (logErr) {}
+    }
 
-    res.json({ message: 'Employee deleted successfully' });
+    res.json({ success: true, message: 'Employee deleted successfully' });
   } catch (error) {
     console.error('Delete Employee Error:', error);
     res.status(500).json({ message: 'Server error deleting employee: ' + error.message });

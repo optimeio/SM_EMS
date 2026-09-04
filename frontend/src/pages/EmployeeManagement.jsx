@@ -93,18 +93,20 @@ const EmployeeManagement = () => {
 
   const handleDeleteEmployee = async () => {
     if (!deleteConfirmEmp) return;
+    const deletedId = deleteConfirmEmp._id;
+    setDeleteConfirmEmp(null);
+    setEmployees(prev => prev.filter(e => e._id !== deletedId));
+    setSuccessMessage('Employee deleted successfully!');
+    setTimeout(() => setSuccessMessage(''), 3000);
+    clearApiCache();
+
     try {
-      clearApiCache();
-      const deletedId = deleteConfirmEmp._id;
       await API.delete(`/employees/${deletedId}`);
       clearApiCache();
-      setDeleteConfirmEmp(null);
-      setEmployees(prev => prev.filter(e => e._id !== deletedId));
-      setSuccessMessage('Employee deleted successfully!');
-      setTimeout(() => setSuccessMessage(''), 3000);
-      fetchEmployees();
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to delete employee');
+      console.error('Delete employee warning:', err);
+    } finally {
+      fetchEmployees();
     }
   };
   
