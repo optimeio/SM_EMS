@@ -9,7 +9,7 @@ import { uploadIDCardToDrive } from '../services/googleDriveService.js';
 export const getEmployees = async (req, res) => {
   try {
     const employees = await Employee.find({})
-      .select('-password -idCardImage')
+      .select('-password -idCardImage -profilePhoto -qrCodeImage')
       .lean();
     res.json(employees);
   } catch (error) {
