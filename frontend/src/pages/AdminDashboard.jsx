@@ -32,29 +32,37 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [statsRes, activityRes, attendanceRes] = await Promise.all([
+        const [statsRes, activityRes, attendanceRes] = await Promise.allSettled([
           API.get('/dashboard/stats'),
           API.get('/activity-logs'),
           API.get('/attendance/admin')
         ]);
 
-        setStats(statsRes.data);
-        setActivities(activityRes.data.slice(0, 5));
-        if (attendanceRes.data) {
-          setAttendanceSummary(attendanceRes.data.summary);
-          setAttendanceRecords(attendanceRes.data.records || []);
+        if (!isMounted) return;
+
+        if (statsRes.status === 'fulfilled' && statsRes.value?.data) {
+          setStats(statsRes.value.data);
+        }
+        if (activityRes.status === 'fulfilled' && Array.isArray(activityRes.value?.data)) {
+          setActivities(activityRes.value.data.slice(0, 5));
+        }
+        if (attendanceRes.status === 'fulfilled' && attendanceRes.value?.data) {
+          setAttendanceSummary(attendanceRes.value.data.summary);
+          setAttendanceRecords(attendanceRes.value.data.records || []);
         }
       } catch (err) {
         console.error('Failed to load admin dashboard data', err);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
 
     fetchData();
+    return () => { isMounted = false; };
   }, []);
 
   if (loading) {

@@ -1,4 +1,5 @@
 import Employee from '../models/Employee.js';
+import Admin from '../models/Admin.js';
 import bcrypt from 'bcryptjs';
 
 export const syncAllEmployeePasswords = async () => {
@@ -36,10 +37,26 @@ export const syncAllEmployeePasswords = async () => {
       }
     }
 
-    if (updatedCount > 0) {
-      console.log(`✅ Successfully re-synchronized credentials for ${updatedCount} employee accounts.`);
+    // Also ensure Admin account is synchronized
+    let admin = await Admin.findOne({ email: 'admin@company.com' });
+    if (!admin) {
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash('Password@123', salt);
+      await Admin.create({
+        name: 'Admin User',
+        email: 'admin@company.com',
+        password: hashedPassword,
+        role: 'admin'
+      });
+      console.log('✅ Created default Admin account (admin@company.com / Password@123)');
     } else {
-      console.log(`✓ All employee credentials in MongoDB are perfectly synchronized.`);
+      const isAdminMatch = await admin.matchPassword('Password@123');
+      if (!isAdminMatch) {
+        const salt = await bcrypt.genSalt(10);
+        admin.password = await bcrypt.hash('Password@123', salt);
+        await admin.save();
+        console.log('🔐 Updated Admin account password to "Password@123"');
+      }
     }
   } catch (error) {
     console.error('⚠️ Password Sync Error:', error.message);

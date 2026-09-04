@@ -8,8 +8,9 @@ export const getActivityLogs = async (req, res) => {
     const logs = await ActivityLog.find({})
       .populate('employeeId', 'name employeeId')
       .populate('taskId', 'title')
-      .sort({ createdAt: -1 }) // Newest first
-      .limit(50); // Get latest 50 activities
+      .sort({ createdAt: -1 })
+      .limit(50)
+      .lean();
 
     res.json(logs);
   } catch (error) {

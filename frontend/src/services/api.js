@@ -1,7 +1,21 @@
 import axios from 'axios';
 
-const rawApiUrl = import.meta.env.VITE_API_URL || 'https://ems-euvq.onrender.com/api';
-const baseURL = rawApiUrl.endsWith('/api') ? rawApiUrl : `${rawApiUrl.replace(/\/$/, '')}/api`;
+const getApiBaseUrl = () => {
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (typeof window !== 'undefined') {
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (isLocalhost) {
+      if (!envUrl || envUrl.includes('onrender.com')) {
+        return 'http://localhost:5000/api';
+      }
+      return envUrl.endsWith('/api') ? envUrl : `${envUrl.replace(/\/$/, '')}/api`;
+    }
+  }
+  const rawApiUrl = envUrl || 'https://ems-euvq.onrender.com/api';
+  return rawApiUrl.endsWith('/api') ? rawApiUrl : `${rawApiUrl.replace(/\/$/, '')}/api`;
+};
+
+const baseURL = getApiBaseUrl();
 
 const API = axios.create({
   baseURL,
@@ -40,15 +54,18 @@ API.interceptors.request.use((config) => {
   return Promise.reject(error);
 });
 
-// Interceptor to store fresh GET responses into cache
+// Interceptor to store fresh GET responses into cache and clear on mutations
 API.interceptors.response.use(
   (response) => {
-    if (response.config.method === 'get' && !response.config.skipCache) {
+    const method = response.config.method?.toLowerCase();
+    if (method === 'get' && !response.config.skipCache) {
       const cacheKey = response.config.url + JSON.stringify(response.config.params || {});
       cacheMap.set(cacheKey, {
         data: response.data,
         timestamp: Date.now()
       });
+    } else if (['post', 'put', 'patch', 'delete'].includes(method)) {
+      cacheMap.clear();
     }
     return response;
   },

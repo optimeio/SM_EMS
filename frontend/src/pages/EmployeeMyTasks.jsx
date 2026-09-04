@@ -72,9 +72,11 @@ const EmployeeMyTasks = () => {
     // Optimistic UI update: Instantly update local React state with 0ms delay!
     setTasks(prev => prev.map(t => t._id === taskId ? { ...t, status: newStatus } : t));
     setSuccessBanner('Application already sent for Admin approval!');
+    clearApiCache();
 
     try {
       await API.patch(`/tasks/${taskId}/status`, { status: newStatus });
+      clearApiCache();
     } catch (err) {
       console.error('Failed to update task status:', err);
       // Revert if error occurs

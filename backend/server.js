@@ -1,3 +1,11 @@
+import dns from 'dns';
+if (process.platform === 'win32') {
+  try {
+    dns.setServers(['8.8.8.8', '1.1.1.1']);
+    dns.setDefaultResultOrder('ipv4first');
+  } catch (e) {}
+}
+
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';

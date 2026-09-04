@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useSearchParams } from 'react-router-dom';
-import API from '../services/api';
+import API, { clearApiCache } from '../services/api';
 import LogoSpinner from '../components/LogoSpinner';
 import { 
   CheckSquare, 
@@ -131,13 +131,18 @@ const TaskManagement = () => {
     setSuccessBanner(null);
     setIsSubmitting(true);
     try {
-      await API.post('/tasks', {
+      clearApiCache();
+      const res = await API.post('/tasks', {
         ...formData,
         status: 'In Progress'
       });
+      clearApiCache();
       setShowAddModal(false);
       resetForm();
       setSuccessBanner('Task assigned successfully! It is now active under In Progress.');
+      if (res.data && res.data._id) {
+        setTasks(prev => [res.data, ...prev.filter(t => t._id !== res.data._id)]);
+      }
       await fetchInitialData(true);
     } catch (err) {
       setFormError(err.response?.data?.message || 'Failed to create task');
@@ -153,10 +158,15 @@ const TaskManagement = () => {
     setSuccessBanner(null);
     setIsSubmitting(true);
     try {
-      await API.put(`/tasks/${editTask._id}`, formData);
+      clearApiCache();
+      const res = await API.put(`/tasks/${editTask._id}`, formData);
+      clearApiCache();
       setEditTask(null);
       resetForm();
       setSuccessBanner('Task updated successfully.');
+      if (res.data && res.data._id) {
+        setTasks(prev => prev.map(t => t._id === res.data._id ? res.data : t));
+      }
       await fetchInitialData(true);
     } catch (err) {
       setFormError(err.response?.data?.message || 'Failed to update task');
@@ -169,7 +179,12 @@ const TaskManagement = () => {
     try {
       setUpdatingTaskId(taskId);
       setSuccessBanner(null);
-      await API.patch(`/tasks/${taskId}/status`, { status: newStatus });
+      clearApiCache();
+      const res = await API.patch(`/tasks/${taskId}/status`, { status: newStatus });
+      clearApiCache();
+      if (res.data && res.data._id) {
+        setTasks(prev => prev.map(t => t._id === res.data._id ? res.data : t));
+      }
       if (newStatus === 'Completed') {
         setSuccessBanner('Task completion approved successfully! Performance points awarded to employee.');
       } else if (newStatus === 'In Progress') {
@@ -189,8 +204,12 @@ const TaskManagement = () => {
     if (!deleteTaskObj) return;
     try {
       setSuccessBanner(null);
-      await API.delete(`/tasks/${deleteTaskObj._id}`);
+      clearApiCache();
+      const deletedId = deleteTaskObj._id;
+      await API.delete(`/tasks/${deletedId}`);
+      clearApiCache();
       setDeleteTaskObj(null);
+      setTasks(prev => prev.filter(t => t._id !== deletedId));
       setSuccessBanner('Task deleted successfully!');
       await fetchInitialData(true);
     } catch (err) {

@@ -274,24 +274,26 @@ export const getAdminAttendance = async (req, res) => {
       query.status = status;
     }
 
-    let records = await Attendance.find(query)
-      .populate('employee', 'name employeeId designation profilePhoto department')
-      .sort({ checkIn: -1 });
+    const [recordsRaw, totalEmployees, todayAllRecords] = await Promise.all([
+      Attendance.find(query)
+        .populate('employee', 'name employeeId designation profilePhoto department')
+        .sort({ checkIn: -1 })
+        .lean(),
+      Employee.countDocuments({ status: 'Active' }),
+      Attendance.find({ date: filterDate }).select('status').lean()
+    ]);
+
+    let records = recordsRaw;
 
     // Optional Search Filter by Employee Name or ID
     if (search && search.trim()) {
       const q = search.trim().toLowerCase();
       records = records.filter(r => 
-        r.employeeId.toLowerCase().includes(q) ||
+        (r.employeeId && r.employeeId.toLowerCase().includes(q)) ||
         (r.employee?.name && r.employee.name.toLowerCase().includes(q))
       );
     }
 
-    // Summary Statistics
-    const allEmployees = await Employee.find({ status: 'Active' });
-    const totalEmployees = allEmployees.length;
-
-    const todayAllRecords = await Attendance.find({ date: filterDate });
     const presentCount = todayAllRecords.length;
     const absentCount = Math.max(0, totalEmployees - presentCount);
     const workingCount = todayAllRecords.filter(r => r.status === 'Present').length;

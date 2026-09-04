@@ -6,20 +6,29 @@ import Task from '../models/Task.js';
 // @access  Private/Admin
 export const getDashboardStats = async (req, res) => {
   try {
-    const totalEmployees = await Employee.countDocuments();
-    const activeEmployees = await Employee.countDocuments({ status: 'Active' });
-    const inactiveEmployees = await Employee.countDocuments({ status: 'Inactive' });
-
-    const totalTasks = await Task.countDocuments();
-    const pendingTasks = await Task.countDocuments({ status: 'Pending' });
-    const inProgressTasks = await Task.countDocuments({ status: 'In Progress' });
-    const completedTasks = await Task.countDocuments({ status: 'Completed' });
-
-    // Sum of points of all completed tasks
-    const completedTaskData = await Task.aggregate([
-      { $match: { status: 'Completed' } },
-      { $group: { _id: null, totalPoints: { $sum: '$points' } } }
+    const [
+      totalEmployees,
+      activeEmployees,
+      inactiveEmployees,
+      totalTasks,
+      pendingTasks,
+      inProgressTasks,
+      completedTasks,
+      completedTaskData
+    ] = await Promise.all([
+      Employee.countDocuments(),
+      Employee.countDocuments({ status: 'Active' }),
+      Employee.countDocuments({ status: 'Inactive' }),
+      Task.countDocuments(),
+      Task.countDocuments({ status: 'Pending' }),
+      Task.countDocuments({ status: 'In Progress' }),
+      Task.countDocuments({ status: 'Completed' }),
+      Task.aggregate([
+        { $match: { status: 'Completed' } },
+        { $group: { _id: null, totalPoints: { $sum: '$points' } } }
+      ])
     ]);
+
     const totalPoints = completedTaskData.length > 0 ? completedTaskData[0].totalPoints : 0;
 
     res.json({
