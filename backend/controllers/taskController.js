@@ -51,6 +51,7 @@ export const createTask = async (req, res) => {
       points: points || 20,
       priority: priority || 'Medium',
       dueDate: dueDate || new Date(),
+      status: req.body.status || 'In Progress',
       createdBy: req.user._id
     });
 

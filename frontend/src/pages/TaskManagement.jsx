@@ -42,6 +42,8 @@ const TaskManagement = () => {
     switch (status) {
       case 'Completed': 
         return 'bg-emerald-50 text-emerald-700 border-emerald-200/90 hover:bg-emerald-100/80';
+      case 'Pending Review': 
+        return 'bg-purple-50 text-purple-700 border-purple-200/90 hover:bg-purple-100/80';
       case 'In Progress': 
         return 'bg-sky-50 text-sky-700 border-sky-200/90 hover:bg-sky-100/80';
       case 'Cancelled': 
@@ -54,6 +56,7 @@ const TaskManagement = () => {
   const getStatusDotColor = (status) => {
     switch (status) {
       case 'Completed': return 'bg-emerald-500';
+      case 'Pending Review': return 'bg-purple-500 animate-pulse';
       case 'In Progress': return 'bg-sky-500';
       case 'Cancelled': return 'bg-slate-400';
       default: return 'bg-amber-500';
@@ -63,6 +66,7 @@ const TaskManagement = () => {
   const getStatusIcon = (status) => {
     switch (status) {
       case 'Completed': return <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />;
+      case 'Pending Review': return <Clock className="w-3.5 h-3.5 text-purple-600" />;
       case 'In Progress': return <Sparkles className="w-3.5 h-3.5 text-sky-600" />;
       case 'Cancelled': return <Ban className="w-3.5 h-3.5 text-slate-400" />;
       default: return <Clock className="w-3.5 h-3.5 text-amber-600" />;
@@ -318,8 +322,8 @@ const TaskManagement = () => {
             className="input-saas w-full text-sm py-2 font-medium"
           >
             <option value="All">All Statuses</option>
-            <option value="Pending">Pending</option>
             <option value="In Progress">In Progress</option>
+            <option value="Pending Review">Pending Review</option>
             <option value="Completed">Completed</option>
             <option value="Cancelled">Cancelled</option>
           </select>
@@ -422,7 +426,7 @@ const TaskManagement = () => {
                           <div className="px-2 py-1 border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                             Change Task Status
                           </div>
-                          {['Pending', 'In Progress', 'Completed', 'Cancelled'].map((status) => (
+                          {['In Progress', 'Pending Review', 'Completed', 'Cancelled'].map((status) => (
                             <button
                               key={status}
                               type="button"
@@ -451,7 +455,28 @@ const TaskManagement = () => {
                   </div>
 
                   {/* Actions */}
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1.5">
+                    {task.status === 'Pending Review' && (
+                      <>
+                        <button
+                          onClick={() => handleStatusChange(task._id, 'Completed')}
+                          className="btn-primary text-[11px] bg-emerald-600 hover:bg-emerald-700 text-white py-1 px-2.5 rounded-lg flex items-center gap-1 shadow-2xs font-bold shrink-0"
+                          title="Approve Task Completion"
+                        >
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => handleStatusChange(task._id, 'In Progress')}
+                          className="btn-secondary text-[11px] bg-amber-50 hover:bg-amber-100 text-amber-800 border-amber-200/80 py-1 px-2 rounded-lg flex items-center gap-1 font-semibold shrink-0"
+                          title="Request Changes / Revise"
+                        >
+                          <Ban className="w-3.5 h-3.5 text-amber-600" />
+                          Revise
+                        </button>
+                      </>
+                    )}
+
                     <button
                       onClick={() => openEditModal(task)}
                       className="p-1.5 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
