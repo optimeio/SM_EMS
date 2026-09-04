@@ -1,18 +1,17 @@
 import axios from 'axios';
 
 const getApiBaseUrl = () => {
-  const envUrl = import.meta.env.VITE_API_URL;
   if (typeof window !== 'undefined') {
     const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     if (isLocalhost) {
-      if (!envUrl || envUrl.includes('onrender.com')) {
-        return 'http://localhost:5000/api';
-      }
-      return envUrl.endsWith('/api') ? envUrl : `${envUrl.replace(/\/$/, '')}/api`;
+      return 'http://localhost:5000/api';
     }
   }
-  const rawApiUrl = envUrl || 'https://ems-euvq.onrender.com/api';
-  return rawApiUrl.endsWith('/api') ? rawApiUrl : `${rawApiUrl.replace(/\/$/, '')}/api`;
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
+    return envUrl.endsWith('/api') ? envUrl : `${envUrl.replace(/\/$/, '')}/api`;
+  }
+  return 'https://ems-euvq.onrender.com/api';
 };
 
 const baseURL = getApiBaseUrl();
