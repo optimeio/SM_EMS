@@ -235,6 +235,25 @@ const EmployeeManagement = () => {
     setFormError(null);
   };
 
+  const formatDateForInput = (dateVal) => {
+    if (!dateVal) return '';
+    const str = String(dateVal).trim();
+    const ddmmyyyyMatch = str.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/);
+    if (ddmmyyyyMatch) {
+      const day = ddmmyyyyMatch[1].padStart(2, '0');
+      const month = ddmmyyyyMatch[2].padStart(2, '0');
+      const year = ddmmyyyyMatch[3];
+      return `${year}-${month}-${day}`;
+    }
+    try {
+      const d = new Date(str);
+      if (!isNaN(d.getTime())) {
+        return d.toISOString().split('T')[0];
+      }
+    } catch (e) {}
+    return '';
+  };
+
   const openEditModal = (emp) => {
     setEditEmployee(emp);
     setFormData({
@@ -245,8 +264,8 @@ const EmployeeManagement = () => {
       phone: emp.phone || '',
       department: emp.department || 'Engineering',
       designation: emp.designation || '',
-      dateOfBirth: emp.dateOfBirth ? emp.dateOfBirth.split('T')[0] : '',
-      joiningDate: emp.joiningDate ? emp.joiningDate.split('T')[0] : '',
+      dateOfBirth: formatDateForInput(emp.dateOfBirth),
+      joiningDate: formatDateForInput(emp.joiningDate),
       address: emp.address || '',
       emergencyContact: emp.emergencyContact || '',
       bloodGroup: emp.bloodGroup || 'O+',

@@ -5,6 +5,29 @@ import ActivityLog from '../models/ActivityLog.js';
 import QRCode from 'qrcode';
 import { uploadIDCardToDrive } from '../services/googleDriveService.js';
 
+const safeParseDate = (dateVal) => {
+  if (!dateVal) return null;
+  if (dateVal instanceof Date && !isNaN(dateVal.getTime())) return dateVal;
+  
+  const str = String(dateVal).trim();
+  if (!str) return null;
+
+  // Check DD-MM-YYYY or DD/MM/YYYY
+  const ddmmyyyyMatch = str.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/);
+  if (ddmmyyyyMatch) {
+    const day = parseInt(ddmmyyyyMatch[1], 10);
+    const month = parseInt(ddmmyyyyMatch[2], 10) - 1;
+    const year = parseInt(ddmmyyyyMatch[3], 10);
+    const parsed = new Date(year, month, day);
+    if (!isNaN(parsed.getTime())) return parsed;
+  }
+
+  const parsedDirect = new Date(str);
+  if (!isNaN(parsedDirect.getTime())) return parsedDirect;
+
+  return null;
+};
+
 // @desc    Get all employees
 // @route   GET /api/employees
 // @access  Private/Admin
@@ -82,22 +105,10 @@ export const verifyEmployee = async (req, res) => {
   try {
     // Find by the custom employeeId, e.g. EMP001
     const employee = await Employee.findOne({ employeeId: req.params.employeeId }).select('-password');
-    
     if (employee) {
-      res.json({
-        name: employee.name,
-        employeeId: employee.employeeId,
-        designation: employee.designation,
-        department: employee.department,
-        email: employee.email,
-        phone: employee.phone,
-        joiningDate: employee.joiningDate,
-        status: employee.status,
-        bloodGroup: employee.bloodGroup,
-        profilePhoto: employee.profilePhoto
-      });
+      res.json(employee);
     } else {
-      res.status(404).json({ message: 'Employee not found' });
+      res.status(404).json({ message: 'Employee not found or invalid QR code' });
     }
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
@@ -145,12 +156,17 @@ export const createEmployee = async (req, res) => {
       phone: phone || '9876543210',
       department,
       designation,
-      joiningDate: joiningDate || new Date(),
+      joiningDate: safeParseDate(joiningDate) || new Date(),
       address,
       emergencyContact,
       bloodGroup,
       profilePhoto
     };
+
+    if (dateOfBirth) {
+      const parsedDOB = safeParseDate(dateOfBirth);
+      if (parsedDOB) empData.dateOfBirth = parsedDOB;
+    }
 
     // Determine public verification base URL and generate permanent QR code
     const host = req.get('host') || '';
@@ -242,10 +258,12 @@ export const updateEmployee = async (req, res) => {
       }
 
       if (req.body.dateOfBirth !== undefined) {
-        employee.dateOfBirth = req.body.dateOfBirth || null;
+        const parsedDOB = safeParseDate(req.body.dateOfBirth);
+        if (parsedDOB) employee.dateOfBirth = parsedDOB;
       }
       if (req.body.joiningDate !== undefined && req.body.joiningDate !== '') {
-        employee.joiningDate = req.body.joiningDate;
+        const parsedJoining = safeParseDate(req.body.joiningDate);
+        if (parsedJoining) employee.joiningDate = parsedJoining;
       }
       if (req.body.password && req.body.password.trim() !== '') {
         employee.password = req.body.password.trim();
