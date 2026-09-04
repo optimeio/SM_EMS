@@ -7,10 +7,13 @@ import ActivityLog from '../models/ActivityLog.js';
 // @access  Private/Admin
 export const getTasks = async (req, res) => {
   try {
-    const tasks = await Task.find({}).populate('assignedTo', 'name employeeId department designation');
+    const tasks = await Task.find({})
+      .sort({ createdAt: -1 })
+      .populate('assignedTo', 'name employeeId department designation');
     res.json(tasks);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('Get Tasks Error:', error);
+    res.status(500).json({ message: 'Server error fetching tasks.' });
   }
 };
 
@@ -19,7 +22,7 @@ export const getTasks = async (req, res) => {
 // @access  Private
 export const getTaskById = async (req, res) => {
   try {
-    const task = await Task.findById(req.params.id).populate('assignedTo', 'name employeeId');
+    const task = await Task.findById(req.params.id).populate('assignedTo', 'name employeeId department designation');
     if (task) {
       res.json(task);
     } else {
@@ -42,28 +45,35 @@ export const createTask = async (req, res) => {
     }
 
     const task = await Task.create({
-      title,
-      description,
+      title: title.trim(),
+      description: description ? description.trim() : '',
       assignedTo,
-      points,
-      priority,
-      dueDate,
+      points: points || 20,
+      priority: priority || 'Medium',
+      dueDate: dueDate || new Date(),
       createdBy: req.user._id
     });
 
     const employee = await Employee.findById(assignedTo);
 
-    await ActivityLog.create({
-      action: 'Created Task',
-      performedBy: `Admin: ${req.user.name}`,
-      employeeId: assignedTo,
-      taskId: task._id,
-      description: `Assigned task "${title}" to ${employee.name}`
-    });
+    try {
+      await ActivityLog.create({
+        action: 'Created Task',
+        performedBy: `Admin: ${req.user.name}`,
+        employeeId: assignedTo,
+        taskId: task._id,
+        description: `Assigned task "${title}" to ${employee ? employee.name : 'Employee'}`
+      });
+    } catch (logErr) {
+      console.error('Failed to log activity for created task:', logErr);
+    }
 
-    res.status(201).json(task);
+    const populatedTask = await Task.findById(task._id).populate('assignedTo', 'name employeeId department designation');
+
+    res.status(201).json(populatedTask || task);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('Create Task Error:', error);
+    res.status(500).json({ message: 'Server error creating task: ' + error.message });
   }
 };
 
@@ -76,7 +86,7 @@ export const updateTask = async (req, res) => {
 
     if (task) {
       task.title = req.body.title || task.title;
-      task.description = req.body.description || task.description;
+      task.description = req.body.description !== undefined ? req.body.description : task.description;
       task.points = req.body.points || task.points;
       task.priority = req.body.priority || task.priority;
       task.dueDate = req.body.dueDate || task.dueDate;
@@ -86,16 +96,22 @@ export const updateTask = async (req, res) => {
         task.assignedTo = req.body.assignedTo;
       }
 
-      const updatedTask = await task.save();
+      await task.save();
 
-      await ActivityLog.create({
-        action: 'Updated Task',
-        performedBy: `Admin: ${req.user.name}`,
-        taskId: task._id,
-        description: `Updated details for task "${task.title}"`
-      });
+      const populatedTask = await Task.findById(task._id).populate('assignedTo', 'name employeeId department designation');
 
-      res.json(updatedTask);
+      try {
+        await ActivityLog.create({
+          action: 'Updated Task',
+          performedBy: `Admin: ${req.user.name}`,
+          taskId: task._id,
+          description: `Updated details for task "${task.title}"`
+        });
+      } catch (logErr) {
+        console.error('Failed to log activity for updated task:', logErr);
+      }
+
+      res.json(populatedTask || task);
     } else {
       res.status(404).json({ message: 'Task not found' });
     }
@@ -138,21 +154,25 @@ export const updateTaskStatus = async (req, res) => {
         }
       }
 
-      const updatedTask = await task.save();
+      await task.save();
+
+      const populatedTask = await Task.findById(task._id).populate('assignedTo', 'name employeeId department designation');
 
       let performer = (req.user && req.user.role === 'admin')
         ? `Admin: ${req.user.name}`
         : (req.user ? `Employee: ${req.user.name}` : 'System');
       
-      await ActivityLog.create({
-        action: 'Updated Task Status',
-        performedBy: performer,
-        taskId: task._id,
-        employeeId: task.assignedTo,
-        description: `Changed status of task "${task.title}" to ${status}`
-      });
+      try {
+        await ActivityLog.create({
+          action: 'Updated Task Status',
+          performedBy: performer,
+          taskId: task._id,
+          employeeId: task.assignedTo,
+          description: `Changed status of task "${task.title}" to ${status}`
+        });
+      } catch (logErr) {}
 
-      res.json(updatedTask);
+      res.json(populatedTask || task);
     } else {
       res.status(404).json({ message: 'Task not found' });
     }
@@ -180,11 +200,13 @@ export const deleteTask = async (req, res) => {
         }
       }
 
-      await ActivityLog.create({
-        action: 'Deleted Task',
-        performedBy: `Admin: ${req.user.name}`,
-        description: `Deleted task "${task.title}"`
-      });
+      try {
+        await ActivityLog.create({
+          action: 'Deleted Task',
+          performedBy: `Admin: ${req.user.name}`,
+          description: `Deleted task "${task.title}"`
+        });
+      } catch (logErr) {}
 
       res.json({ message: 'Task removed' });
     } else {
@@ -201,9 +223,19 @@ export const deleteTask = async (req, res) => {
 // @access  Private/Employee
 export const getMyTasks = async (req, res) => {
   try {
-    const tasks = await Task.find({ assignedTo: req.user._id });
+    let empId = req.user._id;
+    if (!empId && req.user.email) {
+      const emp = await Employee.findOne({ email: req.user.email });
+      if (emp) empId = emp._id;
+    }
+
+    const tasks = await Task.find({ assignedTo: empId })
+      .sort({ createdAt: -1 })
+      .populate('assignedTo', 'name employeeId department designation');
+
     res.json(tasks);
   } catch (error) {
+    console.error('Get My Tasks Error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };

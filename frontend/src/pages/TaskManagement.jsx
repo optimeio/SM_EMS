@@ -195,7 +195,7 @@ const TaskManagement = () => {
 
     const matchesStatus = statusFilter === 'All' || t.status === statusFilter;
     const matchesPriority = priorityFilter === 'All' || t.priority === priorityFilter;
-    const matchesDept = deptFilter === 'All' || (t.assignedTo?.department && t.assignedTo.department === deptFilter);
+    const matchesDept = deptFilter === 'All' || (t.assignedTo?.department ? t.assignedTo.department === deptFilter : false);
 
     return matchesSearch && matchesStatus && matchesPriority && matchesDept;
   });
