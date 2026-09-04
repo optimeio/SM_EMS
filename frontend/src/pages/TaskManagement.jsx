@@ -309,9 +309,9 @@ const TaskManagement = () => {
             className="input-saas w-full text-sm py-2 font-medium"
           >
             <option value="All">All Departments</option>
-            <option value="Marketing">Marketing</option>
-            <option value="Telecalling">Telecalling</option>
-            <option value="IT">IT</option>
+            <option value="COI (Center Of Information)">COI (Center Of Information)</option>
+            <option value="Sales And Marketing">Sales And Marketing</option>
+            <option value="Software Development">Software Development</option>
           </select>
         </div>
 

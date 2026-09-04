@@ -67,7 +67,7 @@ const PerformanceLeaderboard = () => {
     }
   };
 
-  const departments = ['Marketing', 'Telecalling', 'IT'];
+  const departments = ['COI (Center Of Information)', 'Sales And Marketing', 'Software Development'];
 
   return (
     <div className="space-y-6 animate-fade-in">

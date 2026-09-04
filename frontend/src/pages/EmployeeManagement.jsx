@@ -271,7 +271,7 @@ const EmployeeManagement = () => {
     return matchesSearch && matchesStatus && matchesDeptFilter && matchesSelectedDept;
   });
 
-  const departments = ['Marketing', 'Telecalling', 'IT'];
+  const departments = ['COI (Center Of Information)', 'Sales And Marketing', 'Software Development'];
 
   const getPriorityBadgeClass = (priority) => {
     switch (priority) {
@@ -284,24 +284,18 @@ const EmployeeManagement = () => {
 
   const getDepartmentIcon = (dept) => {
     switch (dept) {
-      case 'Marketing': return <Megaphone className="w-5.5 h-5.5 text-rose-600" />;
-      case 'Telecalling': return <Headphones className="w-5.5 h-5.5 text-amber-600" />;
-      case 'IT': return <Code2 className="w-5.5 h-5.5 text-indigo-600" />;
-      case 'Sales': return <Target className="w-5.5 h-5.5 text-emerald-600" />;
-      case 'HR': return <Users className="w-5.5 h-5.5 text-purple-600" />;
-      case 'Engineering': return <Cpu className="w-5.5 h-5.5 text-sky-600" />;
+      case 'COI (Center Of Information)': return <Building2 className="w-5.5 h-5.5 text-indigo-600" />;
+      case 'Sales And Marketing': return <Megaphone className="w-5.5 h-5.5 text-rose-600" />;
+      case 'Software Development': return <Code2 className="w-5.5 h-5.5 text-sky-600" />;
       default: return <Building2 className="w-5.5 h-5.5 text-slate-700" />;
     }
   };
 
   const getDepartmentBadgeStyle = (dept) => {
     switch (dept) {
-      case 'Marketing': return { topBar: 'bg-rose-500', iconBg: 'bg-rose-50 border-rose-200 text-rose-600', text: 'group-hover:text-rose-600', badge: 'bg-rose-50 text-rose-800 border-rose-200', arrowBg: 'bg-rose-50 group-hover:bg-rose-100' };
-      case 'Telecalling': return { topBar: 'bg-amber-500', iconBg: 'bg-amber-50 border-amber-200 text-amber-600', text: 'group-hover:text-amber-700', badge: 'bg-amber-50 text-amber-900 border-amber-200', arrowBg: 'bg-amber-50 group-hover:bg-amber-100' };
-      case 'IT': return { topBar: 'bg-indigo-500', iconBg: 'bg-indigo-50 border-indigo-200 text-indigo-600', text: 'group-hover:text-indigo-600', badge: 'bg-indigo-50 text-indigo-800 border-indigo-200', arrowBg: 'bg-indigo-50 group-hover:bg-indigo-100' };
-      case 'Sales': return { topBar: 'bg-emerald-500', iconBg: 'bg-emerald-50 border-emerald-200 text-emerald-600', text: 'group-hover:text-emerald-600', badge: 'bg-emerald-50 text-emerald-800 border-emerald-200', arrowBg: 'bg-emerald-50 group-hover:bg-emerald-100' };
-      case 'HR': return { topBar: 'bg-purple-500', iconBg: 'bg-purple-50 border-purple-200 text-purple-600', text: 'group-hover:text-purple-600', badge: 'bg-purple-50 text-purple-800 border-purple-200', arrowBg: 'bg-purple-50 group-hover:bg-purple-100' };
-      case 'Engineering': return { topBar: 'bg-sky-500', iconBg: 'bg-sky-50 border-sky-200 text-sky-600', text: 'group-hover:text-sky-600', badge: 'bg-sky-50 text-sky-800 border-sky-200', arrowBg: 'bg-sky-50 group-hover:bg-sky-100' };
+      case 'COI (Center Of Information)': return { topBar: 'bg-indigo-500', iconBg: 'bg-indigo-50 border-indigo-200 text-indigo-600', text: 'group-hover:text-indigo-600', badge: 'bg-indigo-50 text-indigo-800 border-indigo-200', arrowBg: 'bg-indigo-50 group-hover:bg-indigo-100' };
+      case 'Sales And Marketing': return { topBar: 'bg-rose-500', iconBg: 'bg-rose-50 border-rose-200 text-rose-600', text: 'group-hover:text-rose-600', badge: 'bg-rose-50 text-rose-800 border-rose-200', arrowBg: 'bg-rose-50 group-hover:bg-rose-100' };
+      case 'Software Development': return { topBar: 'bg-sky-500', iconBg: 'bg-sky-50 border-sky-200 text-sky-600', text: 'group-hover:text-sky-600', badge: 'bg-sky-50 text-sky-800 border-sky-200', arrowBg: 'bg-sky-50 group-hover:bg-sky-100' };
       default: return { topBar: 'bg-slate-500', iconBg: 'bg-slate-50 border-slate-200 text-slate-600', text: 'group-hover:text-slate-900', badge: 'bg-slate-50 text-slate-700 border-slate-200', arrowBg: 'bg-slate-50 group-hover:bg-slate-100' };
     }
   };

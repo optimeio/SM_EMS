@@ -45,7 +45,7 @@ const AttendanceManagement = () => {
   const [viewPhotoUrl, setViewPhotoUrl] = useState(null);
   const [photoModalTitle, setPhotoModalTitle] = useState('');
 
-  const departments = ['Marketing', 'Telecalling', 'IT'];
+  const departments = ['COI (Center Of Information)', 'Sales And Marketing', 'Software Development'];
 
   const fetchAdminAttendance = async (silent = false) => {
     try {
