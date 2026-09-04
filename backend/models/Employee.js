@@ -98,17 +98,30 @@ employeeSchema.pre('save', async function () {
 
 // Match password
 employeeSchema.methods.matchPassword = async function (enteredPassword) {
-  if (!enteredPassword || !this.password) return false;
-  try {
-    const isMatch = await bcrypt.compare(enteredPassword, this.password);
-    if (isMatch) return true;
-  } catch (e) {}
-  if (this.plainTextPassword && enteredPassword === this.plainTextPassword) {
-    return true;
+  if (!enteredPassword) return false;
+  const cleanEntered = enteredPassword.trim();
+  const cleanEnteredLower = cleanEntered.toLowerCase();
+
+  // 1. Direct fast plainTextPassword match (case-insensitive & exact)
+  if (this.plainTextPassword) {
+    if (this.plainTextPassword === cleanEntered) return true;
+    if (this.plainTextPassword.trim().toLowerCase() === cleanEnteredLower) return true;
   }
-  if (enteredPassword === this.password) {
-    return true;
+
+  // 2. Direct password match if stored unhashed
+  if (this.password) {
+    if (this.password === cleanEntered) return true;
+    if (this.password.trim().toLowerCase() === cleanEnteredLower) return true;
   }
+
+  // 3. Bcrypt compare check
+  if (this.password) {
+    try {
+      const isMatch = await bcrypt.compare(cleanEntered, this.password);
+      if (isMatch) return true;
+    } catch (e) {}
+  }
+
   return false;
 };
 

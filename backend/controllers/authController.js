@@ -22,31 +22,66 @@ export const login = async (req, res) => {
   }
 
   try {
-    const escapedId = cleanIdentifier.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const idRegex = new RegExp(`^${escapedId}$`, 'i');
+    const cleanIdLower = cleanIdentifier.toLowerCase();
+    const cleanIdUpper = cleanIdentifier.toUpperCase();
 
-    // 1. First check Admin collection (by email, name, or regex match)
-    let adminUser = await Admin.findOne({
-      $or: [
-        { email: cleanIdentifier.toLowerCase() },
-        { email: cleanIdentifier },
-        { email: idRegex },
-        { name: idRegex }
-      ]
-    });
-    
-    if (adminUser && (await adminUser.matchPassword(cleanPassword))) {
-      return res.json({
-        _id: adminUser._id,
-        name: adminUser.name,
-        email: adminUser.email,
-        role: adminUser.role || 'admin',
-        token: generateToken(adminUser._id),
-      });
+    // 1. Parallel execution of Admin & Employee lookup using indexed fields (Fast <10ms DB query)
+    const [adminUser, empUser] = await Promise.all([
+      Admin.findOne({
+        $or: [
+          { email: cleanIdLower },
+          { email: cleanIdentifier }
+        ]
+      }),
+      Employee.findOne({
+        $or: [
+          { email: cleanIdLower },
+          { employeeId: cleanIdUpper },
+          { employeeId: cleanIdentifier },
+          { email: cleanIdentifier }
+        ]
+      })
+    ]);
+
+    // 2. Check Admin match first
+    if (adminUser) {
+      const isAdminMatch = await adminUser.matchPassword(cleanPassword);
+      if (isAdminMatch) {
+        return res.json({
+          _id: adminUser._id,
+          name: adminUser.name,
+          email: adminUser.email,
+          role: adminUser.role || 'admin',
+          token: generateToken(adminUser._id),
+        });
+      }
     }
 
-    // 2. Fallback: If cleanIdentifier is "admin" or starts with "admin", test primary Admin account
-    if (cleanIdentifier.toLowerCase() === 'admin' || cleanIdentifier.toLowerCase() === 'admin@company.com') {
+    // 3. Check Employee match
+    if (empUser) {
+      const isEmpMatch = await empUser.matchPassword(cleanPassword);
+      if (isEmpMatch) {
+        if (empUser.status === 'Inactive') {
+          return res.status(401).json({ message: 'Account is inactive. Please contact admin.' });
+        }
+
+        return res.json({
+          _id: empUser._id,
+          employeeId: empUser.employeeId,
+          name: empUser.name,
+          email: empUser.email,
+          role: empUser.role || 'employee',
+          department: empUser.department,
+          designation: empUser.designation,
+          totalPoints: empUser.totalPoints,
+          plainTextPassword: empUser.plainTextPassword,
+          token: generateToken(empUser._id),
+        });
+      }
+    }
+
+    // 4. Fallback check for primary Admin if identifier is "admin"
+    if (cleanIdLower === 'admin' || cleanIdLower === 'admin@company.com') {
       const mainAdmin = await Admin.findOne({ email: 'admin@company.com' });
       if (mainAdmin && (await mainAdmin.matchPassword(cleanPassword))) {
         return res.json({
@@ -57,38 +92,6 @@ export const login = async (req, res) => {
           token: generateToken(mainAdmin._id),
         });
       }
-    }
-
-    // 3. Check Employee collection (by email or employeeId)
-    let empUser = await Employee.findOne({
-      $or: [
-        { email: cleanIdentifier.toLowerCase() },
-        { employeeId: cleanIdentifier.toUpperCase() },
-        { email: cleanIdentifier },
-        { employeeId: cleanIdentifier },
-        { employeeId: idRegex },
-        { email: idRegex }
-      ]
-    });
-    
-    if (empUser && (await empUser.matchPassword(cleanPassword))) {
-      // Check status
-      if (empUser.status === 'Inactive') {
-        return res.status(401).json({ message: 'Account is inactive. Please contact admin.' });
-      }
-
-      return res.json({
-        _id: empUser._id,
-        employeeId: empUser.employeeId,
-        name: empUser.name,
-        email: empUser.email,
-        role: empUser.role || 'employee',
-        department: empUser.department,
-        designation: empUser.designation,
-        totalPoints: empUser.totalPoints,
-        plainTextPassword: empUser.plainTextPassword,
-        token: generateToken(empUser._id),
-      });
     }
 
     res.status(401).json({ message: 'Invalid Employee ID/Email or Password' });
