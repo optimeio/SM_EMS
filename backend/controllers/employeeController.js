@@ -1,4 +1,6 @@
 import Employee from '../models/Employee.js';
+import Task from '../models/Task.js';
+import Attendance from '../models/Attendance.js';
 import ActivityLog from '../models/ActivityLog.js';
 import QRCode from 'qrcode';
 import { uploadIDCardToDrive } from '../services/googleDriveService.js';
@@ -262,25 +264,32 @@ export const updateEmployeeStatus = async (req, res) => {
 // @access  Private/Admin
 export const deleteEmployee = async (req, res) => {
   try {
-    const employee = await Employee.findById(req.params.id);
+    const employeeId = req.params.id;
+    const employee = await Employee.findById(employeeId);
 
-    if (employee) {
-      const empName = employee.name;
-      const empIdStr = employee.employeeId;
+    if (!employee) {
+      return res.status(404).json({ message: 'Employee not found' });
+    }
 
-      await Employee.findByIdAndDelete(req.params.id);
+    const empName = employee.name;
+    const empIdStr = employee.employeeId;
 
-      // Log activity
+    // Delete employee and clean up all associated tasks & attendance records
+    await Promise.allSettled([
+      Employee.findByIdAndDelete(employeeId),
+      Task.deleteMany({ assignedTo: employeeId }),
+      Attendance.deleteMany({ $or: [{ employee: employeeId }, { employeeId: empIdStr }] })
+    ]);
+
+    try {
       await ActivityLog.create({
         action: 'Deleted Employee',
         performedBy: `Admin: ${req.user?.name || 'Admin'}`,
         description: `Permanently deleted employee ${empName} (${empIdStr})`
       });
+    } catch (logErr) {}
 
-      res.json({ message: 'Employee deleted successfully' });
-    } else {
-      res.status(404).json({ message: 'Employee not found' });
-    }
+    res.json({ message: 'Employee deleted successfully' });
   } catch (error) {
     console.error('Delete Employee Error:', error);
     res.status(500).json({ message: 'Server error deleting employee: ' + error.message });

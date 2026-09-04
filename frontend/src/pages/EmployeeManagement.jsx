@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import API from '../services/api';
+import API, { clearApiCache } from '../services/api';
 import LogoSpinner from '../components/LogoSpinner';
 import IDCardModal from '../components/IDCardModal';
 import { exportToExcel } from '../utils/excelExport';
@@ -94,8 +94,14 @@ const EmployeeManagement = () => {
   const handleDeleteEmployee = async () => {
     if (!deleteConfirmEmp) return;
     try {
-      await API.delete(`/employees/${deleteConfirmEmp._id}`);
+      clearApiCache();
+      const deletedId = deleteConfirmEmp._id;
+      await API.delete(`/employees/${deletedId}`);
+      clearApiCache();
       setDeleteConfirmEmp(null);
+      setEmployees(prev => prev.filter(e => e._id !== deletedId));
+      setSuccessMessage('Employee deleted successfully!');
+      setTimeout(() => setSuccessMessage(''), 3000);
       fetchEmployees();
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to delete employee');
