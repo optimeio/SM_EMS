@@ -90,7 +90,7 @@ const Layout = ({ children }) => {
           {/* Navigation Links */}
           <nav className="space-y-1">
             {!isCollapsed && (
-              <div className="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+              <div className="px-3 text-xs font-black text-slate-700 uppercase tracking-wider mb-2">
                 {isAdmin ? 'Management' : 'Workspace'}
               </div>
             )}
@@ -102,29 +102,29 @@ const Layout = ({ children }) => {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`flex items-center ${isCollapsed ? 'justify-center px-2 py-2.5' : 'justify-between px-3 py-2.5'} rounded-xl text-sm font-medium transition-all duration-150 ${
+                  className={`flex items-center ${isCollapsed ? 'justify-center px-2 py-3' : 'justify-between px-3.5 py-3'} rounded-xl text-sm font-extrabold transition-all duration-150 ${
                     isActive
-                      ? 'bg-slate-900 text-white font-semibold shadow-sm'
-                      : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
+                      ? 'bg-slate-950 text-white shadow-sm'
+                      : 'text-slate-900 hover:bg-slate-100 hover:text-black border border-transparent hover:border-slate-200'
                   }`}
                   title={isCollapsed ? link.name : undefined}
                 >
-                  <div className="flex items-center gap-3">
-                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-500'}`} />
+                  <div className="flex items-center gap-3.5">
+                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-800'}`} />
                     {!isCollapsed && <span className="truncate">{link.name}</span>}
                   </div>
-                  {!isCollapsed && isActive && <ChevronRight className="w-4 h-4 text-slate-400" />}
+                  {!isCollapsed && isActive && <ChevronRight className="w-4 h-4 text-white/80" />}
                 </Link>
               );
             })}
 
             {!isCollapsed && (
-              <div className="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider mt-5 mb-2">
+              <div className="px-3 text-xs font-black text-slate-700 uppercase tracking-wider mt-5 mb-2">
                 Utilities
               </div>
             )}
             
-            {isCollapsed && <div className="h-px bg-slate-100 my-3" />}
+            {isCollapsed && <div className="h-px bg-slate-200 my-3" />}
 
             {publicLinks.map((link) => {
               const Icon = link.icon;
@@ -133,18 +133,18 @@ const Layout = ({ children }) => {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`flex items-center ${isCollapsed ? 'justify-center px-2 py-2.5' : 'justify-between px-3 py-2.5'} rounded-xl text-sm font-medium transition-all duration-150 ${
+                  className={`flex items-center ${isCollapsed ? 'justify-center px-2 py-3' : 'justify-between px-3.5 py-3'} rounded-xl text-sm font-extrabold transition-all duration-150 ${
                     isActive
-                      ? 'bg-slate-900 text-white font-semibold shadow-sm'
-                      : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
+                      ? 'bg-slate-950 text-white shadow-sm'
+                      : 'text-slate-900 hover:bg-slate-100 hover:text-black border border-transparent hover:border-slate-200'
                   }`}
                   title={isCollapsed ? link.name : undefined}
                 >
-                  <div className="flex items-center gap-2.5">
-                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+                  <div className="flex items-center gap-3">
+                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-800'}`} />
                     {!isCollapsed && <span className="truncate">{link.name}</span>}
                   </div>
-                  {!isCollapsed && <ExternalLink className="w-3.5 h-3.5 text-slate-400" />}
+                  {!isCollapsed && <ExternalLink className="w-4 h-4 text-slate-700" />}
                 </Link>
               );
             })}
@@ -152,12 +152,12 @@ const Layout = ({ children }) => {
         </div>
 
         {/* User Profile Card */}
-        <div className="pt-3 mt-2 border-t border-slate-100">
+        <div className="pt-3 mt-2 border-t border-slate-200">
           {isCollapsed ? (
             <div className="flex flex-col items-center gap-2">
               <Link to={isAdmin ? '#' : '/employee/profile'} className="shrink-0">
                 <div 
-                  className="w-8 h-8 rounded-full bg-slate-800 text-white flex items-center justify-center font-semibold text-xs shadow-2xs hover:ring-2 hover:ring-slate-400/50 cursor-pointer transition-all"
+                  className="w-8 h-8 rounded-full bg-slate-950 text-white flex items-center justify-center font-bold text-xs shadow-sm hover:ring-2 hover:ring-slate-400 cursor-pointer transition-all"
                   title={`${user?.name} (${user?.role})`}
                 >
                   {user?.name ? user.name[0].toUpperCase() : 'U'}
@@ -166,26 +166,26 @@ const Layout = ({ children }) => {
               <button
                 onClick={handleLogout}
                 title="Logout"
-                className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-md transition-colors"
+                className="p-1.5 text-slate-700 hover:text-rose-600 hover:bg-rose-50 rounded-md transition-colors"
               >
                 <LogOut className="w-3.5 h-3.5" />
               </button>
             </div>
           ) : (
-            <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50 border border-slate-200/70">
+            <div className="flex items-center justify-between p-2 rounded-xl bg-slate-100 border border-slate-300">
               <Link to={isAdmin ? '#' : '/employee/profile'} className="flex items-center gap-2.5 overflow-hidden hover:opacity-80 transition-opacity">
-                <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center font-semibold text-xs shrink-0 shadow-2xs">
+                <div className="w-8 h-8 rounded-full bg-slate-950 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
                   {user?.name ? user.name[0].toUpperCase() : 'U'}
                 </div>
                 <div className="truncate">
-                  <p className="text-xs font-semibold text-slate-900 truncate leading-tight">{user?.name}</p>
-                  <p className="text-[10px] text-slate-500 capitalize">{user?.role}</p>
+                  <p className="text-xs font-black text-slate-950 truncate leading-tight">{user?.name}</p>
+                  <p className="text-[10px] text-slate-700 font-extrabold capitalize">{user?.role} Account</p>
                 </div>
               </Link>
               <button
                 onClick={handleLogout}
                 title="Logout"
-                className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-md transition-colors shrink-0"
+                className="p-1.5 text-slate-700 hover:text-rose-700 hover:bg-rose-100 rounded-md transition-colors shrink-0"
               >
                 <LogOut className="w-3.5 h-3.5" />
               </button>

@@ -85,7 +85,6 @@ export const login = async (req, res) => {
           department: empUser.department,
           designation: empUser.designation,
           totalPoints: empUser.totalPoints,
-          plainTextPassword: empUser.plainTextPassword,
           token: generateToken(empUser._id),
         });
       }

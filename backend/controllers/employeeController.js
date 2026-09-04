@@ -31,11 +31,76 @@ const safeParseDate = (dateVal) => {
 // @desc    Get all employees
 // @route   GET /api/employees
 // @access  Private/Admin
+// @desc    Get all employees (with pagination, projection & filters)
+// @route   GET /api/employees
+// @access  Private/Admin
 export const getEmployees = async (req, res) => {
   try {
+    const page = parseInt(req.query.page, 10);
+    const limit = parseInt(req.query.limit, 10);
+    const search = req.query.search ? req.query.search.trim() : '';
+    const department = req.query.department || 'All';
+    const status = req.query.status || 'All';
     const includeCards = req.query.includeCards === 'true';
-    const selectFields = includeCards ? '-password' : '-password -idCardImage -qrCodeImage';
-    const employees = await Employee.find({}).select(selectFields).lean();
+
+    const selectFields = includeCards 
+      ? '-password' 
+      : '-password -idCardImage -qrCodeImage';
+
+    const query = {};
+
+    if (status && status !== 'All') {
+      query.status = status;
+    }
+
+    if (department && department !== 'All') {
+      if (department === 'COI (Center Of Information)') {
+        query.department = { $in: ['COI (Center Of Information)', 'Telecalling'] };
+      } else if (department === 'Sales And Marketing') {
+        query.department = { $in: ['Sales And Marketing', 'Marketing'] };
+      } else if (department === 'Software Development') {
+        query.department = { $in: ['Software Development', 'IT', 'Engineering'] };
+      } else {
+        query.department = department;
+      }
+    }
+
+    if (search) {
+      const regex = new RegExp(search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+      query.$or = [
+        { name: regex },
+        { employeeId: regex },
+        { email: regex },
+        { designation: regex }
+      ];
+    }
+
+    if (!isNaN(page) && !isNaN(limit) && page > 0 && limit > 0) {
+      const skip = (page - 1) * limit;
+      const [total, employees] = await Promise.all([
+        Employee.countDocuments(query),
+        Employee.find(query)
+          .select(selectFields)
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(limit)
+          .lean()
+      ]);
+
+      return res.json({
+        employees,
+        total,
+        page,
+        pages: Math.ceil(total / limit),
+        limit
+      });
+    }
+
+    // Default response for unpaginated callers (with proper projection & lean)
+    const employees = await Employee.find(query)
+      .select(selectFields)
+      .sort({ createdAt: -1 })
+      .lean();
 
     res.json(employees);
   } catch (error) {
@@ -81,15 +146,31 @@ export const getEmployeeById = async (req, res) => {
 // @access  Public
 export const verifyEmployee = async (req, res) => {
   try {
-    // Find by the custom employeeId, e.g. EMP001
-    const employee = await Employee.findOne({ employeeId: req.params.employeeId }).select('-password');
+    const rawId = (req.params.employeeId || '').trim();
+    if (!rawId) {
+      return res.status(400).json({ message: 'Employee ID is required for verification' });
+    }
+
+    const regex = new RegExp(`^${rawId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i');
+    const isObjectId = /^[0-9a-fA-F]{24}$/.test(rawId);
+
+    const query = {
+      $or: [
+        { employeeId: regex },
+        { email: rawId.toLowerCase() },
+        ...(isObjectId ? [{ _id: rawId }] : [])
+      ]
+    };
+
+    const employee = await Employee.findOne(query).select('-password').lean();
     if (employee) {
       res.json(employee);
     } else {
-      res.status(404).json({ message: 'Employee not found or invalid QR code' });
+      res.status(404).json({ message: 'Employee record not found or invalid QR code' });
     }
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('Verify Employee Error:', error);
+    res.status(500).json({ message: 'Server error during employee verification' });
   }
 };
 
@@ -130,7 +211,6 @@ export const createEmployee = async (req, res) => {
       name: name.trim(),
       email: cleanEmail,
       password,
-      plainTextPassword: password,
       phone: phone || '9876543210',
       department,
       designation,
@@ -146,35 +226,37 @@ export const createEmployee = async (req, res) => {
       if (parsedDOB) empData.dateOfBirth = parsedDOB;
     }
 
-    // Determine public verification base URL and generate permanent QR code
+    const employee = await Employee.create(empData);
+
+    // Non-blocking async QR code generation in background
     const host = req.get('host') || '';
     const isLocal = host.includes('localhost') || host.includes('127.0.0.1');
     const baseUrl = process.env.FRONTEND_URL || (isLocal ? 'http://localhost:5173' : 'https://ems.thesmgroups.com');
-
-    try {
-      const verificationUrl = `${baseUrl}/verify/${employeeId}`;
-      const qrDataUrl = await QRCode.toDataURL(verificationUrl, {
-        width: 335,
-        margin: 1,
-        color: { dark: '#000000', light: '#ffffff' },
-        errorCorrectionLevel: 'H'
+    const verificationUrl = `${baseUrl}/verify/${employeeId}`;
+    
+    QRCode.toDataURL(verificationUrl, {
+      width: 335,
+      margin: 1,
+      color: { dark: '#000000', light: '#ffffff' },
+      errorCorrectionLevel: 'H'
+    }).then(qrDataUrl => {
+      Employee.findByIdAndUpdate(employee._id, { qrCodeImage: qrDataUrl }).catch(err => {
+        console.error('Background QR update failed:', err.message);
       });
-      empData.qrCodeImage = qrDataUrl;
-    } catch (qrErr) {
-      console.error('Failed to generate initial QR code:', qrErr.message);
-    }
+    }).catch(qrErr => console.error('Failed to generate background QR code:', qrErr.message));
 
-    const employee = await Employee.create(empData);
-
-    // Log activity
-    await ActivityLog.create({
+    // Log activity asynchronously
+    ActivityLog.create({
       action: 'Created Employee',
       performedBy: `Admin: ${req.user?.name || 'Admin'}`,
       employeeId: employee._id,
       description: `Created new employee ${name} (${employeeId})`
-    });
+    }).catch(() => {});
 
-    res.status(201).json(employee);
+    // Return safe employee record immediately
+    const safeEmp = employee.toObject();
+    delete safeEmp.password;
+    res.status(201).json(safeEmp);
   } catch (error) {
     console.error('Create Employee Error:', error);
     res.status(500).json({ message: error.message || 'Server error' });
@@ -245,20 +327,21 @@ export const updateEmployee = async (req, res) => {
       }
       if (req.body.password && req.body.password.trim() !== '') {
         employee.password = req.body.password.trim();
-        employee.plainTextPassword = req.body.password.trim();
       }
 
       const updatedEmployee = await employee.save();
 
-      // Log activity
-      await ActivityLog.create({
+      // Log activity asynchronously
+      ActivityLog.create({
         action: 'Updated Employee',
         performedBy: `Admin: ${req.user?.name || 'Admin'}`,
         employeeId: employee._id,
         description: `Updated details for ${employee.name} (${employee.employeeId})`
-      });
+      }).catch(() => {});
 
-      res.json(updatedEmployee);
+      const safeEmp = updatedEmployee.toObject();
+      delete safeEmp.password;
+      res.json(safeEmp);
     } else {
       res.status(404).json({ message: 'Employee not found' });
     }

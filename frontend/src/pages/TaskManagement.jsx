@@ -260,12 +260,17 @@ const TaskManagement = () => {
   const completedTasks = tasks.filter(t => t.status === 'Completed').length;
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 animate-fade-in pb-12">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200/80">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Task Management</h1>
-          <p className="text-sm text-slate-500 mt-1">Assign objectives, set performance points, and track delivery progress.</p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200/80">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-indigo-50 text-indigo-700 border border-indigo-200/60 uppercase tracking-wider inline-flex items-center gap-1.5">
+              <CheckSquare className="w-3 h-3 text-indigo-500" /> Deliverables & Tasks
+            </span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Task Management</h1>
+          <p className="text-xs sm:text-sm text-slate-500 font-medium">Assign objectives, set performance points, and track delivery progress.</p>
         </div>
 
         <button
@@ -273,9 +278,9 @@ const TaskManagement = () => {
             resetForm();
             setShowAddModal(true);
           }}
-          className="btn-primary text-sm shadow-md py-2.5 px-4"
+          className="btn-primary text-xs bg-slate-900 hover:bg-black text-white font-extrabold py-2.5 px-4 rounded-xl shadow-sm hover:shadow-md transition-all flex items-center gap-2"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-4 h-4 text-white" />
           <span>Create Task</span>
         </button>
       </div>
@@ -558,7 +563,7 @@ const TaskManagement = () => {
                       <button
                         onClick={() => handleStatusChange(task._id, 'In Progress')}
                         disabled={updatingTaskId === task._id}
-                        className="btn-secondary text-xs bg-amber-50 hover:bg-amber-100 disabled:bg-slate-100 text-amber-900 border-amber-200/80 py-1.5 px-3 rounded-xl flex items-center justify-center gap-1.5 font-bold transition-all"
+                        className="text-xs bg-amber-50 hover:bg-amber-200 disabled:bg-slate-100 text-amber-950 hover:text-black border-2 border-amber-300 py-1.5 px-3 rounded-xl flex items-center justify-center gap-1.5 font-extrabold transition-all shadow-2xs active:scale-95"
                         title="Request Changes / Revise"
                       >
                         {updatingTaskId === task._id ? (

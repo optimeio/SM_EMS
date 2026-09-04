@@ -51,6 +51,12 @@ const EmployeeManagement = () => {
   const [departmentFilter, setDepartmentFilter] = useState('All');
   const [selectedDept, setSelectedDept] = useState(null);
 
+  // Pagination states
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(20);
+  const [totalEmployees, setTotalEmployees] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+
   const [selectedIDCardEmp, setSelectedIDCardEmp] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showCredentialsModal, setShowCredentialsModal] = useState(false);
@@ -80,7 +86,7 @@ const EmployeeManagement = () => {
       setTimeout(() => setSuccessMessage(''), 3000);
       setEditingPasswordId(null);
       setNewPasswordInput('');
-      fetchEmployees();
+      fetchEmployees(page);
     } catch (err) {
       if (err.response?.status === 403) {
         alert('Unauthorized Action: Changing employee passwords requires Admin privileges. Please sign in as Admin (admin@company.com).');
@@ -106,7 +112,7 @@ const EmployeeManagement = () => {
     } catch (err) {
       console.error('Delete employee warning:', err);
     } finally {
-      fetchEmployees();
+      fetchEmployees(page);
     }
   };
   
@@ -134,11 +140,29 @@ const EmployeeManagement = () => {
   const [formError, setFormError] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
 
-  const fetchEmployees = async () => {
+  const fetchEmployees = async (pageNum = 1) => {
     try {
       setLoading(true);
-      const { data } = await API.get('/employees');
-      setEmployees(data);
+      const activeDept = departmentFilter !== 'All' ? departmentFilter : (selectedDept || 'All');
+      const { data } = await API.get('/employees', {
+        params: {
+          page: pageNum,
+          limit,
+          search: searchTerm,
+          status: statusFilter,
+          department: activeDept
+        }
+      });
+      if (data && data.employees) {
+        setEmployees(data.employees);
+        setTotalEmployees(data.total);
+        setTotalPages(data.pages || 1);
+        setPage(data.page || 1);
+      } else if (Array.isArray(data)) {
+        setEmployees(data);
+        setTotalEmployees(data.length);
+        setTotalPages(1);
+      }
     } catch (err) {
       console.error('Failed to fetch employees', err);
     } finally {
@@ -147,7 +171,10 @@ const EmployeeManagement = () => {
   };
 
   useEffect(() => {
-    fetchEmployees();
+    fetchEmployees(1);
+  }, [searchTerm, statusFilter, departmentFilter, selectedDept, limit]);
+
+  useEffect(() => {
     if (searchParams.get('add') === 'true') {
       setShowAddModal(true);
     }
@@ -376,30 +403,46 @@ const EmployeeManagement = () => {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200/80">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Employee Directory</h1>
-          <p className="text-sm text-slate-500 mt-1">Manage personnel records, issue corporate identity badges, and view performance.</p>
+    <div className="space-y-6 animate-fade-in pb-12">
+      {/* Page Header Container — 100% Ultra-Sharp High-Contrast Panel */}
+      <div className="bg-white border-2 border-slate-300 rounded-2xl p-6 sm:p-7 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-5 relative overflow-hidden">
+        <div className="space-y-2 z-10">
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-[11px] font-black tracking-wider uppercase bg-slate-950 text-white shadow-xs">
+              <Users className="w-3.5 h-3.5 text-indigo-400" />
+              PERSONNEL DIRECTORY
+            </span>
+            <span className="text-slate-300 font-bold">•</span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-[11px] font-black tracking-wider uppercase bg-indigo-100 text-indigo-950 border border-indigo-300 shadow-xs">
+              {employees.length} Active Records
+            </span>
+          </div>
+
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-950 tracking-tight leading-none">
+            Employee Directory
+          </h1>
+          <p className="text-xs sm:text-sm font-bold text-slate-800 leading-relaxed max-w-2xl">
+            Manage personnel records, issue corporate identity badges, and view performance.
+          </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* Unified Action Buttons */}
+        <div className="flex items-center gap-3 flex-wrap justify-start md:justify-end shrink-0 z-10">
           <button
             onClick={handleExportExcel}
-            className="btn-secondary text-sm flex items-center gap-2 border-emerald-300 text-emerald-800 bg-emerald-50 hover:bg-emerald-100 font-bold"
-            title="Download Employee Records as Excel spreadsheet"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-950 text-xs font-extrabold rounded-xl border-2 border-slate-300 shadow-xs transition-all hover:scale-[1.02] active:scale-95"
+            title="Download Employee Records as Excel"
           >
             <Download className="w-4 h-4 text-emerald-600" />
-            Export Excel
+            <span>Export Excel</span>
           </button>
 
           <button
             onClick={() => setShowCredentialsModal(true)}
-            className="btn-secondary text-sm flex items-center gap-2 border-slate-300 text-slate-700 hover:bg-slate-100"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-950 text-xs font-extrabold rounded-xl border-2 border-slate-300 shadow-xs transition-all hover:scale-[1.02] active:scale-95"
           >
-            <Key className="w-4 h-4 text-amber-600" />
-            Credentials Vault
+            <Key className="w-4 h-4 text-amber-500" />
+            <span>Credentials Vault</span>
           </button>
 
           <button
@@ -407,24 +450,24 @@ const EmployeeManagement = () => {
               resetForm();
               setShowAddModal(true);
             }}
-            className="btn-primary text-sm shadow-md"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-950 hover:bg-black text-white text-xs font-black rounded-xl shadow-md border border-slate-900 transition-all hover:scale-[1.02] active:scale-95"
           >
-            <Plus className="w-4 h-4" />
-            Add Employee
+            <Plus className="w-4 h-4 text-white" />
+            <span>Add Employee</span>
           </button>
         </div>
       </div>
 
       {/* Controls Filter Bar */}
-      <div className="card-saas grid grid-cols-1 md:grid-cols-4 gap-3 p-4 border border-slate-200/80">
+      <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-2xs grid grid-cols-1 md:grid-cols-4 gap-3">
         <div className="md:col-span-2 relative">
-          <Search className="w-4.5 h-4.5 text-slate-400 absolute left-3.5 top-3" />
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
           <input
             type="text"
             placeholder="Search by employee name, ID (EMP001), or email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="input-saas w-full pl-10 text-sm py-2"
+            className="input-saas w-full pl-10 text-xs py-2.5 font-medium"
           />
         </div>
 
@@ -432,7 +475,7 @@ const EmployeeManagement = () => {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="input-saas w-full text-sm py-2 font-medium"
+            className="input-saas w-full text-xs py-2.5 font-extrabold"
           >
             <option value="All">All Statuses</option>
             <option value="Active">Active Only</option>
@@ -444,7 +487,7 @@ const EmployeeManagement = () => {
           <select
             value={departmentFilter}
             onChange={(e) => setDepartmentFilter(e.target.value)}
-            className="input-saas w-full text-sm py-2 font-medium"
+            className="input-saas w-full text-xs py-2.5 font-extrabold"
           >
             <option value="All">All Departments</option>
             {departments.map((dept) => (
@@ -463,13 +506,13 @@ const EmployeeManagement = () => {
           <div className="flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-4">
             <button
               onClick={() => setSelectedDept('All')}
-              className="btn-secondary text-sm bg-white shadow-xs flex items-center justify-center sm:justify-start gap-2 w-full sm:w-auto hover:bg-slate-100"
+              className="btn-secondary text-xs bg-white shadow-2xs flex items-center justify-center sm:justify-start gap-2 w-full sm:w-auto hover:bg-slate-50 font-extrabold py-2.5 px-4 rounded-xl"
             >
               <Users className="w-4 h-4 text-slate-500" />
               View All Employees ({employees.length})
             </button>
             <div className="text-center sm:text-right">
-              <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Departments</h2>
+              <h2 className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Departments Overview</h2>
               <p className="text-xs text-slate-500 mt-0.5 font-medium">Select a department to explore employee records</p>
             </div>
           </div>
@@ -482,21 +525,21 @@ const EmployeeManagement = () => {
                 <div
                   key={dept}
                   onClick={() => setSelectedDept(dept)}
-                  className="bg-white rounded-2xl border-2 border-slate-300 p-6 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer group relative overflow-hidden flex flex-col justify-between"
+                  className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-2xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 cursor-pointer group relative overflow-hidden flex flex-col justify-between"
                 >
                   <div className={`absolute top-0 left-0 right-0 h-1.5 ${style.topBar}`}></div>
 
                   <div className="flex items-center justify-between pt-1">
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border-2 shadow-sm transition-transform duration-300 group-hover:scale-110 ${style.iconBg}`}>
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border shadow-2xs transition-transform duration-300 group-hover:scale-105 ${style.iconBg}`}>
                       {getDepartmentIcon(dept)}
                     </div>
-                    <span className={`text-xs font-black px-3.5 py-1 rounded-full border-2 tabular-nums shadow-xs ${style.badge}`}>
+                    <span className={`text-xs font-black px-3 py-1 rounded-full border tabular-nums shadow-2xs ${style.badge}`}>
                       {count} Members
                     </span>
                   </div>
 
                   <div className="my-4">
-                    <h3 className={`text-xl font-black text-slate-900 transition-colors ${style.text}`}>
+                    <h3 className={`text-lg font-black text-slate-900 transition-colors ${style.text}`}>
                       {dept}
                     </h3>
                     <p className="text-xs text-slate-500 mt-1 font-medium leading-relaxed">
@@ -504,7 +547,7 @@ const EmployeeManagement = () => {
                     </p>
                   </div>
 
-                  <div className="pt-3 border-t-2 border-slate-100 flex items-center justify-between text-xs font-extrabold text-slate-700 group-hover:text-slate-900">
+                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-extrabold text-slate-700 group-hover:text-slate-900">
                     <span>Explore Department</span>
                     <div className={`p-1.5 rounded-xl border border-slate-200 group-hover:border-slate-300 transition-colors ${style.arrowBg}`}>
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -516,7 +559,7 @@ const EmployeeManagement = () => {
           </div>
         </div>
       ) : filteredEmployees.length === 0 ? (
-        <div className="card-saas text-center py-16 space-y-3">
+        <div className="bg-white rounded-2xl text-center py-16 space-y-3 border border-slate-200/80 shadow-2xs">
           <Users className="w-12 h-12 text-slate-300 mx-auto" />
           <h3 className="text-base font-bold text-slate-700">No employees match your search</h3>
           <p className="text-xs text-slate-500">Try clearing filters or adjusting your search query.</p>
@@ -524,17 +567,17 @@ const EmployeeManagement = () => {
       ) : (
         /* Employee Table */
         <div className="space-y-4">
-          <div className="flex items-center justify-between bg-white border border-slate-200/80 px-4 py-3 rounded-xl shadow-2xs">
+          <div className="flex items-center justify-between bg-white border border-slate-200/80 px-4 py-3 rounded-2xl shadow-2xs">
             <div className="flex items-center gap-2 text-xs">
               <button
                 onClick={() => setSelectedDept(null)}
-                className="font-semibold text-slate-600 hover:text-slate-900 flex items-center gap-1"
+                className="font-extrabold text-slate-600 hover:text-slate-900 flex items-center gap-1"
               >
                 <ChevronLeft className="w-4 h-4" />
                 Departments
               </button>
               <span className="text-slate-300">/</span>
-              <span className="font-bold text-slate-900 text-xs">
+              <span className="font-extrabold text-slate-900 text-xs">
                 {selectedDept === 'All' ? 'All Departments' : `${selectedDept} Department`} ({filteredEmployees.length} Personnel)
               </span>
             </div>
@@ -542,77 +585,73 @@ const EmployeeManagement = () => {
             {selectedDept && (
               <button
                 onClick={() => setSelectedDept(null)}
-                className="text-xs font-semibold text-slate-500 hover:text-slate-800 underline"
+                className="text-xs font-bold text-indigo-600 hover:text-indigo-800 underline"
               >
                 Show All Departments
               </button>
             )}
           </div>
 
-          <div className="card-saas p-0">
+          <div>
             {/* Desktop Table View */}
-            <div className="hidden md:block overflow-x-auto">
-              <table className="w-full text-left border-collapse">
+            <div className="hidden md:block table-saas-container">
+              <table className="table-saas">
                 <thead>
-                  <tr className="border-b border-slate-200/80 bg-slate-50/80 text-xs font-semibold uppercase text-slate-500 tracking-wider">
-                    <th className="p-4 pl-5">Employee</th>
-                    <th className="p-4">Department & Designation</th>
-                    <th className="p-4">Joined Date</th>
-                    <th className="p-4">Status</th>
-                    <th className="p-4 text-center">Score</th>
-                    <th className="p-4 pr-5 text-right">Actions</th>
+                  <tr>
+                    <th>Employee</th>
+                    <th>Department & Designation</th>
+                    <th>Joined Date</th>
+                    <th>Status</th>
+                    <th className="text-center">Score</th>
+                    <th className="text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 text-sm font-normal">
+                <tbody>
                   {filteredEmployees.map((emp) => (
-                    <tr key={emp._id} className="hover:bg-slate-50/70 transition-colors">
-                      <td className="p-4 pl-5">
-                        <div className="flex items-center gap-3.5">
+                    <tr key={emp._id}>
+                      <td>
+                        <div className="flex items-center gap-3">
                           {emp.profilePhoto ? (
                             <img
                               src={emp.profilePhoto}
                               alt={emp.name}
-                              className="w-9 h-9 rounded-full object-cover border border-slate-200"
+                              className="w-9 h-9 rounded-full object-cover border border-slate-200 shadow-2xs"
                             />
                           ) : (
-                            <div className="w-9 h-9 rounded-full bg-slate-900 text-white font-bold text-xs flex items-center justify-center shrink-0">
+                            <div className="w-9 h-9 rounded-full bg-slate-900 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-2xs">
                               {emp.name[0]}
                             </div>
                           )}
                           <div>
-                            <div className="font-bold text-slate-900 text-sm flex items-center gap-2">
+                            <div className="font-extrabold text-slate-900 text-sm flex items-center gap-2">
                               {emp.name}
-                              <span className="font-mono text-xs text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200/60 font-semibold">
+                              <span className="font-mono text-xs text-slate-500 font-semibold">
                                 {emp.employeeId}
                               </span>
                             </div>
-                            <div className="text-slate-500 text-xs mt-0.5">{emp.email}</div>
+                            <div className="text-slate-500 text-xs mt-0.5 font-medium">{emp.email}</div>
                           </div>
                         </div>
                       </td>
 
-                      <td className="p-4">
-                        <div className="font-semibold text-slate-900 text-sm">{emp.designation}</div>
-                        <div className="text-slate-500 text-xs mt-0.5">{emp.department}</div>
+                      <td>
+                        <div className="font-bold text-slate-900 text-sm">{emp.designation}</div>
+                        <div className="text-slate-500 text-xs mt-0.5 font-medium">{emp.department}</div>
                       </td>
 
-                      <td className="p-4 text-slate-600 font-mono text-xs">
-                        {new Date(emp.joiningDate).toLocaleDateString()}
+                      <td className="text-slate-700 font-mono text-xs font-semibold">
+                        {new Date(emp.joiningDate).toLocaleDateString('en-GB')}
                       </td>
 
-                      <td className="p-4">
+                      <td>
                         <span className={emp.status === 'Active' ? 'badge-success' : 'badge-danger'}>
-                          {emp.status === 'Active' ? (
-                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                          ) : (
-                            <XCircle className="w-3.5 h-3.5 text-rose-600" />
-                          )}
+                          <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
                           {emp.status}
                         </span>
                       </td>
 
-                      <td className="p-4 text-center font-bold text-slate-800 tabular-nums">
-                        <span className="inline-flex items-center gap-1 bg-amber-50 text-amber-700 px-2.5 py-1 rounded-lg border border-amber-200/60 text-xs font-bold">
+                      <td className="text-center font-bold text-slate-900 tabular-nums">
+                        <span className="inline-flex items-center gap-1 bg-amber-50 text-amber-800 px-2.5 py-0.5 rounded-full border border-amber-200/80 text-xs font-bold">
                           <Award className="w-3.5 h-3.5 text-amber-600" />
                           {emp.totalPoints || 0} Pts
                         </span>
@@ -623,7 +662,7 @@ const EmployeeManagement = () => {
                           <button
                             onClick={() => openProfileDetail(emp._id)}
                             title="View Profile"
-                            className="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
+                            className="p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
                           >
                             <Eye className="w-4 h-4" />
                           </button>
@@ -631,7 +670,7 @@ const EmployeeManagement = () => {
                           <button
                             onClick={() => openEditModal(emp)}
                             title="Edit Profile"
-                            className="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
+                            className="p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
                           >
                             <Edit3 className="w-4 h-4" />
                           </button>
@@ -639,7 +678,7 @@ const EmployeeManagement = () => {
                           <button
                             onClick={() => setConfirmStatusEmp(emp)}
                             title={emp.status === 'Active' ? 'Deactivate' : 'Activate'}
-                            className="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
+                            className="p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
                           >
                             {emp.status === 'Active' ? <UserX className="w-4 h-4 text-amber-600" /> : <UserCheck className="w-4 h-4 text-emerald-600" />}
                           </button>
@@ -734,6 +773,31 @@ const EmployeeManagement = () => {
                 </div>
               ))}
             </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between px-6 py-4 border-t border-slate-200/80 bg-slate-50/50 rounded-b-2xl">
+                <div className="text-xs text-slate-500 font-medium">
+                  Page <span className="font-bold text-slate-900">{page}</span> of <span className="font-bold text-slate-900">{totalPages}</span> ({totalEmployees} total employees)
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    disabled={page <= 1}
+                    onClick={() => fetchEmployees(page - 1)}
+                    className="btn-secondary text-xs px-3 py-1.5 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1"
+                  >
+                    <ChevronLeft className="w-4 h-4" /> Previous
+                  </button>
+                  <button
+                    disabled={page >= totalPages}
+                    onClick={() => fetchEmployees(page + 1)}
+                    className="btn-secondary text-xs px-3 py-1.5 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1"
+                  >
+                    Next <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

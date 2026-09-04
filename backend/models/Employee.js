@@ -16,13 +16,9 @@ const employeeSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
-  password: { // Employee will need password to login to their dashboard
+  password: { // Employee password for dashboard login
     type: String,
     required: true
-  },
-  plainTextPassword: { // Stored for Admin credential management display
-    type: String,
-    default: 'Password@123'
   },
   phone: {
     type: String,
@@ -76,8 +72,8 @@ const employeeSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-employeeSchema.index({ status: 1 });
-employeeSchema.index({ department: 1 });
+employeeSchema.index({ status: 1, department: 1 });
+employeeSchema.index({ name: 'text', employeeId: 'text', email: 'text' });
 
 // Hash password before saving
 employeeSchema.pre('save', async function () {
@@ -88,38 +84,27 @@ employeeSchema.pre('save', async function () {
   if (/^\$2[aby]\$/.test(this.password)) {
     return;
   }
-  // Set plainTextPassword if not already set or updated
-  if (!this.plainTextPassword || this.isModified('password')) {
-    this.plainTextPassword = this.password;
-  }
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
 });
 
-// Match password
+// Match password securely using bcrypt
 employeeSchema.methods.matchPassword = async function (enteredPassword) {
   if (!enteredPassword) return false;
   const cleanEntered = enteredPassword.trim();
-  const cleanEnteredLower = cleanEntered.toLowerCase();
 
-  // 1. Direct fast plainTextPassword match (case-insensitive & exact)
-  if (this.plainTextPassword) {
-    if (this.plainTextPassword === cleanEntered) return true;
-    if (this.plainTextPassword.trim().toLowerCase() === cleanEnteredLower) return true;
-  }
-
-  // 2. Direct password match if stored unhashed
-  if (this.password) {
-    if (this.password === cleanEntered) return true;
-    if (this.password.trim().toLowerCase() === cleanEnteredLower) return true;
-  }
-
-  // 3. Bcrypt compare check
-  if (this.password) {
+  // If password stored in DB is already hashed
+  if (this.password && /^\$2[aby]\$/.test(this.password)) {
     try {
-      const isMatch = await bcrypt.compare(cleanEntered, this.password);
-      if (isMatch) return true;
-    } catch (e) {}
+      return await bcrypt.compare(cleanEntered, this.password);
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // Fallback for raw legacy unhashed password before background migration runs
+  if (this.password && (this.password === cleanEntered || this.password.trim().toLowerCase() === cleanEntered.toLowerCase())) {
+    return true;
   }
 
   return false;

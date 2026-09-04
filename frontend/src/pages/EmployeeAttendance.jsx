@@ -429,7 +429,7 @@ const EmployeeAttendance = () => {
                   <div className="flex gap-2 w-full sm:w-auto">
                     <label
                       htmlFor="geo-tag-photo-input"
-                      className="btn-secondary text-xs bg-slate-800 text-slate-200 border-slate-700 hover:bg-slate-700 flex-1 sm:flex-none justify-center cursor-pointer flex items-center gap-1.5"
+                      className="text-xs bg-slate-800 hover:bg-slate-700 text-white hover:text-white border border-slate-700 hover:border-slate-500 font-extrabold py-2 px-3.5 rounded-xl transition-all flex-1 sm:flex-none justify-center cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-95"
                     >
                       <Upload className="w-3.5 h-3.5" />
                       Pick Another
@@ -573,55 +573,56 @@ const EmployeeAttendance = () => {
         ) : (
           <div>
             {/* Desktop Table View */}
-            <div className="hidden md:block overflow-x-auto">
-              <table className="w-full text-left text-sm border-collapse">
+            <div className="hidden md:block table-saas-container">
+              <table className="table-saas">
                 <thead>
-                  <tr className="border-b border-slate-200/80 bg-slate-50/70 text-xs font-semibold uppercase text-slate-500 tracking-wider">
-                    <th className="p-4 pl-5">Date</th>
-                    <th className="p-4">Status</th>
-                    <th className="p-4">Check In</th>
-                    <th className="p-4">Check Out</th>
-                    <th className="p-4">Hours</th>
-                    <th className="p-4">Location</th>
-                    <th className="p-4 pr-5 text-right">Photo Audit</th>
+                  <tr>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Check In</th>
+                    <th>Check Out</th>
+                    <th>Hours</th>
+                    <th>Location</th>
+                    <th className="text-right">Photo Audit</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 font-normal text-slate-700">
+                <tbody>
                   {history.map((record) => (
-                    <tr key={record._id} className="hover:bg-slate-50/70 transition-colors">
-                      <td className="p-4 pl-5 font-bold text-slate-900 font-mono text-xs">{record.date}</td>
-                      <td className="p-4">
+                    <tr key={record._id}>
+                      <td className="font-extrabold text-slate-900 font-mono text-xs">{record.date}</td>
+                      <td>
                         <span className={record.status === 'Present' ? 'badge-success' : 'badge-neutral'}>
+                          <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
                           {record.status}
                         </span>
                       </td>
-                      <td className="p-4 font-mono text-xs font-semibold text-slate-900">{formatTime(record.checkIn)}</td>
-                      <td className="p-4 font-mono text-xs text-slate-500">{formatTime(record.checkOut)}</td>
-                      <td className="p-4 font-mono text-emerald-700 font-bold text-xs">{record.workingHours || '-'}</td>
-                      <td className="p-4">
+                      <td className="font-mono text-xs font-bold text-emerald-700">{formatTime(record.checkIn)}</td>
+                      <td className="font-mono text-xs text-slate-700 font-bold">{formatTime(record.checkOut)}</td>
+                      <td className="font-mono text-slate-900 font-bold text-xs">{record.workingHours || '-'}</td>
+                      <td>
                         {record.location?.lat ? (
                           <a
                             href={`https://www.google.com/maps?q=${record.location.lat},${record.location.lng}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-start gap-1 text-sky-700 hover:text-sky-900 transition-colors"
+                            className="inline-flex items-start gap-1 text-slate-800 hover:text-indigo-600 transition-colors font-medium text-xs max-w-xs"
                           >
-                            <MapPin className="w-3.5 h-3.5 shrink-0 mt-0.5" />
-                            <span className="text-[11px] font-bold whitespace-normal break-words leading-tight" title={record.location.address || 'Map'}>
-                              {record.location.address || 'Map'}
+                            <MapPin className="w-3.5 h-3.5 shrink-0 mt-0.5 text-rose-500" />
+                            <span className="truncate" title={record.location.address || 'Map'}>
+                              {record.location.address || 'Map Location'}
                             </span>
                           </a>
                         ) : (
-                          <span className="text-slate-400 text-xs">-</span>
+                          <span className="text-slate-400 text-xs italic">Location not tagged</span>
                         )}
                       </td>
-                      <td className="p-4 pr-5 text-right">
+                      <td className="text-right">
                         <button
                           onClick={() => openPhotoModal(record._id)}
-                          className="btn-secondary text-xs py-1.5 px-3"
+                          className="inline-flex items-center gap-1.5 text-xs py-1.5 px-3 bg-white hover:bg-slate-50 text-slate-800 font-bold border border-slate-200 hover:border-slate-300 rounded-xl shadow-xs transition-all"
                         >
                           <Eye className="w-3.5 h-3.5 text-slate-600" />
-                          View
+                          Audit Photo
                         </button>
                       </td>
                     </tr>

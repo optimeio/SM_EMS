@@ -22,7 +22,24 @@ export const syncAllEmployeePasswords = async () => {
         console.log('🔐 Successfully synchronized Admin account password to "Password@123"');
       }
     }
+
+    // Migrate any legacy unhashed employee passwords or clean up plainTextPassword field
+    const employees = await Employee.find({});
+    for (const emp of employees) {
+      let needsSave = false;
+      if (emp.password && !/^\$2[aby]\$/.test(emp.password)) {
+        emp.password = emp.password; // Triggers pre('save') bcrypt hashing
+        needsSave = true;
+      }
+      if (emp._doc.plainTextPassword !== undefined) {
+        emp.set('plainTextPassword', undefined, { strict: false });
+        needsSave = true;
+      }
+      if (needsSave) {
+        await emp.save();
+      }
+    }
   } catch (error) {
-    console.error('⚠️ Admin Password Sync Error:', error.message);
+    console.error('⚠️ Password Sync / Migration Error:', error.message);
   }
 };

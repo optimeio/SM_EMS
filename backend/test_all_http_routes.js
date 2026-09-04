@@ -3,7 +3,7 @@ import path from 'path';
 import dotenv from 'dotenv';
 import { google } from 'googleapis';
 
-dotenv.config({ path: 'c:/Users/Lenovo/Desktop/ID_Scan/backend/.env' });
+dotenv.config({ path: './.env' });
 
 const API_BASE = 'http://localhost:5000/api';
 

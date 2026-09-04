@@ -69,18 +69,19 @@ export const getLeaderboard = async (req, res) => {
 export const getEmployeePerformance = async (req, res) => {
   try {
     const employeeId = req.params.id;
-    const employee = await Employee.findById(employeeId)
-      .select('-password -idCardImage')
-      .lean();
-    
+
+    const [employee, tasks, totalTasks, completedTasks, pendingTasks] = await Promise.all([
+      Employee.findById(employeeId).select('-password -idCardImage -qrCodeImage').lean(),
+      Task.find({ assignedTo: employeeId }).sort({ createdAt: -1 }).lean(),
+      Task.countDocuments({ assignedTo: employeeId }),
+      Task.countDocuments({ assignedTo: employeeId, status: 'Completed' }),
+      Task.countDocuments({ assignedTo: employeeId, status: 'Pending' })
+    ]);
+
     if (!employee) {
       return res.status(404).json({ message: 'Employee not found' });
     }
 
-    const tasks = await Task.find({ assignedTo: employeeId }).lean();
-    const totalTasks = tasks.length;
-    const completedTasks = tasks.filter(t => t.status === 'Completed').length;
-    const pendingTasks = tasks.filter(t => t.status === 'Pending').length;
     const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
     res.json({

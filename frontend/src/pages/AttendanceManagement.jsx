@@ -121,106 +121,117 @@ const AttendanceManagement = () => {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 animate-fade-in pb-12">
       
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200/80">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Attendance Operations</h1>
-          <p className="text-sm text-slate-500 mt-1">
+      {/* Page Header Container */}
+      <div className="rounded-3xl bg-white border-2 border-slate-300 shadow-sm p-6 sm:p-7 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="space-y-2 z-10">
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <span className="px-3 py-1 rounded-md text-[11px] font-black bg-slate-950 text-white uppercase tracking-wider inline-flex items-center gap-1.5 shadow-xs">
+              <Calendar className="w-3.5 h-3.5 text-indigo-400" />
+              ATTENDANCE OPERATIONS
+            </span>
+            <span className="text-slate-400">•</span>
+            <span className="text-xs font-black text-slate-950 font-mono bg-slate-200 px-2.5 py-0.5 rounded-lg border border-slate-300">
+              Live Audit Log
+            </span>
+          </div>
+
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-950 tracking-tight leading-tight">Attendance Operations</h1>
+          <p className="text-xs sm:text-sm text-slate-800 font-bold max-w-2xl leading-relaxed">
             Monitor daily check-ins, working hours, and audit photo evidence on Google Drive.
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5 flex-wrap z-10 shrink-0">
           <button
             onClick={handleExportAttendanceExcel}
-            className="btn-secondary text-sm flex items-center gap-2 border-emerald-300 text-emerald-800 bg-emerald-50 hover:bg-emerald-100 font-bold"
-            title="Download Attendance Report as Excel spreadsheet"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-950 text-xs font-extrabold rounded-xl border-2 border-slate-300 shadow-xs transition-all hover:scale-[1.02] active:scale-95"
+            title="Download Attendance Report as Excel"
           >
             <Download className="w-4 h-4 text-emerald-600" />
-            Export Excel
+            <span>Export Excel</span>
           </button>
 
           <button
             onClick={fetchAdminAttendance}
-            className="btn-secondary text-sm shadow-xs"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-950 hover:bg-black text-white text-xs font-black rounded-xl shadow-md border border-slate-900 transition-all hover:scale-[1.02] active:scale-95"
           >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-            Refresh Records
+            <RefreshCw className={`w-4 h-4 text-indigo-400 ${loading ? 'animate-spin' : ''}`} />
+            <span>Refresh Records</span>
           </button>
         </div>
       </div>
 
-      {/* Summary KPI Cards Grid — Compact Run Beyond Style with Hover Highlight */}
+      {/* Summary KPI Cards Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-3.5">
         {/* Total Staff */}
-        <div className="bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200/90 hover:border-slate-800 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group flex flex-col justify-between cursor-pointer">
+        <div className="bg-white rounded-2xl p-4 border-2 border-slate-300 hover:border-slate-950 hover:shadow-md transition-all duration-200 group flex flex-col justify-between cursor-pointer">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider truncate group-hover:text-slate-900 transition-colors">Total Staff</span>
-            <div className="w-9 h-9 rounded-full bg-slate-800 text-white flex items-center justify-center shadow-2xs shrink-0 group-hover:scale-110 transition-transform">
+            <span className="text-xs font-black text-slate-950 uppercase tracking-wider truncate">Total Staff</span>
+            <div className="w-9 h-9 rounded-xl bg-slate-950 text-white flex items-center justify-center shadow-xs shrink-0 group-hover:scale-105 transition-transform">
               <Users className="w-4.5 h-4.5" />
             </div>
           </div>
           <div className="mt-2.5">
-            <p className="text-2xl font-black text-slate-900 tabular-nums tracking-tight">{summary.totalEmployees || 0}</p>
-            <p className="text-[11px] font-semibold text-slate-400 mt-0.5 truncate">Active staff members</p>
+            <p className="text-2xl sm:text-3xl font-black text-slate-950 tabular-nums tracking-tight">{summary.totalEmployees || 0}</p>
+            <p className="text-xs font-bold text-slate-800 mt-0.5 truncate">Active staff members</p>
           </div>
         </div>
 
         {/* Present */}
-        <div className="bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200/90 hover:border-indigo-500 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group flex flex-col justify-between cursor-pointer">
+        <div className="bg-white rounded-2xl p-4 border-2 border-slate-300 hover:border-slate-950 hover:shadow-md transition-all duration-200 group flex flex-col justify-between cursor-pointer">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider truncate group-hover:text-indigo-600 transition-colors">Present</span>
-            <div className="w-9 h-9 rounded-full bg-indigo-600 text-white flex items-center justify-center shadow-2xs shrink-0 group-hover:scale-110 transition-transform">
+            <span className="text-xs font-black text-slate-950 uppercase tracking-wider truncate">Present</span>
+            <div className="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-xs shrink-0 group-hover:scale-105 transition-transform">
               <UserCheck className="w-4.5 h-4.5" />
             </div>
           </div>
           <div className="mt-2.5">
-            <p className="text-2xl font-black text-slate-900 tabular-nums tracking-tight">{summary.presentCount || 0}</p>
-            <p className="text-[11px] font-semibold text-slate-400 mt-0.5 truncate">Checked in today</p>
+            <p className="text-2xl sm:text-3xl font-black text-slate-950 tabular-nums tracking-tight">{summary.presentCount || 0}</p>
+            <p className="text-xs font-bold text-slate-800 mt-0.5 truncate">Checked in today</p>
           </div>
         </div>
 
         {/* Absent */}
-        <div className="bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200/90 hover:border-rose-500 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group flex flex-col justify-between cursor-pointer">
+        <div className="bg-white rounded-2xl p-4 border-2 border-slate-300 hover:border-slate-950 hover:shadow-md transition-all duration-200 group flex flex-col justify-between cursor-pointer">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider truncate group-hover:text-rose-600 transition-colors">Absent</span>
-            <div className="w-9 h-9 rounded-full bg-rose-500 text-white flex items-center justify-center shadow-2xs shrink-0 group-hover:scale-110 transition-transform">
+            <span className="text-xs font-black text-slate-950 uppercase tracking-wider truncate">Absent</span>
+            <div className="w-9 h-9 rounded-xl bg-rose-600 text-white flex items-center justify-center shadow-xs shrink-0 group-hover:scale-105 transition-transform">
               <UserX className="w-4.5 h-4.5" />
             </div>
           </div>
           <div className="mt-2.5">
-            <p className="text-2xl font-black text-slate-900 tabular-nums tracking-tight">{summary.absentCount || 0}</p>
-            <p className="text-[11px] font-semibold text-slate-400 mt-0.5 truncate">Not checked in</p>
+            <p className="text-2xl sm:text-3xl font-black text-slate-950 tabular-nums tracking-tight">{summary.absentCount || 0}</p>
+            <p className="text-xs font-bold text-slate-800 mt-0.5 truncate">Not checked in</p>
           </div>
         </div>
 
         {/* On Shift */}
-        <div className="bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200/90 hover:border-emerald-500 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group flex flex-col justify-between cursor-pointer">
+        <div className="bg-white rounded-2xl p-4 border-2 border-slate-300 hover:border-slate-950 hover:shadow-md transition-all duration-200 group flex flex-col justify-between cursor-pointer">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider truncate group-hover:text-emerald-600 transition-colors">On Shift</span>
-            <div className="w-9 h-9 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-2xs shrink-0 group-hover:scale-110 transition-transform">
+            <span className="text-xs font-black text-slate-950 uppercase tracking-wider truncate">On Shift</span>
+            <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-xs shrink-0 group-hover:scale-105 transition-transform">
               <Clock className="w-4.5 h-4.5" />
             </div>
           </div>
           <div className="mt-2.5">
-            <p className="text-2xl font-black text-slate-900 tabular-nums tracking-tight">{summary.workingCount || 0}</p>
-            <p className="text-[11px] font-semibold text-slate-400 mt-0.5 truncate">Currently working</p>
+            <p className="text-2xl sm:text-3xl font-black text-slate-950 tabular-nums tracking-tight">{summary.workingCount || 0}</p>
+            <p className="text-xs font-bold text-slate-800 mt-0.5 truncate">Currently working</p>
           </div>
         </div>
 
         {/* Checked Out */}
-        <div className="bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200/90 hover:border-amber-500 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group flex flex-col justify-between cursor-pointer">
+        <div className="bg-white rounded-2xl p-4 border-2 border-slate-300 hover:border-slate-950 hover:shadow-md transition-all duration-200 group flex flex-col justify-between cursor-pointer">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider truncate group-hover:text-amber-600 transition-colors">Checked Out</span>
-            <div className="w-9 h-9 rounded-full bg-amber-500 text-white flex items-center justify-center shadow-2xs shrink-0 group-hover:scale-110 transition-transform">
+            <span className="text-xs font-black text-slate-950 uppercase tracking-wider truncate">Checked Out</span>
+            <div className="w-9 h-9 rounded-xl bg-amber-600 text-white flex items-center justify-center shadow-xs shrink-0 group-hover:scale-105 transition-transform">
               <LogOut className="w-4.5 h-4.5" />
             </div>
           </div>
           <div className="mt-2.5">
-            <p className="text-2xl font-black text-slate-900 tabular-nums tracking-tight">{summary.checkedOutCount || 0}</p>
-            <p className="text-[11px] font-semibold text-slate-400 mt-0.5 truncate">Shift completed</p>
+            <p className="text-2xl sm:text-3xl font-black text-slate-950 tabular-nums tracking-tight">{summary.checkedOutCount || 0}</p>
+            <p className="text-xs font-bold text-slate-800 mt-0.5 truncate">Shift completed</p>
           </div>
         </div>
       </div>
@@ -228,21 +239,21 @@ const AttendanceManagement = () => {
       {/* Filter Bar */}
       <div className="card-saas p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 border-2 border-slate-300 shadow-sm">
         <div className="space-y-1">
-          <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Filter Date</label>
+          <label className="text-xs font-black text-slate-950 uppercase tracking-wider block">Filter Date</label>
           <input
             type="date"
             value={filterDate}
             onChange={(e) => setFilterDate(e.target.value)}
-            className="input-saas text-sm w-full py-2"
+            className="input-saas text-sm w-full py-2 font-bold"
           />
         </div>
 
         <div className="space-y-1">
-          <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Department</label>
+          <label className="text-xs font-black text-slate-950 uppercase tracking-wider block">Department</label>
           <select
             value={departmentFilter}
             onChange={(e) => setDepartmentFilter(e.target.value)}
-            className="input-saas text-sm w-full py-2 font-medium"
+            className="input-saas text-sm w-full py-2 font-extrabold"
           >
             <option value="All">All Departments</option>
             {departments.map((dept) => (
@@ -252,11 +263,11 @@ const AttendanceManagement = () => {
         </div>
 
         <div className="space-y-1">
-          <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Status</label>
+          <label className="text-xs font-black text-slate-950 uppercase tracking-wider block">Status</label>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="input-saas text-sm w-full py-2 font-medium"
+            className="input-saas text-sm w-full py-2 font-extrabold"
           >
             <option value="All">All Statuses</option>
             <option value="Present">Present (Working)</option>
@@ -265,15 +276,15 @@ const AttendanceManagement = () => {
         </div>
 
         <div className="space-y-1">
-          <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Search</label>
+          <label className="text-xs font-black text-slate-950 uppercase tracking-wider block">Search</label>
           <div className="relative">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+            <Search className="w-4 h-4 text-slate-600 absolute left-3.5 top-3" />
             <input
               type="text"
               placeholder="Search by name, ID..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="input-saas pl-10 text-sm w-full py-2"
+              className="input-saas pl-10 text-sm w-full py-2 font-bold"
             />
           </div>
         </div>
@@ -284,27 +295,27 @@ const AttendanceManagement = () => {
         {loading ? (
           <LogoSpinner label="Fetching attendance logs..." />
         ) : records.length === 0 ? (
-          <div className="text-center py-16 space-y-3">
-            <Calendar className="w-12 h-12 text-slate-300 mx-auto" />
-            <h3 className="text-base font-bold text-slate-700">No attendance records found</h3>
-            <p className="text-xs text-slate-500">Try adjusting your date or filter criteria.</p>
+          <div className="text-center py-16 space-y-3 bg-slate-100/70">
+            <Calendar className="w-12 h-12 text-slate-500 mx-auto" />
+            <h3 className="text-base font-black text-slate-950">No attendance records found</h3>
+            <p className="text-xs font-bold text-slate-800">Try adjusting your date or filter criteria.</p>
           </div>
         ) : (
           <div className="w-full">
-            {/* Desktop & Laptop Table View — Fits 100% Screen Width without Horizontal Scrolling */}
-            <div className="hidden lg:block w-full">
+            {/* Desktop & Laptop Table View */}
+            <div className="hidden lg:block w-full overflow-hidden rounded-2xl border-2 border-slate-300 shadow-xs">
               <table className="w-full text-left border-collapse text-sm table-fixed">
                 <thead>
-                  <tr className="border-b-2 border-slate-300 bg-slate-100 text-xs font-extrabold uppercase text-slate-600 tracking-wider">
-                    <th className="p-3.5 pl-5 w-[24%] border-r border-slate-200">Employee & Department</th>
-                    <th className="p-3.5 w-[14%] border-r border-slate-200">Date</th>
-                    <th className="p-3.5 w-[20%] border-r border-slate-200">Check In / Out</th>
-                    <th className="p-3.5 w-[20%] border-r border-slate-200">Jio Tag Location</th>
-                    <th className="p-3.5 w-[11%] border-r border-slate-200">Status</th>
-                    <th className="p-3.5 pr-5 w-[11%] text-right">Evidence</th>
+                  <tr className="border-b-2 border-slate-300 bg-slate-100 text-xs font-black uppercase text-slate-950 tracking-wider">
+                    <th className="py-3.5 px-4 pl-5 w-[24%]">Employee & Department</th>
+                    <th className="py-3.5 px-4 w-[14%]">Date</th>
+                    <th className="py-3.5 px-4 w-[20%]">Check In / Out</th>
+                    <th className="py-3.5 px-4 w-[20%]">Jio Tag Location</th>
+                    <th className="py-3.5 px-4 w-[11%]">Status</th>
+                    <th className="py-3.5 px-4 pr-5 w-[11%] text-right">Evidence</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y-2 divide-slate-200 bg-white font-normal">
+                <tbody className="divide-y divide-slate-200 bg-white">
                   {records.map((r) => {
                     const empName = typeof r.employee === 'object' && r.employee?.name ? r.employee.name : (r.employeeId || 'Employee');
                     const initialChar = typeof empName === 'string' && empName.length > 0 ? empName.charAt(0).toUpperCase() : 'E';
@@ -317,18 +328,18 @@ const AttendanceManagement = () => {
                         <td className="p-3.5 pl-5">
                           <div className="flex items-center gap-3">
                             {photo ? (
-                              <img src={photo} alt={empName} className="w-9 h-9 rounded-full object-cover border border-slate-200 shrink-0 shadow-2xs" />
+                              <img src={photo} alt={empName} className="w-8 h-8 rounded-full object-cover border border-slate-200 shrink-0 shadow-xs" />
                             ) : (
-                              <div className="w-9 h-9 rounded-full bg-slate-900 text-white font-bold flex items-center justify-center text-xs shrink-0 shadow-2xs">
+                              <div className="w-8 h-8 rounded-full bg-slate-900 text-white font-bold flex items-center justify-center text-xs shrink-0 shadow-xs">
                                 {initialChar}
                               </div>
                             )}
                             <div className="truncate">
-                              <span className="font-bold text-slate-900 text-sm block truncate leading-tight">{empName}</span>
+                              <span className="font-extrabold text-slate-900 text-sm block truncate leading-tight">{empName}</span>
                               <div className="flex items-center gap-1.5 mt-0.5">
-                                <span className="font-mono text-xs font-semibold text-slate-400">{r.employeeId}</span>
+                                <span className="font-mono text-xs font-semibold text-slate-500">{r.employeeId}</span>
                                 <span className="text-slate-300">•</span>
-                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-700 border border-slate-200/60">
+                                <span className="text-xs font-bold text-slate-600">
                                   {dept}
                                 </span>
                               </div>
@@ -337,7 +348,7 @@ const AttendanceManagement = () => {
                         </td>
 
                         {/* Date */}
-                        <td className="p-3.5 font-mono text-slate-600 text-xs font-semibold">
+                        <td className="p-3.5 font-mono text-slate-700 text-xs font-semibold">
                           {r.date}
                         </td>
 
@@ -367,15 +378,15 @@ const AttendanceManagement = () => {
                               href={r.location?.lat ? `https://www.google.com/maps?q=${r.location.lat},${r.location.lng}` : '#'}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="flex items-start gap-1.5 p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-medium leading-relaxed border border-slate-200/80 hover:border-slate-300 transition-all shadow-2xs group cursor-pointer"
+                              className="flex items-start gap-1.5 text-slate-700 hover:text-slate-900 text-xs font-medium leading-relaxed transition-colors group cursor-pointer"
                               title="Click to open exact location in Google Maps"
                             >
                               <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0 mt-0.5" />
-                              <span className="whitespace-normal break-words font-medium text-slate-700 group-hover:text-slate-900">{r.location.address}</span>
+                              <span className="whitespace-normal break-words font-medium text-slate-800 group-hover:text-black">{r.location.address}</span>
                               <ExternalLink className="w-3 h-3 text-slate-400 group-hover:text-slate-700 shrink-0 ml-auto mt-0.5" />
                             </a>
                           ) : (
-                            <span className="text-xs text-slate-400 font-normal italic">Location not tagged</span>
+                            <span className="text-xs text-slate-400 italic">Location not tagged</span>
                           )}
                         </td>
 
@@ -397,7 +408,7 @@ const AttendanceManagement = () => {
                         <td className="p-3.5 pr-5 text-right">
                           <button
                             onClick={() => openPhotoModal(r)}
-                            className="btn-secondary text-xs py-1.5 px-2.5 hover:border-slate-400"
+                            className="inline-flex items-center gap-1.5 text-xs py-1.5 px-3 bg-white hover:bg-slate-50 text-slate-800 font-bold border border-slate-200 hover:border-slate-300 rounded-xl shadow-xs transition-all"
                             title="View Jio Tag Photo Evidence"
                           >
                             <Eye className="w-3.5 h-3.5 text-slate-600" />
