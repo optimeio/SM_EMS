@@ -20,9 +20,9 @@ export const protect = async (req, res, next) => {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
       // Check if it's admin or employee
-      let user = await Admin.findById(decoded.id).select('-password');
+      let user = await Admin.findById(decoded.id).select('-password').lean();
       if (!user) {
-        user = await Employee.findById(decoded.id).select('-password');
+        user = await Employee.findById(decoded.id).select('-password -idCardImage -profilePhoto -qrCodeImage').lean();
       }
 
       if (!user) {
