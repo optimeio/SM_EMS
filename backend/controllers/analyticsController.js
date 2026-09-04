@@ -45,11 +45,12 @@ export const getLeaderboard = async (req, res) => {
     const leaderboard = await Employee.find({ status: 'Active' })
       .select('name employeeId department designation totalPoints profilePhoto')
       .sort({ totalPoints: -1 }) // Sort descending
-      .limit(10); // Top 10
+      .limit(10)
+      .lean();
 
     res.json(leaderboard);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error fetching leaderboard' });
   }
 };
 
@@ -59,13 +60,15 @@ export const getLeaderboard = async (req, res) => {
 export const getEmployeePerformance = async (req, res) => {
   try {
     const employeeId = req.params.id;
-    const employee = await Employee.findById(employeeId).select('-password');
+    const employee = await Employee.findById(employeeId)
+      .select('-password -idCardImage')
+      .lean();
     
     if (!employee) {
       return res.status(404).json({ message: 'Employee not found' });
     }
 
-    const tasks = await Task.find({ assignedTo: employeeId });
+    const tasks = await Task.find({ assignedTo: employeeId }).lean();
     const totalTasks = tasks.length;
     const completedTasks = tasks.filter(t => t.status === 'Completed').length;
     const pendingTasks = tasks.filter(t => t.status === 'Pending').length;
@@ -82,6 +85,6 @@ export const getEmployeePerformance = async (req, res) => {
       tasks
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error fetching performance' });
   }
 };
