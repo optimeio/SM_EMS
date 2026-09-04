@@ -8,10 +8,13 @@ import { uploadIDCardToDrive } from '../services/googleDriveService.js';
 // @access  Private/Admin
 export const getEmployees = async (req, res) => {
   try {
-    const employees = await Employee.find({}).select('-password');
+    const employees = await Employee.find({})
+      .select('-password -idCardImage')
+      .lean();
     res.json(employees);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('Get Employees Error:', error);
+    res.status(500).json({ message: 'Server error fetching employees: ' + error.message });
   }
 };
 

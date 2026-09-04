@@ -9,7 +9,8 @@ export const getTasks = async (req, res) => {
   try {
     const tasks = await Task.find({})
       .sort({ createdAt: -1 })
-      .populate('assignedTo', 'name employeeId department designation');
+      .populate('assignedTo', 'name employeeId department designation')
+      .lean();
     res.json(tasks);
   } catch (error) {
     console.error('Get Tasks Error:', error);
