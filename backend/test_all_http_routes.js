@@ -41,7 +41,7 @@ async function runFullSystemTest() {
     const res = await fetch(`${API_BASE}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: 'EMP001', password: 'Password@123' })
+      body: JSON.stringify({ email: 'TSMG013', password: 'Password@123' })
     });
     const data = await res.json();
     if (res.ok && data.token) {
