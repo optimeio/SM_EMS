@@ -151,8 +151,9 @@ export const checkOut = async (req, res) => {
     const now = new Date();
     const dateStr = now.toISOString().split('T')[0];
 
+    const empIdStr = (emp.employeeId || '').trim();
     const attendance = await Attendance.findOne({ 
-      employeeId: { $regex: new RegExp(`^${emp.employeeId}$`, 'i') },
+      employeeId: { $in: [empIdStr, empIdStr.toUpperCase(), empIdStr.toLowerCase()] },
       $or: [
         { date: dateStr },
         { checkOut: null, status: 'Present' }
@@ -209,8 +210,9 @@ export const getTodayAttendance = async (req, res) => {
     }
 
     const dateStr = new Date().toISOString().split('T')[0];
+    const empIdStr = (emp.employeeId || '').trim();
     const attendance = await Attendance.findOne({ 
-      employeeId: { $regex: new RegExp(`^${emp.employeeId}$`, 'i') },
+      employeeId: { $in: [empIdStr, empIdStr.toUpperCase(), empIdStr.toLowerCase()] },
       $or: [
         { date: dateStr },
         { checkOut: null, status: 'Present' }
