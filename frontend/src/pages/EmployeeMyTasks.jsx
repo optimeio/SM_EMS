@@ -185,7 +185,7 @@ const EmployeeMyTasks = () => {
                       ) : (
                         <>
                           <CheckCircle2 className="w-3.5 h-3.5" />
-                          <span>Submit for Approval</span>
+                          <span>Send Completion Approval</span>
                         </>
                       )}
                     </button>
