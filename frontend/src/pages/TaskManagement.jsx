@@ -94,6 +94,8 @@ const TaskManagement = () => {
 
   const [successBanner, setSuccessBanner] = useState(null);
   const [formError, setFormError] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [updatingTaskId, setUpdatingTaskId] = useState(null);
 
   const fetchInitialData = async (silent = false) => {
     try {
@@ -124,8 +126,10 @@ const TaskManagement = () => {
 
   const handleCreateTask = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
     setFormError(null);
     setSuccessBanner(null);
+    setIsSubmitting(true);
     try {
       await API.post('/tasks', {
         ...formData,
@@ -134,29 +138,36 @@ const TaskManagement = () => {
       setShowAddModal(false);
       resetForm();
       setSuccessBanner('Task assigned successfully! It is now active under In Progress.');
-      fetchInitialData();
+      await fetchInitialData(true);
     } catch (err) {
       setFormError(err.response?.data?.message || 'Failed to create task');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleEditTask = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
     setFormError(null);
     setSuccessBanner(null);
+    setIsSubmitting(true);
     try {
       await API.put(`/tasks/${editTask._id}`, formData);
       setEditTask(null);
       resetForm();
       setSuccessBanner('Task updated successfully.');
-      fetchInitialData();
+      await fetchInitialData(true);
     } catch (err) {
       setFormError(err.response?.data?.message || 'Failed to update task');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleStatusChange = async (taskId, newStatus) => {
     try {
+      setUpdatingTaskId(taskId);
       setSuccessBanner(null);
       await API.patch(`/tasks/${taskId}/status`, { status: newStatus });
       if (newStatus === 'Completed') {
@@ -166,9 +177,11 @@ const TaskManagement = () => {
       } else if (newStatus === 'Pending Review') {
         setSuccessBanner('Task status changed to Pending Review.');
       }
-      fetchInitialData();
+      await fetchInitialData(true);
     } catch (err) {
-      alert('Failed to update task status');
+      alert(err.response?.data?.message || 'Failed to update task status');
+    } finally {
+      setUpdatingTaskId(null);
     }
   };
 
@@ -510,19 +523,29 @@ const TaskManagement = () => {
                     <div className="grid grid-cols-2 gap-2 pt-1">
                       <button
                         onClick={() => handleStatusChange(task._id, 'Completed')}
-                        className="btn-primary text-xs bg-emerald-600 hover:bg-emerald-700 text-white py-1.5 px-3 rounded-xl flex items-center justify-center gap-1.5 shadow-2xs font-bold"
+                        disabled={updatingTaskId === task._id}
+                        className="btn-primary text-xs bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 text-white py-1.5 px-3 rounded-xl flex items-center justify-center gap-1.5 shadow-2xs font-bold transition-all"
                         title="Approve Task Completion"
                       >
-                        <CheckCircle2 className="w-4 h-4" />
-                        Approve
+                        {updatingTaskId === task._id ? (
+                          <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <CheckCircle2 className="w-4 h-4" />
+                        )}
+                        <span>{updatingTaskId === task._id ? 'Approving...' : 'Approve'}</span>
                       </button>
                       <button
                         onClick={() => handleStatusChange(task._id, 'In Progress')}
-                        className="btn-secondary text-xs bg-amber-50 hover:bg-amber-100 text-amber-900 border-amber-200/80 py-1.5 px-3 rounded-xl flex items-center justify-center gap-1.5 font-bold"
+                        disabled={updatingTaskId === task._id}
+                        className="btn-secondary text-xs bg-amber-50 hover:bg-amber-100 disabled:bg-slate-100 text-amber-900 border-amber-200/80 py-1.5 px-3 rounded-xl flex items-center justify-center gap-1.5 font-bold transition-all"
                         title="Request Changes / Revise"
                       >
-                        <Ban className="w-4 h-4 text-amber-600" />
-                        Revise
+                        {updatingTaskId === task._id ? (
+                          <div className="w-3.5 h-3.5 border-2 border-amber-600 border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <Ban className="w-4 h-4 text-amber-600" />
+                        )}
+                        <span>{updatingTaskId === task._id ? 'Revising...' : 'Revise'}</span>
                       </button>
                     </div>
                   )}
@@ -677,6 +700,7 @@ const TaskManagement = () => {
               <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
                 <button
                   type="button"
+                  disabled={isSubmitting}
                   onClick={() => {
                     setShowAddModal(false);
                     setEditTask(null);
@@ -685,8 +709,19 @@ const TaskManagement = () => {
                 >
                   Cancel
                 </button>
-                <button type="submit" className="btn-primary text-xs rounded-xl">
-                  {editTask ? 'Save Changes' : 'Create Task'}
+                <button 
+                  type="submit" 
+                  disabled={isSubmitting}
+                  className="btn-primary text-xs rounded-xl flex items-center gap-2 disabled:opacity-60"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Saving Task...</span>
+                    </>
+                  ) : (
+                    <span>{editTask ? 'Save Changes' : 'Create Task'}</span>
+                  )}
                 </button>
               </div>
             </form>

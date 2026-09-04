@@ -15,7 +15,8 @@ const EmployeeMyTasks = () => {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('All');
-  const [activeDropdownTaskId, setActiveDropdownTaskId] = useState(null);
+  const [updatingTaskId, setUpdatingTaskId] = useState(null);
+  const [successBanner, setSuccessBanner] = useState(null);
 
   const getStatusBadgeStyle = (status) => {
     switch (status) {
@@ -42,16 +43,6 @@ const EmployeeMyTasks = () => {
     }
   };
 
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'Completed': return <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />;
-      case 'Pending Review': return <Clock className="w-3.5 h-3.5 text-purple-600" />;
-      case 'In Progress': return <Sparkles className="w-3.5 h-3.5 text-sky-600" />;
-      case 'Cancelled': return <Ban className="w-3.5 h-3.5 text-slate-400" />;
-      default: return <Clock className="w-3.5 h-3.5 text-amber-600" />;
-    }
-  };
-
   const getPriorityBadgeStyle = (priority) => {
     switch (priority) {
       case 'Urgent': return 'bg-rose-50 text-rose-700 border-rose-200/80 font-bold';
@@ -61,9 +52,9 @@ const EmployeeMyTasks = () => {
     }
   };
 
-  const fetchMyTasks = async () => {
+  const fetchMyTasks = async (silent = false) => {
     try {
-      setLoading(true);
+      if (!silent) setLoading(true);
       const { data } = await API.get('/tasks/employee');
       setTasks(data);
     } catch (err) {
@@ -79,10 +70,15 @@ const EmployeeMyTasks = () => {
 
   const handleStatusChange = async (taskId, newStatus) => {
     try {
+      setUpdatingTaskId(taskId);
+      setSuccessBanner(null);
       await API.patch(`/tasks/${taskId}/status`, { status: newStatus });
-      fetchMyTasks();
+      setSuccessBanner('Task submitted for Admin approval! Status is now Awaiting Approval.');
+      await fetchMyTasks(true);
     } catch (err) {
-      alert('Failed to update task status');
+      alert(err.response?.data?.message || 'Failed to update task status');
+    } finally {
+      setUpdatingTaskId(null);
     }
   };
 
@@ -93,9 +89,21 @@ const EmployeeMyTasks = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200/80">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">My Assigned Objectives</h1>
-          <p className="text-sm text-slate-500 mt-1">Track deliverables, update status to Completed, and earn performance points.</p>
+          <p className="text-sm text-slate-500 mt-1">Track deliverables, submit completed tasks for Admin approval, and earn performance points.</p>
         </div>
       </div>
+
+      {successBanner && (
+        <div className="badge-success p-4 rounded-2xl text-xs flex items-center justify-between shadow-2xs font-semibold animate-fade-in">
+          <div className="flex items-center gap-2.5">
+            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+            <span className="text-emerald-950 font-bold">{successBanner}</span>
+          </div>
+          <button onClick={() => setSuccessBanner(null)} className="text-emerald-500 hover:text-emerald-800 p-1">
+            <Ban className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
       {/* Filter Bar */}
       <div className="card-saas p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border border-slate-200/80">
@@ -165,11 +173,21 @@ const EmployeeMyTasks = () => {
                   {task.status === 'In Progress' ? (
                     <button
                       onClick={() => handleStatusChange(task._id, 'Pending Review')}
-                      className="btn-primary text-xs bg-purple-600 hover:bg-purple-700 text-white font-bold py-1.5 px-3 rounded-full flex items-center gap-1.5 shadow-2xs active:scale-[0.98]"
+                      disabled={updatingTaskId === task._id}
+                      className="btn-primary text-xs bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white font-bold py-1.5 px-3 rounded-full flex items-center gap-1.5 shadow-2xs active:scale-[0.98] transition-all"
                       title="Submit Task for Admin Approval"
                     >
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      Submit for Approval
+                      {updatingTaskId === task._id ? (
+                        <>
+                          <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          <span>Submitting...</span>
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          <span>Submit for Approval</span>
+                        </>
+                      )}
                     </button>
                   ) : task.status === 'Pending Review' ? (
                     <span className="text-xs font-bold py-1.5 px-3 rounded-full border bg-purple-50 text-purple-700 border-purple-200/90 flex items-center gap-1.5 shadow-2xs">
