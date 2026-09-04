@@ -361,122 +361,20 @@ const TaskManagement = () => {
               className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group relative"
             >
               <div className="space-y-3">
-                {/* Card Top Pill Header */}
+                {/* Card Top Header: Badges + Edit/Delete Actions */}
                 <div className="flex items-center justify-between gap-2">
-                  <span className={`px-2.5 py-1 rounded-full text-xs border ${getPriorityBadgeStyle(task.priority)}`}>
-                    {task.priority} Priority
-                  </span>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className={`px-2.5 py-1 rounded-full text-xs border ${getPriorityBadgeStyle(task.priority)}`}>
+                      {task.priority} Priority
+                    </span>
 
-                  <span className="text-xs font-bold text-amber-800 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-200/70 inline-flex items-center gap-1.5 shadow-2xs">
-                    <Award className="w-3.5 h-3.5 text-amber-600" />
-                    +{task.points} Pts
-                  </span>
-                </div>
-
-                {/* Title & Description */}
-                <div>
-                  <h3 className="font-bold text-base text-slate-900 group-hover:text-indigo-600 transition-colors leading-snug">
-                    {task.title}
-                  </h3>
-                  <p className="text-xs text-slate-500 mt-1 line-clamp-3 leading-relaxed font-normal">
-                    {task.description}
-                  </p>
-                </div>
-              </div>
-
-              {/* Bottom Details Footer */}
-              <div className="space-y-3 pt-3 mt-4 border-t border-slate-100">
-                <div className="flex items-center justify-between text-xs">
-                  {/* Assignee Pill */}
-                  <div className="flex items-center gap-2 font-semibold text-slate-800 truncate">
-                    <div className="w-6 h-6 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-[10px] font-extrabold text-slate-700 shrink-0">
-                      {task.assignedTo?.name ? task.assignedTo.name.charAt(0).toUpperCase() : 'U'}
-                    </div>
-                    <span className="truncate text-xs">{task.assignedTo?.name || 'Unassigned'}</span>
+                    <span className="text-xs font-bold text-amber-800 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-200/70 inline-flex items-center gap-1.5 shadow-2xs">
+                      <Award className="w-3.5 h-3.5 text-amber-600" />
+                      +{task.points} Pts
+                    </span>
                   </div>
 
-                  {/* Due Date */}
-                  <div className="flex items-center gap-1.5 font-mono text-[11px] text-slate-500 font-medium shrink-0 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-200/60">
-                    <Calendar className="w-3 h-3 text-slate-400" />
-                    <span>{new Date(task.dueDate).toLocaleDateString('en-GB')}</span>
-                  </div>
-                </div>
-
-                {/* Status Dropdown Pill & Edit/Delete Actions */}
-                <div className="flex items-center justify-between gap-2 pt-1">
-                  
-                  {/* Interactive Custom Status Dropdown Button */}
-                  <div className="relative">
-                    <button
-                      onClick={() => setActiveDropdownTaskId(activeDropdownTaskId === task._id ? null : task._id)}
-                      className={`text-xs font-bold py-1.5 px-3 rounded-full border transition-all flex items-center gap-1.5 shadow-2xs ${getStatusBadgeStyle(task.status)}`}
-                    >
-                      <span className={`w-2 h-2 rounded-full ${getStatusDotColor(task.status)}`}></span>
-                      <span>{task.status}</span>
-                      <ChevronDown className="w-3 h-3 text-slate-400 opacity-70 group-hover:opacity-100" />
-                    </button>
-                    
-                    {activeDropdownTaskId === task._id && (
-                      <>
-                        <div 
-                          className="fixed inset-0 z-30" 
-                          onClick={() => setActiveDropdownTaskId(null)}
-                        />
-                        <div className="absolute left-0 bottom-full mb-1 z-40 w-44 bg-white/95 backdrop-blur-md border border-slate-200/90 rounded-2xl shadow-2xl p-1.5 space-y-1 animate-fade-in ring-1 ring-slate-900/5">
-                          <div className="px-2 py-1 border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                            Change Task Status
-                          </div>
-                          {['In Progress', 'Pending Review', 'Completed', 'Cancelled'].map((status) => (
-                            <button
-                              key={status}
-                              type="button"
-                              onClick={() => {
-                                handleStatusChange(task._id, status);
-                                setActiveDropdownTaskId(null);
-                              }}
-                              className={`w-full text-left px-2.5 py-2 text-xs font-semibold rounded-xl transition-all flex items-center justify-between ${
-                                task.status === status 
-                                  ? 'bg-slate-900 text-white font-bold shadow-2xs' 
-                                  : 'hover:bg-slate-100 text-slate-700'
-                              }`}
-                            >
-                              <div className="flex items-center gap-2">
-                                {getStatusIcon(status)}
-                                <span>{status}</span>
-                              </div>
-                              {task.status === status && (
-                                <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
-                              )}
-                            </button>
-                          ))}
-                        </div>
-                      </>
-                    )}
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center gap-1.5">
-                    {task.status === 'Pending Review' && (
-                      <>
-                        <button
-                          onClick={() => handleStatusChange(task._id, 'Completed')}
-                          className="btn-primary text-[11px] bg-emerald-600 hover:bg-emerald-700 text-white py-1 px-2.5 rounded-lg flex items-center gap-1 shadow-2xs font-bold shrink-0"
-                          title="Approve Task Completion"
-                        >
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                          Approve
-                        </button>
-                        <button
-                          onClick={() => handleStatusChange(task._id, 'In Progress')}
-                          className="btn-secondary text-[11px] bg-amber-50 hover:bg-amber-100 text-amber-800 border-amber-200/80 py-1 px-2 rounded-lg flex items-center gap-1 font-semibold shrink-0"
-                          title="Request Changes / Revise"
-                        >
-                          <Ban className="w-3.5 h-3.5 text-amber-600" />
-                          Revise
-                        </button>
-                      </>
-                    )}
-
+                  <div className="flex items-center gap-1">
                     <button
                       onClick={() => openEditModal(task)}
                       className="p-1.5 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
@@ -495,6 +393,112 @@ const TaskManagement = () => {
                   </div>
                 </div>
 
+                {/* Title & Description */}
+                <div>
+                  <h3 className="font-bold text-base text-slate-900 group-hover:text-indigo-600 transition-colors leading-snug">
+                    {task.title}
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-1 line-clamp-3 leading-relaxed font-normal">
+                    {task.description}
+                  </p>
+                </div>
+              </div>
+
+              {/* Bottom Details Footer */}
+              <div className="space-y-3 pt-3 mt-4 border-t border-slate-100">
+                <div className="flex items-center justify-between text-xs">
+                  {/* Assignee Pill */}
+                  <div className="flex items-center gap-2 font-semibold text-slate-800 truncate">
+                    <div className="w-6.5 h-6.5 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-[10px] font-extrabold text-slate-700 shrink-0">
+                      {task.assignedTo?.name ? task.assignedTo.name.charAt(0).toUpperCase() : 'U'}
+                    </div>
+                    <span className="truncate text-xs font-bold">{task.assignedTo?.name || 'Unassigned'}</span>
+                  </div>
+
+                  {/* Due Date */}
+                  <div className="flex items-center gap-1.5 font-mono text-[11px] text-slate-500 font-medium shrink-0 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-200/60">
+                    <Calendar className="w-3 h-3 text-slate-400" />
+                    <span>{new Date(task.dueDate).toLocaleDateString('en-GB')}</span>
+                  </div>
+                </div>
+
+                {/* Status & Review Actions */}
+                <div className="pt-1 flex flex-col gap-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Status</span>
+                    
+                    {/* Status Dropdown Button */}
+                    <div className="relative">
+                      <button
+                        onClick={() => setActiveDropdownTaskId(activeDropdownTaskId === task._id ? null : task._id)}
+                        className={`text-xs font-bold py-1 px-3 rounded-full border transition-all flex items-center gap-1.5 shadow-2xs ${getStatusBadgeStyle(task.status)}`}
+                      >
+                        <span className={`w-2 h-2 rounded-full ${getStatusDotColor(task.status)}`}></span>
+                        <span>{task.status}</span>
+                        <ChevronDown className="w-3 h-3 text-slate-400 opacity-70 group-hover:opacity-100" />
+                      </button>
+                      
+                      {activeDropdownTaskId === task._id && (
+                        <>
+                          <div 
+                            className="fixed inset-0 z-30" 
+                            onClick={() => setActiveDropdownTaskId(null)}
+                          />
+                          <div className="absolute right-0 bottom-full mb-1 z-40 w-44 bg-white/95 backdrop-blur-md border border-slate-200/90 rounded-2xl shadow-2xl p-1.5 space-y-1 animate-fade-in ring-1 ring-slate-900/5">
+                            <div className="px-2 py-1 border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                              Change Task Status
+                            </div>
+                            {['In Progress', 'Pending Review', 'Completed', 'Cancelled'].map((status) => (
+                              <button
+                                key={status}
+                                type="button"
+                                onClick={() => {
+                                  handleStatusChange(task._id, status);
+                                  setActiveDropdownTaskId(null);
+                                }}
+                                className={`w-full text-left px-2.5 py-2 text-xs font-semibold rounded-xl transition-all flex items-center justify-between ${
+                                  task.status === status 
+                                    ? 'bg-slate-900 text-white font-bold shadow-2xs' 
+                                    : 'hover:bg-slate-100 text-slate-700'
+                                }`}
+                              >
+                                <div className="flex items-center gap-2">
+                                  {getStatusIcon(status)}
+                                  <span>{status}</span>
+                                </div>
+                                {task.status === status && (
+                                  <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
+                                )}
+                              </button>
+                            ))}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Dedicated Approval Bar for Pending Review Tasks */}
+                  {task.status === 'Pending Review' && (
+                    <div className="grid grid-cols-2 gap-2 pt-1">
+                      <button
+                        onClick={() => handleStatusChange(task._id, 'Completed')}
+                        className="btn-primary text-xs bg-emerald-600 hover:bg-emerald-700 text-white py-1.5 px-3 rounded-xl flex items-center justify-center gap-1.5 shadow-2xs font-bold"
+                        title="Approve Task Completion"
+                      >
+                        <CheckCircle2 className="w-4 h-4" />
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => handleStatusChange(task._id, 'In Progress')}
+                        className="btn-secondary text-xs bg-amber-50 hover:bg-amber-100 text-amber-900 border-amber-200/80 py-1.5 px-3 rounded-xl flex items-center justify-center gap-1.5 font-bold"
+                        title="Request Changes / Revise"
+                      >
+                        <Ban className="w-4 h-4 text-amber-600" />
+                        Revise
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           ))}
