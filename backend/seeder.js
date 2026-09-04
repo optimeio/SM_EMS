@@ -25,7 +25,7 @@ const importData = async () => {
     const createdAdmin = await Admin.create({
       name: 'Admin User',
       email: 'admin@company.com',
-      password: 'password123',
+      password: 'Password@123',
     });
 
     const adminId = createdAdmin._id;
@@ -197,6 +197,12 @@ const importData = async () => {
     ];
 
     await Task.insertMany(tasks);
+
+    await ActivityLog.create({
+      action: 'System Database Seeded',
+      performedBy: 'System Admin',
+      description: 'Initialized system database with default employee and task records.'
+    });
 
     console.log('Data Imported!');
     process.exit();

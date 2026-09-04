@@ -81,14 +81,20 @@ const EmployeeAttendance = () => {
         
         let addressStr = '';
         try {
-          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), 3000);
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`, {
+            signal: controller.signal,
+            headers: { 'Accept-Language': 'en' }
+          });
+          clearTimeout(timer);
           const data = await res.json();
           if (data && data.display_name) {
             addressStr = data.display_name;
           }
         } catch (err) {
-          console.error("Geocoding failed:", err);
-          // Non-fatal, we just won't have an address
+          console.warn("Geocoding fast-fallback:", err.message);
+          addressStr = `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`;
         }
 
         setLocation({

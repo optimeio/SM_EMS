@@ -68,7 +68,7 @@ async function runEdgeCaseTests() {
     // Case 1.5: Valid Admin Login
     const adminLoginRes = await axios.post(`${API_URL}/auth/login`, {
       email: 'admin@company.com',
-      password: 'password123'
+      password: 'Password@123'
     });
     assert(adminLoginRes.status === 200 && adminLoginRes.data.token, 'Admin login succeeds with JWT token');
     const adminToken = adminLoginRes.data.token;

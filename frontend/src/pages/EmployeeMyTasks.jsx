@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import API from '../services/api';
+import API, { clearApiCache } from '../services/api';
 import { 
   CheckSquare, 
   Award, 

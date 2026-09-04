@@ -37,28 +37,6 @@ export const getEmployees = async (req, res) => {
     const selectFields = includeCards ? '-password' : '-password -idCardImage';
     const employees = await Employee.find({}).select(selectFields).lean();
 
-    // Trigger QR generation in background for any employees missing qrCodeImage (non-blocking)
-    setImmediate(async () => {
-      const host = req.get('host') || '';
-      const isLocal = host.includes('localhost') || host.includes('127.0.0.1');
-      const baseUrl = process.env.FRONTEND_URL || (isLocal ? 'http://localhost:5173' : 'https://ems.thesmgroups.com');
-
-      for (let emp of employees) {
-        if (!emp.qrCodeImage) {
-          try {
-            const verificationUrl = `${baseUrl}/verify/${emp.employeeId}`;
-            const qrDataUrl = await QRCode.toDataURL(verificationUrl, {
-              width: 335,
-              margin: 1,
-              color: { dark: '#000000', light: '#ffffff' },
-              errorCorrectionLevel: 'H'
-            });
-            await Employee.updateOne({ _id: emp._id }, { $set: { qrCodeImage: qrDataUrl } });
-          } catch (qrErr) {}
-        }
-      }
-    });
-
     res.json(employees);
   } catch (error) {
     console.error('Get Employees Error:', error);
@@ -392,6 +370,43 @@ export const generateEmployeeQR = async (req, res) => {
   } catch (error) {
     console.error('Generate QR Error:', error);
     res.status(500).json({ message: 'Failed to generate QR code: ' + error.message });
+  }
+};
+
+// @desc    Generate & save permanent QR codes for ALL employees at once (335x335px for Canva)
+// @route   POST /api/employees/generate-all-qrs
+// @access  Private/Admin
+export const generateAllEmployeeQRs = async (req, res) => {
+  try {
+    const employees = await Employee.find({});
+    const host = req.get('host') || '';
+    const isLocal = host.includes('localhost') || host.includes('127.0.0.1');
+    const baseUrl = process.env.FRONTEND_URL || (isLocal ? 'http://localhost:5173' : 'https://ems.thesmgroups.com');
+
+    let updatedCount = 0;
+    for (let emp of employees) {
+      const verificationUrl = `${baseUrl}/verify/${emp.employeeId}`;
+      const qrDataUrl = await QRCode.toDataURL(verificationUrl, {
+        width: 335,
+        margin: 1,
+        color: { dark: '#000000', light: '#ffffff' },
+        errorCorrectionLevel: 'H'
+      });
+      emp.qrCodeImage = qrDataUrl;
+      await emp.save();
+      updatedCount++;
+    }
+
+    await ActivityLog.create({
+      action: 'Generated All QR Codes',
+      performedBy: `Admin: ${req.user?.name || 'Admin'}`,
+      description: `Batch generated permanent 335x335px QR codes for ${updatedCount} employees`
+    });
+
+    res.json({ success: true, count: updatedCount, message: `Successfully generated unique QR codes for ${updatedCount} employees.` });
+  } catch (error) {
+    console.error('Generate All QRs Error:', error);
+    res.status(500).json({ message: 'Failed to batch generate QR codes: ' + error.message });
   }
 };
 

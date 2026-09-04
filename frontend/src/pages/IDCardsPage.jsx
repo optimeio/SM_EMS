@@ -70,6 +70,8 @@ const IDCardsPage = () => {
     fetchEmployees();
   }, [user]);
 
+  const [generatingAllQRs, setGeneratingAllQRs] = useState(false);
+
   const generateAndSaveQR = async (emp) => {
     try {
       setGeneratingQR(emp._id);
@@ -82,6 +84,21 @@ const IDCardsPage = () => {
       alert(err.response?.data?.message || 'Failed to generate QR code');
     } finally {
       setGeneratingQR(null);
+    }
+  };
+
+  const generateAllQRs = async () => {
+    try {
+      setGeneratingAllQRs(true);
+      const { data } = await API.post('/employees/generate-all-qrs');
+      setUploadSuccess(data.message || 'Unique QR codes generated for all employees!');
+      await fetchEmployees();
+      setTimeout(() => setUploadSuccess(null), 3000);
+    } catch (err) {
+      console.error('Failed to generate all QRs', err);
+      alert(err.response?.data?.message || 'Failed to batch generate QR codes');
+    } finally {
+      setGeneratingAllQRs(false);
     }
   };
 
@@ -178,12 +195,31 @@ const IDCardsPage = () => {
         </div>
 
         {isAdmin && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={generateAllQRs}
+              disabled={generatingAllQRs}
+              className="btn-primary text-sm shadow-md bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 flex items-center gap-2"
+              title="Generate unique 335x335px QR code for all employees"
+            >
+              {generatingAllQRs ? (
+                <>
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                  <span>Generating QRs...</span>
+                </>
+              ) : (
+                <>
+                  <QrCode className="w-4 h-4" />
+                  <span>Generate All QR Codes</span>
+                </>
+              )}
+            </button>
+
             <a
               href={CANVA_EDIT_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-primary text-sm shadow-md"
+              className="btn-secondary text-sm bg-white"
             >
               <ExternalLink className="w-4 h-4" />
               Edit Canva Design

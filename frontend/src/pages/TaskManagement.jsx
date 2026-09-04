@@ -255,7 +255,7 @@ const TaskManagement = () => {
   });
 
   const totalTasks = tasks.length;
-  const pendingTasks = tasks.filter(t => t.status === 'Pending').length;
+  const pendingTasks = tasks.filter(t => t.status === 'Pending Review' || t.status === 'Pending').length;
   const inProgressTasks = tasks.filter(t => t.status === 'In Progress').length;
   const completedTasks = tasks.filter(t => t.status === 'Completed').length;
 

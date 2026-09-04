@@ -41,7 +41,7 @@ const EmployeeDashboard = () => {
   }, []);
 
   const assignedCount = tasks.length;
-  const pendingCount = tasks.filter(t => t.status === 'Pending').length;
+  const pendingCount = tasks.filter(t => t.status === 'In Progress' || t.status === 'Pending Review' || t.status === 'Pending').length;
   const completedCount = tasks.filter(t => t.status === 'Completed').length;
 
   return (
