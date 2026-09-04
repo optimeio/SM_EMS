@@ -48,19 +48,18 @@ export const createTask = async (req, res) => {
       title: title.trim(),
       description: description ? description.trim() : '',
       assignedTo,
-      points: points || 20,
+      points: points ? Number(points) : 20,
       priority: priority || 'Medium',
       dueDate: dueDate || new Date(),
-      status: req.body.status || 'In Progress',
+      status: 'In Progress', // ALWAYS automatically set to 'In Progress' upon assignment
       createdBy: req.user._id
     });
 
-    const employee = await Employee.findById(assignedTo);
-
     try {
+      const employee = await Employee.findById(assignedTo);
       await ActivityLog.create({
         action: 'Created Task',
-        performedBy: `Admin: ${req.user.name}`,
+        performedBy: req.user ? `Admin: ${req.user.name}` : 'Admin',
         employeeId: assignedTo,
         taskId: task._id,
         description: `Assigned task "${title}" to ${employee ? employee.name : 'Employee'}`
@@ -104,7 +103,7 @@ export const updateTask = async (req, res) => {
       try {
         await ActivityLog.create({
           action: 'Updated Task',
-          performedBy: `Admin: ${req.user.name}`,
+          performedBy: req.user ? `Admin: ${req.user.name}` : 'Admin',
           taskId: task._id,
           description: `Updated details for task "${task.title}"`
         });
@@ -117,7 +116,7 @@ export const updateTask = async (req, res) => {
       res.status(404).json({ message: 'Task not found' });
     }
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error updating task: ' + error.message });
   }
 };
 
@@ -129,56 +128,63 @@ export const updateTaskStatus = async (req, res) => {
     const { status } = req.body;
     const task = await Task.findById(req.params.id);
 
-    if (task) {
-      const oldStatus = task.status;
-      task.status = status;
+    if (!task) {
+      return res.status(404).json({ message: 'Task not found' });
+    }
 
-      // If marked as completed
-      if (status === 'Completed' && oldStatus !== 'Completed') {
-        task.completedAt = Date.now();
-        
-        // Award points to employee
-        const employee = await Employee.findById(task.assignedTo);
+    const oldStatus = task.status;
+    task.status = status;
+
+    if (status === 'Completed' && oldStatus !== 'Completed') {
+      task.completedAt = Date.now();
+    } else if (status !== 'Completed') {
+      task.completedAt = undefined;
+    }
+
+    await task.save();
+
+    // Safely update employee points without throwing schema errors
+    const empId = task.assignedTo?._id || task.assignedTo;
+    if (empId) {
+      try {
+        const employee = await Employee.findById(empId);
         if (employee) {
-          employee.totalPoints += task.points;
-          await employee.save();
+          if (status === 'Completed' && oldStatus !== 'Completed') {
+            employee.totalPoints = (employee.totalPoints || 0) + (task.points || 20);
+            await employee.save();
+          } else if (status !== 'Completed' && oldStatus === 'Completed') {
+            employee.totalPoints = Math.max(0, (employee.totalPoints || 0) - (task.points || 20));
+            await employee.save();
+          }
         }
+      } catch (empErr) {
+        console.error('Failed to update employee points:', empErr);
       }
-      
-      // If status reverted from completed, subtract points
-      if (status !== 'Completed' && oldStatus === 'Completed') {
-        task.completedAt = undefined;
-        const employee = await Employee.findById(task.assignedTo);
-        if (employee) {
-          employee.totalPoints -= task.points;
-          await employee.save();
-        }
-      }
+    }
 
-      await task.save();
-
-      const populatedTask = await Task.findById(task._id).populate('assignedTo', 'name employeeId department designation');
-
+    // Safely log activity
+    try {
       let performer = (req.user && req.user.role === 'admin')
         ? `Admin: ${req.user.name}`
         : (req.user ? `Employee: ${req.user.name}` : 'System');
-      
-      try {
-        await ActivityLog.create({
-          action: 'Updated Task Status',
-          performedBy: performer,
-          taskId: task._id,
-          employeeId: task.assignedTo,
-          description: `Changed status of task "${task.title}" to ${status}`
-        });
-      } catch (logErr) {}
 
-      res.json(populatedTask || task);
-    } else {
-      res.status(404).json({ message: 'Task not found' });
+      await ActivityLog.create({
+        action: 'Updated Task Status',
+        performedBy: performer,
+        taskId: task._id,
+        employeeId: empId,
+        description: `Changed status of task "${task.title}" to ${status}`
+      });
+    } catch (logErr) {
+      console.error('Failed to log activity for task status change:', logErr);
     }
+
+    const populatedTask = await Task.findById(task._id).populate('assignedTo', 'name employeeId department designation');
+
+    return res.json(populatedTask || task);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('Update Task Status Error:', error);
+    return res.status(500).json({ message: 'Server error updating task status: ' + error.message });
   }
 };
 
