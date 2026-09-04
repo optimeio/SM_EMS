@@ -92,6 +92,7 @@ const TaskManagement = () => {
     dueDate: '',
   });
 
+  const [successBanner, setSuccessBanner] = useState(null);
   const [formError, setFormError] = useState(null);
 
   const fetchInitialData = async (silent = false) => {
@@ -124,10 +125,15 @@ const TaskManagement = () => {
   const handleCreateTask = async (e) => {
     e.preventDefault();
     setFormError(null);
+    setSuccessBanner(null);
     try {
-      await API.post('/tasks', formData);
+      await API.post('/tasks', {
+        ...formData,
+        status: 'In Progress'
+      });
       setShowAddModal(false);
       resetForm();
+      setSuccessBanner('Task assigned successfully! It is now active under In Progress.');
       fetchInitialData();
     } catch (err) {
       setFormError(err.response?.data?.message || 'Failed to create task');
@@ -137,10 +143,12 @@ const TaskManagement = () => {
   const handleEditTask = async (e) => {
     e.preventDefault();
     setFormError(null);
+    setSuccessBanner(null);
     try {
       await API.put(`/tasks/${editTask._id}`, formData);
       setEditTask(null);
       resetForm();
+      setSuccessBanner('Task updated successfully.');
       fetchInitialData();
     } catch (err) {
       setFormError(err.response?.data?.message || 'Failed to update task');
@@ -149,7 +157,15 @@ const TaskManagement = () => {
 
   const handleStatusChange = async (taskId, newStatus) => {
     try {
+      setSuccessBanner(null);
       await API.patch(`/tasks/${taskId}/status`, { status: newStatus });
+      if (newStatus === 'Completed') {
+        setSuccessBanner('Task completion approved successfully! Performance points awarded to employee.');
+      } else if (newStatus === 'In Progress') {
+        setSuccessBanner('Task sent back to employee for revision.');
+      } else if (newStatus === 'Pending Review') {
+        setSuccessBanner('Task status changed to Pending Review.');
+      }
       fetchInitialData();
     } catch (err) {
       alert('Failed to update task status');
@@ -229,6 +245,18 @@ const TaskManagement = () => {
           <span>Create Task</span>
         </button>
       </div>
+
+      {successBanner && (
+        <div className="badge-success p-4 rounded-2xl text-xs flex items-center justify-between shadow-2xs font-semibold animate-fade-in">
+          <div className="flex items-center gap-2.5">
+            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+            <span className="text-emerald-950 font-bold">{successBanner}</span>
+          </div>
+          <button onClick={() => setSuccessBanner(null)} className="text-emerald-500 hover:text-emerald-800 p-1">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
       {/* Stats Summary Bar — Run Beyond Style with Hover Highlight */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
