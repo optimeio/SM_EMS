@@ -34,7 +34,7 @@ const safeParseDate = (dateVal) => {
 export const getEmployees = async (req, res) => {
   try {
     const includeCards = req.query.includeCards === 'true';
-    const selectFields = includeCards ? '-password' : '-password -idCardImage';
+    const selectFields = includeCards ? '-password' : '-password -idCardImage -qrCodeImage';
     const employees = await Employee.find({}).select(selectFields).lean();
 
     res.json(employees);
