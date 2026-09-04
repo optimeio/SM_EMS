@@ -188,11 +188,13 @@ const TaskManagement = () => {
   const handleDeleteTask = async () => {
     if (!deleteTaskObj) return;
     try {
+      setSuccessBanner(null);
       await API.delete(`/tasks/${deleteTaskObj._id}`);
       setDeleteTaskObj(null);
-      fetchInitialData();
+      setSuccessBanner('Task deleted successfully!');
+      await fetchInitialData(true);
     } catch (err) {
-      alert('Failed to delete task');
+      alert(err.response?.data?.message || 'Failed to delete task');
     }
   };
 

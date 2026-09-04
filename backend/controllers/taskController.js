@@ -196,33 +196,41 @@ export const deleteTask = async (req, res) => {
   try {
     const task = await Task.findById(req.params.id);
 
-    if (task) {
-      await Task.deleteOne({ _id: task._id });
+    if (!task) {
+      return res.status(404).json({ message: 'Task not found' });
+    }
 
-      // Deduct points if deleted while completed
-      if (task.status === 'Completed') {
-        const employee = await Employee.findById(task.assignedTo);
+    const empId = task.assignedTo?._id || task.assignedTo;
+
+    // Deduct points safely if deleted while completed
+    if (task.status === 'Completed' && empId) {
+      try {
+        const employee = await Employee.findById(empId);
         if (employee) {
-          employee.totalPoints -= task.points;
+          employee.totalPoints = Math.max(0, (employee.totalPoints || 0) - (task.points || 20));
           await employee.save();
         }
+      } catch (empErr) {
+        console.error('Failed to deduct points on task deletion:', empErr);
       }
-
-      try {
-        await ActivityLog.create({
-          action: 'Deleted Task',
-          performedBy: `Admin: ${req.user.name}`,
-          description: `Deleted task "${task.title}"`
-        });
-      } catch (logErr) {}
-
-      res.json({ message: 'Task removed' });
-    } else {
-      res.status(404).json({ message: 'Task not found' });
     }
+
+    await Task.deleteOne({ _id: task._id });
+
+    try {
+      await ActivityLog.create({
+        action: 'Deleted Task',
+        performedBy: req.user ? `Admin: ${req.user.name}` : 'Admin',
+        description: `Deleted task "${task.title}"`
+      });
+    } catch (logErr) {
+      console.error('Failed to log activity for deleted task:', logErr);
+    }
+
+    return res.json({ message: 'Task removed successfully' });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Delete Task Error:', error);
+    return res.status(500).json({ message: 'Server error deleting task: ' + error.message });
   }
 };
 
