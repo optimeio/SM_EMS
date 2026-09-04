@@ -247,7 +247,8 @@ export const getMyTasks = async (req, res) => {
 
     const tasks = await Task.find({ assignedTo: empId })
       .sort({ createdAt: -1 })
-      .populate('assignedTo', 'name employeeId department designation');
+      .populate('assignedTo', 'name employeeId department designation')
+      .lean();
 
     res.json(tasks);
   } catch (error) {

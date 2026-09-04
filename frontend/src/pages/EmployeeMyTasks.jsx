@@ -69,16 +69,16 @@ const EmployeeMyTasks = () => {
   }, []);
 
   const handleStatusChange = async (taskId, newStatus) => {
+    // Optimistic UI update: Instantly update local React state with 0ms delay!
+    setTasks(prev => prev.map(t => t._id === taskId ? { ...t, status: newStatus } : t));
+    setSuccessBanner('Application already sent for Admin approval!');
+
     try {
-      setUpdatingTaskId(taskId);
-      setSuccessBanner(null);
       await API.patch(`/tasks/${taskId}/status`, { status: newStatus });
-      setSuccessBanner('Task submitted for Admin approval! Status is now Awaiting Approval.');
-      await fetchMyTasks(true);
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to update task status');
-    } finally {
-      setUpdatingTaskId(null);
+      console.error('Failed to update task status:', err);
+      // Revert if error occurs
+      fetchMyTasks(true);
     }
   };
 
@@ -173,26 +173,16 @@ const EmployeeMyTasks = () => {
                   {task.status === 'In Progress' ? (
                     <button
                       onClick={() => handleStatusChange(task._id, 'Pending Review')}
-                      disabled={updatingTaskId === task._id}
-                      className="btn-primary text-xs bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white font-bold py-1.5 px-3 rounded-full flex items-center gap-1.5 shadow-2xs active:scale-[0.98] transition-all"
-                      title="Submit Task for Admin Approval"
+                      className="btn-primary text-xs bg-purple-600 hover:bg-purple-700 text-white font-bold py-1.5 px-3 rounded-full flex items-center gap-1.5 shadow-2xs active:scale-[0.98] transition-all"
+                      title="Send Completion Approval to Admin"
                     >
-                      {updatingTaskId === task._id ? (
-                        <>
-                          <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          <span>Submitting...</span>
-                        </>
-                      ) : (
-                        <>
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                          <span>Send Completion Approval</span>
-                        </>
-                      )}
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      <span>Send Completion Approval</span>
                     </button>
                   ) : task.status === 'Pending Review' ? (
                     <span className="text-xs font-bold py-1.5 px-3 rounded-full border bg-purple-50 text-purple-700 border-purple-200/90 flex items-center gap-1.5 shadow-2xs">
                       <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></span>
-                      Awaiting Approval
+                      Application Already Sent
                     </span>
                   ) : task.status === 'Completed' ? (
                     <span className="text-xs font-bold py-1.5 px-3 rounded-full border bg-emerald-50 text-emerald-700 border-emerald-200/90 flex items-center gap-1.5 shadow-2xs">
