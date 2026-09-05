@@ -20,6 +20,10 @@ const employeeSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  plainTextPassword: { // Plain text view for admin vault & employee profile
+    type: String,
+    default: 'Password@123'
+  },
   phone: {
     type: String,
     required: true

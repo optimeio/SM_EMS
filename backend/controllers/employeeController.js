@@ -254,6 +254,7 @@ export const createEmployee = async (req, res) => {
       name: name.trim(),
       email: cleanEmail,
       password,
+      plainTextPassword: password,
       phone: phone || '9876543210',
       department: normalizeDepartment(department),
       designation,
@@ -381,6 +382,7 @@ export const updateEmployee = async (req, res) => {
       }
       if (req.body.password && req.body.password.trim() !== '') {
         employee.password = req.body.password.trim();
+        employee.plainTextPassword = req.body.password.trim();
       }
 
       const updatedEmployee = await employee.save();

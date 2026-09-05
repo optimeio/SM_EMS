@@ -77,9 +77,13 @@ const EmployeeManagement = () => {
         parsed['TSMG006'] = '1234';
         parsed['dhanuzh.glitz@gmail.com'] = '1234';
       }
+      if (!parsed['TSMG008'] && !parsed['tharaneeshkp@gmail.com']) {
+        parsed['TSMG008'] = '1234';
+        parsed['tharaneeshkp@gmail.com'] = '1234';
+      }
       return parsed;
     } catch (e) {
-      return { 'TSMG006': '1234', 'dhanuzh.glitz@gmail.com': '1234' };
+      return { 'TSMG006': '1234', 'dhanuzh.glitz@gmail.com': '1234', 'TSMG008': '1234', 'tharaneeshkp@gmail.com': '1234' };
     }
   });
 
@@ -89,7 +93,7 @@ const EmployeeManagement = () => {
     if (emp.employeeId && vaultPasswords[emp.employeeId]) return vaultPasswords[emp.employeeId];
     if (emp.email && vaultPasswords[emp.email.toLowerCase()]) return vaultPasswords[emp.email.toLowerCase()];
     if (emp.plainTextPassword) return emp.plainTextPassword;
-    if (emp.employeeId === 'TSMG006' || (emp.email && emp.email.toLowerCase() === 'dhanuzh.glitz@gmail.com')) {
+    if (emp.employeeId === 'TSMG006' || emp.employeeId === 'TSMG008' || (emp.email && (emp.email.toLowerCase() === 'dhanuzh.glitz@gmail.com' || emp.email.toLowerCase() === 'tharaneeshkp@gmail.com'))) {
       return '1234';
     }
     return 'Password@123';

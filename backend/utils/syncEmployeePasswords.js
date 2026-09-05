@@ -31,8 +31,8 @@ export const syncAllEmployeePasswords = async () => {
         emp.password = emp.password; // Triggers pre('save') bcrypt hashing
         needsSave = true;
       }
-      if (emp._doc.plainTextPassword !== undefined) {
-        emp.set('plainTextPassword', undefined, { strict: false });
+      if (!emp.plainTextPassword) {
+        emp.plainTextPassword = 'Password@123';
         needsSave = true;
       }
       if (needsSave) {
