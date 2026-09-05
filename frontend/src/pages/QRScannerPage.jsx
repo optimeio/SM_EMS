@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Html5QrcodeScanner, Html5Qrcode } from 'html5-qrcode';
+import jsQR from 'jsqr';
 import { 
   Camera, 
   Upload, 
@@ -108,6 +109,70 @@ const QRScannerPage = () => {
     }
   };
 
+  const scanWithJsQR = async (imageFile) => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          try {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+            // Scale 1: Original Size
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            let imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            let code = jsQR(imgData.data, imgData.width, imgData.height, { inversionAttempts: 'attemptBoth' });
+            if (code && code.data) return resolve(code.data);
+
+            // Scale 2: Downscaled to 800px (standard for large photos or high-res ID cards)
+            if (img.width > 800 || img.height > 800) {
+              const scale = Math.min(800 / img.width, 800 / img.height);
+              canvas.width = Math.round(img.width * scale);
+              canvas.height = Math.round(img.height * scale);
+              ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+              imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+              code = jsQR(imgData.data, imgData.width, imgData.height, { inversionAttempts: 'attemptBoth' });
+              if (code && code.data) return resolve(code.data);
+            }
+
+            // Scale 3: Sub-regions for full card images (top, center, bottom)
+            const regions = [
+              { x: 0.1, y: 0.1, w: 0.8, h: 0.8 },
+              { x: 0.1, y: 0.35, w: 0.8, h: 0.65 }, // Bottom half (where ID card back QR sits)
+              { x: 0.15, y: 0.15, w: 0.7, h: 0.7 }
+            ];
+
+            for (const r of regions) {
+              const rx = Math.round(img.width * r.x);
+              const ry = Math.round(img.height * r.y);
+              const rw = Math.round(img.width * r.w);
+              const rh = Math.round(img.height * r.h);
+
+              canvas.width = rw;
+              canvas.height = rh;
+              ctx.drawImage(img, rx, ry, rw, rh, 0, 0, rw, rh);
+              imgData = ctx.getImageData(0, 0, rw, rh);
+              code = jsQR(imgData.data, rw, rh, { inversionAttempts: 'attemptBoth' });
+              if (code && code.data) return resolve(code.data);
+            }
+
+            resolve(null);
+          } catch (e) {
+            console.error('jsQR decode error:', e);
+            resolve(null);
+          }
+        };
+        img.onerror = () => resolve(null);
+        img.src = reader.result;
+      };
+      reader.onerror = () => resolve(null);
+      reader.readAsDataURL(imageFile);
+    });
+  };
+
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     setScanError(null);
@@ -117,12 +182,31 @@ const QRScannerPage = () => {
 
     try {
       setScanningFile(true);
-      const html5QrCode = new Html5Qrcode('qr-file-reader-temp');
-      const decodedText = await html5QrCode.scanFile(file, true);
-      processScannedCode(decodedText);
+
+      // Primary: High performance canvas jsQR scan (handles pure QR, full ID cards, screenshots)
+      const decodedText = await scanWithJsQR(file);
+
+      if (decodedText) {
+        processScannedCode(decodedText);
+        return;
+      }
+
+      // Fallback: Html5Qrcode if jsQR did not find it
+      try {
+        const html5QrCode = new Html5Qrcode('qr-file-reader-temp');
+        const fallbackText = await html5QrCode.scanFile(file, false);
+        if (fallbackText) {
+          processScannedCode(fallbackText);
+          return;
+        }
+      } catch (fallbackErr) {
+        console.warn('Fallback scanner also failed:', fallbackErr);
+      }
+
+      setScanError('No valid QR Code detected in uploaded image. Please ensure the QR code image is clear and well-lit.');
     } catch (err) {
       console.error('QR Image File Scan Error:', err);
-      setScanError('No valid QR Code detected in uploaded image. Please ensure the QR code image is clear.');
+      setScanError('Unable to read QR code from this image. Please ensure the QR code is clearly visible.');
     } finally {
       setScanningFile(false);
     }
