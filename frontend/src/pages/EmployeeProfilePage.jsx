@@ -98,10 +98,10 @@ const EmployeeProfilePage = () => {
             <img
               src={user.profilePhoto}
               alt={user.name}
-              className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl object-cover border-2 border-indigo-500/20 shadow-md shrink-0"
+              className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-2 border-indigo-500/20 shadow-md shrink-0"
             />
           ) : (
-            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-gradient-to-br from-slate-900 to-indigo-950 text-white font-extrabold flex items-center justify-center text-3xl shadow-md shrink-0 border border-slate-800">
+            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gradient-to-br from-slate-900 to-indigo-950 text-white font-extrabold flex items-center justify-center text-3xl shadow-md shrink-0 border border-slate-800">
               {user.name?.[0]?.toUpperCase()}
             </div>
           )}

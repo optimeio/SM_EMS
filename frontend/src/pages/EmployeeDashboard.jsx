@@ -63,10 +63,10 @@ const EmployeeDashboard = () => {
               <img 
                 src={user.profilePhoto} 
                 alt={user?.name} 
-                className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border-2 border-indigo-400/30 shadow-lg shrink-0" 
+                className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-indigo-400/30 shadow-lg shrink-0" 
               />
             ) : (
-              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-700 text-white font-extrabold flex items-center justify-center text-2xl sm:text-3xl shadow-lg shrink-0 border border-indigo-400/30">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-700 text-white font-extrabold flex items-center justify-center text-2xl sm:text-3xl shadow-lg shrink-0 border border-indigo-400/30">
                 {user?.name?.[0]?.toUpperCase()}
               </div>
             )}

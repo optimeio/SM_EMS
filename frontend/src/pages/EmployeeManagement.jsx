@@ -942,10 +942,10 @@ const EmployeeManagement = () => {
                   <img
                     src={profileData.employee.profilePhoto}
                     alt={profileData.employee.name}
-                    className="w-20 h-20 rounded-2xl object-cover border-2 border-white/20 shadow-lg shrink-0"
+                    className="w-20 h-20 rounded-full object-cover border-2 border-white/20 shadow-lg shrink-0"
                   />
                 ) : (
-                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-500 to-slate-700 text-white font-bold flex items-center justify-center text-2xl border-2 border-white/20 shadow-lg shrink-0">
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500 to-slate-700 text-white font-bold flex items-center justify-center text-2xl border-2 border-white/20 shadow-lg shrink-0">
                     {profileData.employee.name[0]}
                   </div>
                 )}
