@@ -586,19 +586,13 @@ const IDCardsPage = () => {
                   {emp.qrCodeImage ? (
                     <div className="space-y-2 p-3 bg-slate-50 border border-slate-200/60 rounded-xl">
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                          <QrCode className="w-3.5 h-3.5 text-slate-500" />
-                          QR Code (335×335px)
+                        <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                          <QrCode className="w-3.5 h-3.5 text-slate-600" />
+                          Permanent QR Code
                         </span>
-                        {isAdmin && (
-                          <button
-                            onClick={() => generateAndSaveQR(emp)}
-                            disabled={generatingQR === emp._id}
-                            className="text-xs font-semibold text-slate-600 hover:text-slate-900 underline disabled:opacity-50"
-                          >
-                            Regenerate
-                          </button>
-                        )}
+                        <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">
+                          Active & Permanent
+                        </span>
                       </div>
                       <div className="flex items-center justify-center bg-white rounded-lg border border-slate-200 p-2">
                         <img

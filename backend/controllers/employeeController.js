@@ -146,18 +146,50 @@ export const getEmployeeById = async (req, res) => {
 // @access  Public
 export const verifyEmployee = async (req, res) => {
   try {
-    const rawId = (req.params.employeeId || '').trim();
+    let rawId = (req.params.employeeId || '').trim();
     if (!rawId) {
       return res.status(400).json({ message: 'Employee ID is required for verification' });
     }
 
-    const regex = new RegExp(`^${rawId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i');
+    // Clean up URL parts, query params, trailing slashes if passed into param
+    if (rawId.includes('/verify/')) {
+      rawId = rawId.split('/verify/')[1] || rawId;
+    }
+    rawId = rawId.split('?')[0].split('#')[0].replace(/^\/+|\/+$/g, '').trim();
+
+    const normalizedUpper = rawId.toUpperCase();
+
+    // Legacy and alternate ID mappings so older printed QR codes still work permanently
+    const LEGACY_ID_MAP = {
+      'TSMGS011': 'TSMG005',
+      'TSMGS005': 'TSMG005',
+      'TSMG5': 'TSMG005',
+      'TSMGS012': 'TSMG009',
+      'TSMGS009': 'TSMG009',
+      'TSMG9': 'TSMG009',
+      'TSMG013': 'TSMG010', // Rupasri k old ID
+      'TSMGS013': 'TSMG010',
+      'TSMGS010': 'TSMG010',
+      'TSMG10': 'TSMG010',
+      'TSMGS014': 'TSMG011', // soundharya old ID
+      'TSMG11': 'TSMG011',
+      'TSMGS015': 'TSMG012', // Aaron old ID
+      'TSMG015': 'TSMG012',
+      'TSMG12': 'TSMG012',
+    };
+
+    const targetId = LEGACY_ID_MAP[normalizedUpper] || normalizedUpper;
+
+    const regex = new RegExp(`^${targetId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i');
+    const rawRegex = new RegExp(`^${rawId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i');
     const isObjectId = /^[0-9a-fA-F]{24}$/.test(rawId);
 
     const query = {
       $or: [
         { employeeId: regex },
+        { employeeId: rawRegex },
         { email: rawId.toLowerCase() },
+        { phone: rawId },
         ...(isObjectId ? [{ _id: rawId }] : [])
       ]
     };

@@ -17,9 +17,10 @@ const IDCardModal = ({ employee, onClose }) => {
   const [rendering, setRendering] = useState(true);
   const [canvaLoading, setCanvaLoading] = useState(false);
   const [canvaStatusMsg, setCanvaStatusMsg] = useState('');
-  const [canvaAuthUrl, setCanvaAuthUrl] = useState('');
-
-  const verificationUrl = employee ? `${window.location.origin}/verify/${employee.employeeId}` : '';
+  const PERMANENT_DOMAIN = 'https://ems.thesmgroups.com';
+  const verificationUrl = employee 
+    ? `${PERMANENT_DOMAIN}/verify/${employee.employeeId}` 
+    : '';
 
   // Formatted date of birth or default
   const formattedDOB = employee?.dateOfBirth

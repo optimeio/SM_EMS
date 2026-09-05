@@ -44,17 +44,28 @@ const QRScannerPage = () => {
 
     scannerRef.current = scanner;
 
+    const extractCleanEmployeeId = (text) => {
+      if (!text) return null;
+      let clean = decodeURIComponent(text.trim());
+      if (clean.includes('/verify/')) {
+        clean = clean.split('/verify/')[1] || clean;
+      }
+      clean = clean.split('?')[0].split('#')[0];
+      clean = clean.replace(/^\/+|\/+$/g, '').trim();
+      if (clean.includes('/')) {
+        const segs = clean.split('/').filter(Boolean);
+        clean = segs[segs.length - 1] || clean;
+      }
+      return clean.trim();
+    };
+
     const onScanSuccess = (decodedText) => {
       scanner.clear().catch((err) => console.error(err));
 
-      let employeeId = decodedText;
-      if (decodedText.includes('/verify/')) {
-        const parts = decodedText.split('/verify/');
-        employeeId = parts[parts.length - 1];
-      }
+      const employeeId = extractCleanEmployeeId(decodedText);
 
       if (employeeId) {
-        navigate(`/verify/${employeeId.trim()}`);
+        navigate(`/verify/${employeeId}`);
       } else {
         setScanError('Invalid QR Code format.');
       }
@@ -75,16 +86,22 @@ const QRScannerPage = () => {
   }, [activeTab, navigate]);
 
   const processScannedCode = (decodedText) => {
-    let employeeId = decodedText;
-    if (decodedText.includes('/verify/')) {
-      const parts = decodedText.split('/verify/');
-      employeeId = parts[parts.length - 1];
+    if (!decodedText) return;
+    let clean = decodeURIComponent(decodedText.trim());
+    if (clean.includes('/verify/')) {
+      clean = clean.split('/verify/')[1] || clean;
     }
+    clean = clean.split('?')[0].split('#')[0].replace(/^\/+|\/+$/g, '').trim();
+    if (clean.includes('/')) {
+      const segs = clean.split('/').filter(Boolean);
+      clean = segs[segs.length - 1] || clean;
+    }
+    const employeeId = clean.trim();
 
     if (employeeId) {
-      setFileSuccessMsg(`QR Code Detected! Employee ID: ${employeeId.trim()}`);
+      setFileSuccessMsg(`QR Code Detected! Employee ID: ${employeeId}`);
       setTimeout(() => {
-        navigate(`/verify/${employeeId.trim()}`);
+        navigate(`/verify/${employeeId}`);
       }, 600);
     } else {
       setScanError('Invalid QR Code. Could not extract Employee ID.');
