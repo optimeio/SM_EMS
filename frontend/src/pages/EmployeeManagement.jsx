@@ -38,7 +38,13 @@ import {
   Headphones,
   Code2,
   Target,
-  Cpu
+  Cpu,
+  QrCode,
+  Sparkles,
+  Briefcase,
+  ClipboardList,
+  Clock,
+  Check
 } from 'lucide-react';
 
 const EmployeeManagement = () => {
@@ -929,110 +935,295 @@ const EmployeeManagement = () => {
 
       {/* Profile Detail Modal */}
       {profileData && createPortal(
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white border border-slate-200/90 rounded-3xl max-w-2xl w-full relative space-y-6 shadow-2xl overflow-hidden animate-fade-in my-auto">
+        <div className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 md:p-6 overflow-y-auto animate-fade-in">
+          <div className="bg-white border border-slate-200/90 rounded-[2rem] max-w-3xl w-full relative shadow-[0_25px_70px_rgba(0,0,0,0.35)] overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[92vh]">
             
-            {/* Header Banner */}
-            <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 p-6 text-white relative">
-              <button
-                onClick={() => setProfileData(null)}
-                className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-xs transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
+            {/* High-End Enterprise Header Banner */}
+            <div className="relative overflow-hidden bg-slate-950 p-6 sm:p-7 text-white shrink-0 border-b border-slate-800">
+              {/* Multi-layered Ambient Glows & Grid Texture */}
+              <div className="absolute top-0 right-0 -mt-10 -mr-10 w-72 h-72 bg-indigo-600/25 rounded-full blur-3xl pointer-events-none"></div>
+              <div className="absolute bottom-0 left-1/3 -mb-12 w-72 h-72 bg-rose-600/20 rounded-full blur-3xl pointer-events-none"></div>
+              <div className="absolute top-1/2 left-0 -translate-y-1/2 w-48 h-48 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none"></div>
+              <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b0f_1px,transparent_1px),linear-gradient(to_bottom,#1e293b0f_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none"></div>
 
-              <div className="flex flex-col sm:flex-row items-center gap-5">
-                {profileData.employee.profilePhoto ? (
-                  <img
-                    src={profileData.employee.profilePhoto}
-                    alt={profileData.employee.name}
-                    className="w-20 h-20 rounded-full object-cover border-2 border-white/20 shadow-lg shrink-0"
-                  />
-                ) : (
-                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500 to-slate-700 text-white font-bold flex items-center justify-center text-2xl border-2 border-white/20 shadow-lg shrink-0">
-                    {profileData.employee.name[0]}
+              {/* Top Bar with Badge and Close button */}
+              <div className="relative z-20 flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="px-3 py-1 rounded-full text-[10px] font-black tracking-wider uppercase bg-white/10 text-white border border-white/15 backdrop-blur-md inline-flex items-center gap-1.5 shadow-xs">
+                    <Sparkles className="w-3 h-3 text-amber-400" />
+                    CORPORATE PROFILE DOSSIER
+                  </span>
+                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold inline-flex items-center gap-1.5 border shadow-xs ${
+                    profileData.employee.status === 'Active'
+                      ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
+                      : 'bg-rose-500/15 text-rose-300 border-rose-500/30'
+                  }`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${profileData.employee.status === 'Active' ? 'bg-emerald-400 animate-pulse' : 'bg-rose-400'}`}></span>
+                    {profileData.employee.status}
+                  </span>
+                </div>
+
+                <button
+                  onClick={() => setProfileData(null)}
+                  className="p-2 text-slate-400 hover:text-white rounded-full bg-white/10 hover:bg-white/20 border border-white/15 backdrop-blur-md transition-all hover:scale-105 active:scale-95"
+                  title="Close Profile"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Employee Identity Layout */}
+              <div className="relative z-10 flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
+                {/* Halo Ring Avatar with Online Pulse */}
+                <div className="relative shrink-0 group">
+                  <div className="p-1 rounded-full bg-gradient-to-tr from-indigo-500 via-rose-500 to-amber-400 shadow-xl shadow-indigo-500/25 transition-transform duration-300 group-hover:scale-105">
+                    {profileData.employee.profilePhoto ? (
+                      <img
+                        src={profileData.employee.profilePhoto}
+                        alt={profileData.employee.name}
+                        className="w-20 h-20 sm:w-22 sm:h-22 rounded-full object-cover bg-slate-900 border-2 border-slate-950 shadow-inner"
+                      />
+                    ) : (
+                      <div className="w-20 h-20 sm:w-22 sm:h-22 rounded-full bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white font-black flex items-center justify-center text-3xl border-2 border-slate-950 shadow-inner">
+                        {profileData.employee.name[0]}
+                      </div>
+                    )}
                   </div>
-                )}
-                <div className="text-center sm:text-left space-y-1">
+
+                  {/* Active Status Pulse Dot */}
+                  <div className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-slate-950 flex items-center justify-center p-0.5" title={profileData.employee.status}>
+                    <span className="relative flex h-3.5 w-3.5">
+                      <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
+                        profileData.employee.status === 'Active' ? 'bg-emerald-400' : 'bg-rose-400'
+                      }`}></span>
+                      <span className={`relative inline-flex rounded-full h-3.5 w-3.5 ${
+                        profileData.employee.status === 'Active' ? 'bg-emerald-500' : 'bg-rose-500'
+                      }`}></span>
+                    </span>
+                  </div>
+                </div>
+
+                {/* Identity Text */}
+                <div className="text-center sm:text-left space-y-2 flex-1 min-w-0">
                   <div className="flex items-center gap-2 justify-center sm:justify-start flex-wrap">
-                    <h2 className="text-xl font-extrabold tracking-tight text-white">{profileData.employee.name}</h2>
-                    <span className="font-mono text-xs text-amber-300 bg-white/10 backdrop-blur-xs px-2.5 py-0.5 rounded-full border border-amber-400/30 font-semibold">
+                    <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+                      {profileData.employee.name}
+                    </h2>
+                    <span className="font-mono text-xs font-black tracking-wider text-amber-300 bg-amber-400/10 backdrop-blur-md px-3 py-1 rounded-full border border-amber-400/30 shadow-xs">
                       {profileData.employee.employeeId}
                     </span>
-                    <span className={profileData.employee.status === 'Active' ? 'px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/30'}>
-                      {profileData.employee.status}
+                  </div>
+
+                  <div className="flex items-center gap-2 justify-center sm:justify-start flex-wrap text-xs">
+                    <span className="px-3 py-1 rounded-xl bg-white/10 text-slate-200 border border-white/10 font-bold backdrop-blur-sm shadow-xs">
+                      {profileData.employee.designation || 'Staff Member'}
+                    </span>
+                    <span className="px-3 py-1 rounded-xl bg-indigo-950/80 text-indigo-300 border border-indigo-500/30 font-bold inline-flex items-center gap-1.5 shadow-xs">
+                      <Building2 className="w-3.5 h-3.5 text-indigo-400" />
+                      {profileData.employee.department} Department
                     </span>
                   </div>
-                  <p className="text-sm font-medium text-slate-300">{profileData.employee.designation}</p>
-                  <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">{profileData.employee.department} Department</p>
                 </div>
               </div>
             </div>
 
-            <div className="p-6 pt-0 space-y-6">
-              {/* Stats Bar */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
-                <div className="p-3 bg-slate-50 border border-slate-200/80 rounded-2xl">
-                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">Total Tasks</span>
-                  <span className="text-xl font-extrabold text-slate-900 mt-1 block tabular-nums">{profileData.stats.totalTasks}</span>
+            {/* Scrollable Content Body */}
+            <div className="p-5 sm:p-7 space-y-6 overflow-y-auto flex-1">
+              
+              {/* Executive KPI Performance Metric Cards */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-3.5">
+                {/* Total Tasks */}
+                <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-br from-slate-50 to-indigo-50/40 border border-slate-200/80 hover:border-indigo-300 transition-all shadow-2xs group">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Total Tasks</span>
+                    <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-indigo-100/80 text-indigo-600 flex items-center justify-center">
+                      <ClipboardList className="w-3.5 h-3.5" />
+                    </div>
+                  </div>
+                  <div className="text-xl sm:text-2xl font-black text-slate-900 tabular-nums">{profileData.stats.totalTasks}</div>
+                  <span className="text-[10px] text-slate-400 font-semibold block mt-0.5">Assigned overall</span>
                 </div>
-                <div className="p-3 bg-emerald-50/70 border border-emerald-200/60 rounded-2xl">
-                  <span className="text-[11px] font-semibold text-emerald-700 uppercase tracking-wider block">Completed</span>
-                  <span className="text-xl font-extrabold text-emerald-800 mt-1 block tabular-nums">{profileData.stats.completedTasks}</span>
+
+                {/* Completed */}
+                <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-br from-emerald-50/60 to-teal-50/40 border border-emerald-200/70 hover:border-emerald-300 transition-all shadow-2xs group">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-[10px] font-black text-emerald-800 uppercase tracking-wider">Completed</span>
+                    <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                    </div>
+                  </div>
+                  <div className="text-xl sm:text-2xl font-black text-emerald-700 tabular-nums">{profileData.stats.completedTasks}</div>
+                  <span className="text-[10px] text-emerald-600/90 font-semibold block mt-0.5">Delivered</span>
                 </div>
-                <div className="p-3 bg-sky-50/70 border border-sky-200/60 rounded-2xl">
-                  <span className="text-[11px] font-semibold text-sky-700 uppercase tracking-wider block">Pending</span>
-                  <span className="text-xl font-extrabold text-sky-800 mt-1 block tabular-nums">{profileData.stats.pendingTasks}</span>
+
+                {/* Pending */}
+                <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-br from-amber-50/60 to-orange-50/40 border border-amber-200/70 hover:border-amber-300 transition-all shadow-2xs group">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-[10px] font-black text-amber-800 uppercase tracking-wider">Pending</span>
+                    <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center">
+                      <Clock className="w-3.5 h-3.5" />
+                    </div>
+                  </div>
+                  <div className="text-xl sm:text-2xl font-black text-amber-700 tabular-nums">{profileData.stats.pendingTasks}</div>
+                  <span className="text-[10px] text-amber-600/90 font-semibold block mt-0.5">Awaiting action</span>
                 </div>
-                <div className="p-3 bg-amber-50/70 border border-amber-200/60 rounded-2xl">
-                  <span className="text-[11px] font-semibold text-amber-700 uppercase tracking-wider block">Completion</span>
-                  <span className="text-xl font-extrabold text-amber-800 mt-1 block tabular-nums">{profileData.stats.completionRate}%</span>
+
+                {/* Completion Rate */}
+                <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-br from-purple-50/60 to-indigo-50/40 border border-purple-200/70 hover:border-purple-300 transition-all shadow-2xs group">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-[10px] font-black text-purple-800 uppercase tracking-wider">Completion</span>
+                    <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center">
+                      <Target className="w-3.5 h-3.5" />
+                    </div>
+                  </div>
+                  <div className="text-xl sm:text-2xl font-black text-purple-800 tabular-nums">{profileData.stats.completionRate}%</div>
+                  <div className="w-full bg-purple-200/60 rounded-full h-1.5 mt-1.5 overflow-hidden">
+                    <div 
+                      className="bg-purple-600 h-full rounded-full transition-all duration-500" 
+                      style={{ width: `${Math.min(100, profileData.stats.completionRate || 0)}%` }}
+                    ></div>
+                  </div>
                 </div>
               </div>
 
-              {/* Employee Information */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs bg-slate-50/80 p-4 rounded-2xl border border-slate-200/80">
-                <div className="flex justify-between py-1.5 border-b border-slate-200/60">
-                  <span className="text-slate-500 flex items-center gap-2 font-medium"><Mail className="w-3.5 h-3.5 text-slate-400" /> Email</span>
-                  <span className="text-slate-900 font-semibold truncate max-w-[180px]">{profileData.employee.email}</span>
+              {/* Employee Information Tiles */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {/* Official Email */}
+                <div className="p-3.5 rounded-2xl bg-slate-50/90 border border-slate-200/80 hover:bg-slate-100/70 transition-colors shadow-2xs">
+                  <div className="flex items-center justify-between text-slate-500 mb-1">
+                    <span className="text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5">
+                      <Mail className="w-3.5 h-3.5 text-indigo-500" /> Official Email
+                    </span>
+                    <button 
+                      onClick={() => handleCopyToClipboard(profileData.employee.email, 'Email')}
+                      className="text-slate-400 hover:text-indigo-600 transition-colors p-1"
+                      title="Copy email"
+                    >
+                      <Copy className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  <a 
+                    href={`mailto:${profileData.employee.email}`} 
+                    className="text-xs font-bold text-slate-900 hover:text-indigo-600 transition-colors break-all block leading-relaxed"
+                    title={profileData.employee.email}
+                  >
+                    {profileData.employee.email}
+                  </a>
                 </div>
-                <div className="flex justify-between py-1.5 border-b border-slate-200/60">
-                  <span className="text-slate-500 flex items-center gap-2 font-medium"><Phone className="w-3.5 h-3.5 text-slate-400" /> Phone</span>
-                  <span className="text-slate-900 font-semibold">{profileData.employee.phone}</span>
+
+                {/* Phone Number */}
+                <div className="p-3.5 rounded-2xl bg-slate-50/90 border border-slate-200/80 hover:bg-slate-100/70 transition-colors shadow-2xs">
+                  <div className="flex items-center justify-between text-slate-500 mb-1">
+                    <span className="text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5">
+                      <Phone className="w-3.5 h-3.5 text-emerald-500" /> Phone Number
+                    </span>
+                    <button 
+                      onClick={() => handleCopyToClipboard(profileData.employee.phone, 'Phone')}
+                      className="text-slate-400 hover:text-emerald-600 transition-colors p-1"
+                      title="Copy phone number"
+                    >
+                      <Copy className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  <a 
+                    href={`tel:${profileData.employee.phone}`} 
+                    className="text-xs font-bold text-slate-900 hover:text-emerald-600 transition-colors block leading-relaxed"
+                  >
+                    {profileData.employee.phone || 'N/A'}
+                  </a>
                 </div>
-                <div className="flex justify-between py-1.5 border-b border-slate-200/60">
-                  <span className="text-slate-500 flex items-center gap-2 font-medium"><Calendar className="w-3.5 h-3.5 text-slate-400" /> Joined</span>
-                  <span className="text-slate-900 font-semibold">{new Date(profileData.employee.joiningDate).toLocaleDateString()}</span>
+
+                {/* Date Joined */}
+                <div className="p-3.5 rounded-2xl bg-slate-50/90 border border-slate-200/80 hover:bg-slate-100/70 transition-colors shadow-2xs">
+                  <span className="text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 text-slate-500 mb-1">
+                    <Calendar className="w-3.5 h-3.5 text-sky-500" /> Date of Joining
+                  </span>
+                  <span className="text-xs font-bold text-slate-900 block leading-relaxed">
+                    {profileData.employee.joiningDate 
+                      ? new Date(profileData.employee.joiningDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+                      : 'N/A'}
+                  </span>
                 </div>
-                <div className="flex justify-between py-1.5 border-b border-slate-200/60">
-                  <span className="text-slate-500 flex items-center gap-2 font-medium"><Award className="w-3.5 h-3.5 text-amber-500" /> Total Points</span>
-                  <span className="text-amber-700 font-extrabold tabular-nums">{profileData.employee.totalPoints || 0} Pts</span>
+
+                {/* Performance Reward Points */}
+                <div className="p-3.5 rounded-2xl bg-amber-50/60 border border-amber-200/70 hover:bg-amber-50 transition-colors shadow-2xs">
+                  <span className="text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 text-amber-800 mb-1">
+                    <Award className="w-3.5 h-3.5 text-amber-600" /> Performance Points
+                  </span>
+                  <span className="text-xs font-black text-amber-700 block leading-relaxed">
+                    {profileData.employee.totalPoints || 0} Reward Pts
+                  </span>
                 </div>
-                <div className="flex justify-between py-1.5">
-                  <span className="text-slate-500 flex items-center gap-2 font-medium"><Heart className="w-3.5 h-3.5 text-rose-500" /> Blood Group</span>
-                  <span className="text-rose-700 font-extrabold">{profileData.employee.bloodGroup || 'O+'}</span>
+
+                {/* Blood Group */}
+                <div className="p-3.5 rounded-2xl bg-rose-50/60 border border-rose-200/70 hover:bg-rose-50 transition-colors shadow-2xs">
+                  <span className="text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 text-rose-800 mb-1">
+                    <Heart className="w-3.5 h-3.5 text-rose-600" /> Blood Group
+                  </span>
+                  <span className="text-xs font-black text-rose-700 block leading-relaxed">
+                    {profileData.employee.bloodGroup || 'O+'}
+                  </span>
+                </div>
+
+                {/* Admin Vault Login Password */}
+                <div className="p-3.5 rounded-2xl bg-indigo-50/60 border border-indigo-200/70 hover:bg-indigo-50 transition-colors shadow-2xs">
+                  <div className="flex items-center justify-between text-indigo-800 mb-1">
+                    <span className="text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5">
+                      <Key className="w-3.5 h-3.5 text-indigo-600" /> Login Password
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <button 
+                        onClick={() => togglePasswordVisibility(`modal_${profileData.employee._id}`)}
+                        className="text-indigo-600 hover:text-indigo-900 transition-colors p-0.5"
+                        title={visiblePasswords[`modal_${profileData.employee._id}`] ? "Hide password" : "Show password"}
+                      >
+                        {visiblePasswords[`modal_${profileData.employee._id}`] ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                      </button>
+                      <button 
+                        onClick={() => handleCopyToClipboard(getEmployeePassword(profileData.employee), 'Password')}
+                        className="text-indigo-600 hover:text-indigo-900 transition-colors p-0.5"
+                        title="Copy password"
+                      >
+                        <Copy className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                  <span className="text-xs font-mono font-extrabold text-indigo-950 block leading-relaxed">
+                    {visiblePasswords[`modal_${profileData.employee._id}`] 
+                      ? getEmployeePassword(profileData.employee) 
+                      : '••••••••••••'}
+                  </span>
                 </div>
               </div>
 
-              {/* Task History */}
-              <div className="space-y-3">
-                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                  <CheckSquare className="w-4 h-4 text-slate-500" />
-                  Task History
-                </h3>
+              {/* Task History Section */}
+              <div className="space-y-3 pt-1">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                    <CheckSquare className="w-4 h-4 text-indigo-600" />
+                    Task History & Objectives
+                  </h3>
+                  <span className="text-[11px] font-bold text-slate-600 bg-slate-100 border border-slate-200/80 px-2.5 py-0.5 rounded-full">
+                    {profileData.tasks.length} Assigned
+                  </span>
+                </div>
                 
                 {profileData.tasks.length === 0 ? (
-                  <p className="text-xs text-slate-400 text-center py-4 bg-slate-50 rounded-xl border border-slate-200/60">No tasks assigned yet.</p>
+                  <div className="text-center py-6 px-4 bg-slate-50/80 rounded-2xl border border-dashed border-slate-200">
+                    <ClipboardList className="w-7 h-7 text-slate-300 mx-auto mb-1.5" />
+                    <p className="text-xs font-bold text-slate-700">No tasks assigned yet</p>
+                    <p className="text-[11px] text-slate-400 mt-0.5">Manager will allocate new objectives here.</p>
+                  </div>
                 ) : (
-                  <div className="max-h-[180px] overflow-y-auto space-y-2 pr-1">
+                  <div className="max-h-[190px] overflow-y-auto space-y-2 pr-1">
                     {profileData.tasks.map((task) => (
-                      <div key={task._id} className="p-3 bg-white border border-slate-200 rounded-xl flex items-center justify-between gap-3 text-xs shadow-2xs">
+                      <div key={task._id} className="p-3.5 bg-white border border-slate-200/90 rounded-2xl flex items-center justify-between gap-3 text-xs shadow-2xs hover:border-indigo-200 transition-colors">
                         <div className="space-y-1">
-                          <h4 className="font-bold text-slate-900">{task.title}</h4>
-                          <div className="flex items-center gap-2 text-[11px] text-slate-500">
+                          <h4 className="font-extrabold text-slate-900">{task.title}</h4>
+                          <div className="flex items-center gap-2 text-[11px] text-slate-500 flex-wrap">
                             <span className={getPriorityBadgeClass(task.priority)}>{task.priority}</span>
                             <span>•</span>
-                            <span className="font-mono text-amber-700 font-bold">+{task.points} Pts</span>
+                            <span className="font-mono text-amber-700 font-bold bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/60">+{task.points} Pts</span>
                             <span>•</span>
                             <span>Due: {new Date(task.dueDate).toLocaleDateString()}</span>
                           </div>
@@ -1050,19 +1241,38 @@ const EmployeeManagement = () => {
                   </div>
                 )}
               </div>
+            </div>
 
-              {/* Footer Controls */}
-              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+            {/* Premium Action Footer Bar */}
+            <div className="p-4 sm:p-5 bg-slate-50 border-t border-slate-200/80 flex items-center justify-between gap-3 flex-wrap shrink-0">
+              <button
+                onClick={() => {
+                  const emp = profileData.employee;
+                  setProfileData(null);
+                  setSelectedIDCardEmp(emp);
+                }}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-800 border border-slate-200/80 text-xs font-extrabold shadow-2xs transition-all hover:scale-[1.02] active:scale-95"
+                title="View verified corporate digital ID badge"
+              >
+                <QrCode className="w-4 h-4 text-rose-500" />
+                <span>View ID Card</span>
+              </button>
+
+              <div className="flex items-center gap-2.5 ml-auto">
                 <button
-                  onClick={() => openEditModal(profileData.employee)}
-                  className="btn-secondary text-xs"
+                  onClick={() => {
+                    const emp = profileData.employee;
+                    setProfileData(null);
+                    openEditModal(emp);
+                  }}
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/70 text-xs font-extrabold transition-all hover:scale-[1.02] active:scale-95"
                 >
-                  <Edit3 className="w-3.5 h-3.5" />
-                  Edit Profile
+                  <Edit3 className="w-3.5 h-3.5 text-indigo-600" />
+                  <span>Edit Profile</span>
                 </button>
                 <button
                   onClick={() => setProfileData(null)}
-                  className="btn-primary text-xs px-5"
+                  className="px-5 py-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 text-white text-xs font-black shadow-md transition-all hover:scale-[1.02] active:scale-95"
                 >
                   Close
                 </button>
