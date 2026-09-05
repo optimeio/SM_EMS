@@ -5,7 +5,7 @@ import Attendance from './models/Attendance.js';
 import Task from './models/Task.js';
 import Admin from './models/Admin.js';
 
-dotenv.config({ path: 'c:/Users/Lenovo/Desktop/ID_Scan/backend/.env' });
+dotenv.config();
 
 async function inspectDatabase() {
   console.log('====================================================');

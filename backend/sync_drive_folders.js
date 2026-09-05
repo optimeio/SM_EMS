@@ -3,7 +3,7 @@ import { connectDB } from './config/db.js';
 import Employee from './models/Employee.js';
 import { google } from 'googleapis';
 
-dotenv.config({ path: 'c:/Users/Lenovo/Desktop/ID_Scan/backend/.env' });
+dotenv.config();
 
 const ROOT_ATTENDANCE_FOLDER = 'THE SM GROUPS Attendance';
 const ROOT_IDCARD_FOLDER = 'THE SM GROUPS ID Cards';

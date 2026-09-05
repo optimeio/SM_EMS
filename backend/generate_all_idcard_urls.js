@@ -3,7 +3,7 @@ import { connectDB } from './config/db.js';
 import Employee from './models/Employee.js';
 import { uploadIDCardToDrive } from './services/googleDriveService.js';
 
-dotenv.config({ path: 'c:/Users/Lenovo/Desktop/ID_Scan/backend/.env' });
+dotenv.config();
 
 // 1x1 transparent PNG base64 placeholder for initial batch sync
 const SAMPLE_IDCARD_BASE64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
