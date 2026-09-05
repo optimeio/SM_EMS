@@ -1244,21 +1244,8 @@ const EmployeeManagement = () => {
             </div>
 
             {/* Premium Action Footer Bar */}
-            <div className="p-4 sm:p-5 bg-slate-50 border-t border-slate-200/80 flex items-center justify-between gap-3 flex-wrap shrink-0">
-              <button
-                onClick={() => {
-                  const emp = profileData.employee;
-                  setProfileData(null);
-                  setSelectedIDCardEmp(emp);
-                }}
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-800 border border-slate-200/80 text-xs font-extrabold shadow-2xs transition-all hover:scale-[1.02] active:scale-95"
-                title="View verified corporate digital ID badge"
-              >
-                <QrCode className="w-4 h-4 text-rose-500" />
-                <span>View ID Card</span>
-              </button>
-
-              <div className="flex items-center gap-2.5 ml-auto">
+            <div className="p-4 sm:p-5 bg-slate-50 border-t border-slate-200/80 flex items-center justify-end gap-3 flex-wrap shrink-0">
+              <div className="flex items-center gap-2.5">
                 <button
                   onClick={() => {
                     const emp = profileData.employee;
