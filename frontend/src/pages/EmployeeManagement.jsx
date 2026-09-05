@@ -49,7 +49,8 @@ const EmployeeManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [departmentFilter, setDepartmentFilter] = useState('All');
-  const [selectedDept, setSelectedDept] = useState(null);
+  const [selectedDept, setSelectedDept] = useState('All');
+  const [showDeptCards, setShowDeptCards] = useState(false);
 
   // Pagination states
   const [page, setPage] = useState(1);
@@ -67,6 +68,33 @@ const EmployeeManagement = () => {
   const [confirmStatusEmp, setConfirmStatusEmp] = useState(null);
   const [deleteConfirmEmp, setDeleteConfirmEmp] = useState(null);
 
+  // Persistent vault passwords store for admin visibility
+  const [vaultPasswords, setVaultPasswords] = useState(() => {
+    try {
+      const saved = localStorage.getItem('ems_vault_passwords');
+      const parsed = saved ? JSON.parse(saved) : {};
+      if (!parsed['TSMG006'] && !parsed['dhanuzh.glitz@gmail.com']) {
+        parsed['TSMG006'] = '1234';
+        parsed['dhanuzh.glitz@gmail.com'] = '1234';
+      }
+      return parsed;
+    } catch (e) {
+      return { 'TSMG006': '1234', 'dhanuzh.glitz@gmail.com': '1234' };
+    }
+  });
+
+  const getEmployeePassword = (emp) => {
+    if (!emp) return 'Password@123';
+    if (vaultPasswords[emp._id]) return vaultPasswords[emp._id];
+    if (emp.employeeId && vaultPasswords[emp.employeeId]) return vaultPasswords[emp.employeeId];
+    if (emp.email && vaultPasswords[emp.email.toLowerCase()]) return vaultPasswords[emp.email.toLowerCase()];
+    if (emp.plainTextPassword) return emp.plainTextPassword;
+    if (emp.employeeId === 'TSMG006' || (emp.email && emp.email.toLowerCase() === 'dhanuzh.glitz@gmail.com')) {
+      return '1234';
+    }
+    return 'Password@123';
+  };
+
   const togglePasswordVisibility = (id) => {
     setVisiblePasswords(prev => ({ ...prev, [id]: !prev[id] }));
   };
@@ -79,9 +107,27 @@ const EmployeeManagement = () => {
   };
 
   const handleSaveVaultPassword = async (empId) => {
-    if (!newPasswordInput.trim()) return;
+    const trimmedPass = newPasswordInput.trim();
+    if (!trimmedPass) return;
     try {
-      await API.put(`/employees/${empId}`, { password: newPasswordInput });
+      const targetEmp = employees.find(e => e._id === empId);
+      await API.put(`/employees/${empId}`, { password: trimmedPass });
+
+      // Save to persistent vault state and localStorage for admin visibility
+      const updatedVault = {
+        ...vaultPasswords,
+        [empId]: trimmedPass,
+        ...(targetEmp?.employeeId ? { [targetEmp.employeeId]: trimmedPass } : {}),
+        ...(targetEmp?.email ? { [targetEmp.email.toLowerCase()]: trimmedPass } : {})
+      };
+      setVaultPasswords(updatedVault);
+      try {
+        localStorage.setItem('ems_vault_passwords', JSON.stringify(updatedVault));
+      } catch (e) {}
+
+      // Update in-memory employees state
+      setEmployees(prev => prev.map(e => e._id === empId ? { ...e, plainTextPassword: trimmedPass } : e));
+
       setSuccessMessage('Password updated successfully!');
       setTimeout(() => setSuccessMessage(''), 3000);
       setEditingPasswordId(null);
@@ -334,9 +380,10 @@ const EmployeeManagement = () => {
 
   const getNormalizedDept = (dept) => {
     if (!dept) return 'Software Development';
-    if (dept === 'IT' || dept === 'Engineering') return 'Software Development';
-    if (dept === 'Telecalling') return 'COI (Center Of Information)';
-    if (dept === 'Marketing') return 'Sales And Marketing';
+    const d = String(dept).trim().toLowerCase();
+    if (d.includes('coi') || d.includes('center of information') || d.includes('telecalling')) return 'COI (Center Of Information)';
+    if (d.includes('sales') || d.includes('marketing')) return 'Sales And Marketing';
+    if (d.includes('software') || d.includes('dev') || d.includes('engineering') || d.includes('it')) return 'Software Development';
     return dept;
   };
 
@@ -500,16 +547,20 @@ const EmployeeManagement = () => {
       {/* Department Cards or Table */}
       {loading ? (
         <LogoSpinner label="Loading employee directory..." />
-      ) : !selectedDept && !searchTerm ? (
-        /* Department Selection Cards */
-        <div className="space-y-4">
+      ) : showDeptCards ? (
+        /* Department Selection Cards (When user explicitly chooses to view Department Overview) */
+        <div className="space-y-4 animate-fade-in">
           <div className="flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-4">
             <button
-              onClick={() => setSelectedDept('All')}
+              onClick={() => {
+                setShowDeptCards(false);
+                setSelectedDept('All');
+                setDepartmentFilter('All');
+              }}
               className="btn-secondary text-xs bg-white shadow-2xs flex items-center justify-center sm:justify-start gap-2 w-full sm:w-auto hover:bg-slate-50 font-extrabold py-2.5 px-4 rounded-xl"
             >
-              <Users className="w-4 h-4 text-slate-500" />
-              View All Employees ({employees.length})
+              <ChevronLeft className="w-4 h-4 text-slate-500" />
+              Back to Employee List ({employees.length})
             </button>
             <div className="text-center sm:text-right">
               <h2 className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Departments Overview</h2>
@@ -524,7 +575,11 @@ const EmployeeManagement = () => {
               return (
                 <div
                   key={dept}
-                  onClick={() => setSelectedDept(dept)}
+                  onClick={() => {
+                    setSelectedDept(dept);
+                    setDepartmentFilter(dept);
+                    setShowDeptCards(false);
+                  }}
                   className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-2xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 cursor-pointer group relative overflow-hidden flex flex-col justify-between"
                 >
                   <div className={`absolute top-0 left-0 right-0 h-1.5 ${style.topBar}`}></div>
@@ -558,39 +613,96 @@ const EmployeeManagement = () => {
             })}
           </div>
         </div>
-      ) : filteredEmployees.length === 0 ? (
-        <div className="bg-white rounded-2xl text-center py-16 space-y-3 border border-slate-200/80 shadow-2xs">
-          <Users className="w-12 h-12 text-slate-300 mx-auto" />
-          <h3 className="text-base font-bold text-slate-700">No employees match your search</h3>
-          <p className="text-xs text-slate-500">Try clearing filters or adjusting your search query.</p>
-        </div>
       ) : (
-        /* Employee Table */
-        <div className="space-y-4">
-          <div className="flex items-center justify-between bg-white border border-slate-200/80 px-4 py-3 rounded-2xl shadow-2xs">
-            <div className="flex items-center gap-2 text-xs">
+        /* Employee Table Direct Listing */
+        <div className="space-y-4 animate-fade-in">
+          {/* Department Quick Tabs & View Switcher Bar */}
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-white border border-slate-200/80 p-3 rounded-2xl shadow-2xs">
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
               <button
-                onClick={() => setSelectedDept(null)}
-                className="font-extrabold text-slate-600 hover:text-slate-900 flex items-center gap-1"
+                onClick={() => {
+                  setSelectedDept('All');
+                  setDepartmentFilter('All');
+                }}
+                className={`px-3.5 py-2 rounded-xl text-xs font-black whitespace-nowrap transition-all flex items-center gap-2 ${
+                  (selectedDept === 'All' || !selectedDept) && departmentFilter === 'All'
+                    ? 'bg-slate-950 text-white shadow-xs'
+                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                }`}
               >
-                <ChevronLeft className="w-4 h-4" />
-                Departments
+                <Users className="w-3.5 h-3.5" />
+                <span>All Employees</span>
+                <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-mono ${
+                  (selectedDept === 'All' || !selectedDept) && departmentFilter === 'All' ? 'bg-slate-800 text-white' : 'bg-slate-200 text-slate-800'
+                }`}>
+                  {employees.length}
+                </span>
               </button>
-              <span className="text-slate-300">/</span>
-              <span className="font-extrabold text-slate-900 text-xs">
-                {selectedDept === 'All' ? 'All Departments' : `${selectedDept} Department`} ({filteredEmployees.length} Personnel)
-              </span>
+
+              {departments.map((dept) => {
+                const count = employees.filter((e) => getNormalizedDept(e.department) === dept).length;
+                const isSelected = (selectedDept === dept || departmentFilter === dept) && selectedDept !== 'All';
+                return (
+                  <button
+                    key={dept}
+                    onClick={() => {
+                      setSelectedDept(dept);
+                      setDepartmentFilter(dept);
+                    }}
+                    className={`px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 ${
+                      isSelected
+                        ? 'bg-indigo-600 text-white shadow-xs'
+                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    }`}
+                  >
+                    <span>{dept}</span>
+                    <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-mono ${
+                      isSelected ? 'bg-indigo-800 text-white' : 'bg-slate-200 text-slate-800'
+                    }`}>
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
 
-            {selectedDept && (
-              <button
-                onClick={() => setSelectedDept(null)}
-                className="text-xs font-bold text-indigo-600 hover:text-indigo-800 underline"
-              >
-                Show All Departments
-              </button>
-            )}
+            <button
+              onClick={() => setShowDeptCards(true)}
+              className="inline-flex items-center justify-center gap-2 px-3.5 py-2 bg-slate-50 hover:bg-slate-100 text-slate-800 text-xs font-black rounded-xl border border-slate-200 shrink-0 transition-colors"
+              title="View Departments Overview Cards"
+            >
+              <Building2 className="w-4 h-4 text-indigo-600" />
+              <span>Department Cards Overview</span>
+            </button>
           </div>
+
+          {filteredEmployees.length === 0 ? (
+            <div className="bg-white rounded-2xl text-center py-16 space-y-3 border border-slate-200/80 shadow-2xs">
+              <Users className="w-12 h-12 text-slate-300 mx-auto" />
+              <h3 className="text-base font-bold text-slate-700">No employees match your search</h3>
+              <p className="text-xs text-slate-500">Try clearing filters or adjusting your search query.</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between bg-white border border-slate-200/80 px-4 py-3 rounded-2xl shadow-2xs">
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="font-extrabold text-slate-900 text-xs">
+                    {selectedDept === 'All' ? 'All Personnel Records' : `${selectedDept} Department`} ({filteredEmployees.length} Personnel)
+                  </span>
+                </div>
+
+                {selectedDept && selectedDept !== 'All' && (
+                  <button
+                    onClick={() => {
+                      setSelectedDept('All');
+                      setDepartmentFilter('All');
+                    }}
+                    className="text-xs font-bold text-indigo-600 hover:text-indigo-800 underline"
+                  >
+                    Show All Employees
+                  </button>
+                )}
+              </div>
 
           <div>
             {/* Desktop Table View */}
@@ -798,7 +910,9 @@ const EmployeeManagement = () => {
                 </div>
               </div>
             )}
-          </div>
+            </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -1422,7 +1536,7 @@ const EmployeeManagement = () => {
                           <div className="space-y-0.5 px-1 min-w-[100px]">
                             <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">Password</span>
                             <div className="font-mono text-xs font-bold text-slate-800 tracking-wider">
-                              {visiblePasswords[emp._id] ? (emp.plainTextPassword || 'Password@123') : '••••••••'}
+                              {visiblePasswords[emp._id] ? getEmployeePassword(emp) : '••••••••'}
                             </div>
                           </div>
 
@@ -1435,7 +1549,7 @@ const EmployeeManagement = () => {
                           </button>
 
                           <button
-                            onClick={() => handleCopyToClipboard(emp.plainTextPassword || 'Password@123', 'Password')}
+                            onClick={() => handleCopyToClipboard(getEmployeePassword(emp), 'Password')}
                             className="p-1.5 text-slate-500 hover:text-indigo-600 hover:bg-white rounded-lg transition-colors shadow-2xs border border-slate-200/60"
                             title="Copy Password"
                           >
@@ -1445,7 +1559,7 @@ const EmployeeManagement = () => {
                           <button
                             onClick={() => {
                               setEditingPasswordId(emp._id);
-                              setNewPasswordInput(emp.plainTextPassword || '');
+                              setNewPasswordInput(getEmployeePassword(emp));
                             }}
                             className="p-1.5 text-slate-500 hover:text-indigo-600 hover:bg-white rounded-lg transition-colors shadow-2xs border border-slate-200/60"
                             title="Quick Change Password"

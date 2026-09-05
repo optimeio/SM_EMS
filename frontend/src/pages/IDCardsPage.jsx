@@ -39,7 +39,8 @@ const IDCardsPage = () => {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedDept, setSelectedDept] = useState(null);
+  const [selectedDept, setSelectedDept] = useState('All');
+  const [showDeptCards, setShowDeptCards] = useState(false);
   const [selectedEmp, setSelectedEmp] = useState(null);
   const [generatingQR, setGeneratingQR] = useState(null);
 
@@ -324,15 +325,6 @@ const IDCardsPage = () => {
             />
           </div>
 
-          {selectedDept && (
-            <button
-              onClick={() => setSelectedDept(null)}
-              className="btn-secondary text-xs flex items-center gap-1.5"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              Change Department
-            </button>
-          )}
         </div>
       )}
 
@@ -421,19 +413,23 @@ const IDCardsPage = () => {
             </div>
           ))}
         </div>
-      ) : isAdmin && !selectedDept && !searchTerm ? (
-        /* Admin Department Selection Cards */
-        <div className="space-y-4">
+      ) : isAdmin && showDeptCards ? (
+        /* Admin Department Selection Cards (When toggled by admin) */
+        <div className="space-y-4 animate-fade-in">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Departments</h2>
               <p className="text-xs text-slate-500 mt-0.5 font-medium">Select a department to view employee ID badges</p>
             </div>
             <button
-              onClick={() => setSelectedDept('All')}
-              className="text-xs font-bold text-slate-700 hover:text-slate-900 underline"
+              onClick={() => {
+                setShowDeptCards(false);
+                setSelectedDept('All');
+              }}
+              className="btn-secondary text-xs flex items-center gap-1.5"
             >
-              View All ({employees.length})
+              <ChevronLeft className="w-4 h-4" />
+              Back to ID Badges ({employees.length})
             </button>
           </div>
 
@@ -444,7 +440,10 @@ const IDCardsPage = () => {
               return (
                 <div
                   key={dept}
-                  onClick={() => setSelectedDept(dept)}
+                  onClick={() => {
+                    setSelectedDept(dept);
+                    setShowDeptCards(false);
+                  }}
                   className={`rounded-2xl p-6 border cursor-pointer group space-y-4 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${style.bg}`}
                 >
                   <div className="flex items-center justify-between">
@@ -481,32 +480,60 @@ const IDCardsPage = () => {
           <p className="text-xs text-slate-500">Try adjusting your search terms or filters.</p>
         </div>
       ) : (
-        /* Admin Employee Badges Cards */
-        <div className="space-y-4">
+        /* Admin Employee Badges Direct Grid */
+        <div className="space-y-4 animate-fade-in">
           {isAdmin && (
-            <div className="flex items-center justify-between bg-white border border-slate-200/80 px-4 py-3 rounded-xl shadow-2xs">
-              <div className="flex items-center gap-2 text-xs">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-white border border-slate-200/80 p-3 rounded-2xl shadow-2xs">
+              <div className="flex items-center gap-2 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
                 <button
-                  onClick={() => setSelectedDept(null)}
-                  className="font-semibold text-slate-600 hover:text-slate-900 flex items-center gap-1"
+                  onClick={() => setSelectedDept('All')}
+                  className={`px-3.5 py-2 rounded-xl text-xs font-black whitespace-nowrap transition-all flex items-center gap-2 ${
+                    selectedDept === 'All' || !selectedDept
+                      ? 'bg-slate-950 text-white shadow-xs'
+                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  }`}
                 >
-                  <ChevronLeft className="w-4 h-4" />
-                  Departments
+                  <Users className="w-3.5 h-3.5" />
+                  <span>All Badges</span>
+                  <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-mono ${
+                    selectedDept === 'All' || !selectedDept ? 'bg-slate-800 text-white' : 'bg-slate-200 text-slate-800'
+                  }`}>
+                    {employees.length}
+                  </span>
                 </button>
-                <span className="text-slate-300">/</span>
-                <span className="font-bold text-slate-900 text-xs">
-                  {selectedDept === 'All' ? 'All Departments' : `${selectedDept} Department`} ({filteredEmployees.length})
-                </span>
+
+                {departments.map((dept) => {
+                  const count = employees.filter((e) => normalizeDept(e.department) === dept).length;
+                  const isSelected = selectedDept === dept;
+                  return (
+                    <button
+                      key={dept}
+                      onClick={() => setSelectedDept(dept)}
+                      className={`px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 ${
+                        isSelected
+                          ? 'bg-indigo-600 text-white shadow-xs'
+                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                      }`}
+                    >
+                      <span>{dept}</span>
+                      <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-mono ${
+                        isSelected ? 'bg-indigo-800 text-white' : 'bg-slate-200 text-slate-800'
+                      }`}>
+                        {count}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
 
-              {selectedDept && (
-                <button
-                  onClick={() => setSelectedDept(null)}
-                  className="text-xs font-semibold text-slate-500 hover:text-slate-800 underline"
-                >
-                  Show All Departments
-                </button>
-              )}
+              <button
+                onClick={() => setShowDeptCards(true)}
+                className="inline-flex items-center justify-center gap-2 px-3.5 py-2 bg-slate-50 hover:bg-slate-100 text-slate-800 text-xs font-black rounded-xl border border-slate-200 shrink-0 transition-colors"
+                title="View Departments Overview Cards"
+              >
+                <Building2 className="w-4 h-4 text-indigo-600" />
+                <span>Department Cards Overview</span>
+              </button>
             </div>
           )}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
