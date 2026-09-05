@@ -282,42 +282,6 @@ const EmployeeProfilePage = () => {
             </div>
           </div>
 
-          {/* 4. Credentials & Security Access */}
-          <div className="space-y-3 pt-4 border-t border-slate-100">
-            <h3 className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-              <Key className="w-4 h-4 text-indigo-500" />
-              Credentials & Dashboard Access
-            </h3>
-
-            <div className="p-4 rounded-2xl bg-indigo-50/60 border border-indigo-200/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="space-y-0.5">
-                <span className="text-xs font-black text-indigo-950 block">Current Workspace Password</span>
-                <p className="text-[11px] text-indigo-700 font-medium">Use your Employee ID or Email and password to log in.</p>
-              </div>
-
-              <div className="flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl border border-indigo-200 shadow-2xs self-start sm:self-auto">
-                <span className="font-mono text-xs font-bold text-slate-900 tracking-wider">
-                  {showPassword ? getDisplayPassword() : '••••••••'}
-                </span>
-
-                <button
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="p-1 text-slate-400 hover:text-slate-700 rounded-md transition-colors"
-                  title={showPassword ? "Hide Password" : "Show Password"}
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-
-                <button
-                  onClick={() => copyToClipboard(getDisplayPassword(), 'Password')}
-                  className="p-1 text-slate-400 hover:text-indigo-600 rounded-md transition-colors"
-                  title="Copy Password"
-                >
-                  <Copy className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </div>
 
         </div>
       </div>
