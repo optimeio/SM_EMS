@@ -158,52 +158,63 @@ export const verifyEmployee = async (req, res) => {
     rawId = rawId.split('?')[0].split('#')[0].replace(/^\/+|\/+$/g, '').trim();
 
     const normalizedUpper = rawId.toUpperCase();
-
-    // Legacy and alternate ID mappings so older printed QR codes still work permanently
-    const LEGACY_ID_MAP = {
-      'TSMGS011': 'TSMG005',
-      'TSMGS005': 'TSMG005',
-      'TSMG5': 'TSMG005',
-      'TSMGS012': 'TSMG009',
-      'TSMGS009': 'TSMG009',
-      'TSMG9': 'TSMG009',
-      'TSMG013': 'TSMG010', // Rupasri k old ID
-      'TSMGS013': 'TSMG010',
-      'TSMGS010': 'TSMG010',
-      'TSMG10': 'TSMG010',
-      'TSMGS014': 'TSMG011', // soundharya old ID
-      'TSMG11': 'TSMG011',
-      'TSMGS015': 'TSMG012', // Aaron old ID
-      'TSMG015': 'TSMG012',
-      'TSMG12': 'TSMG012',
-    };
-
-    const targetId = LEGACY_ID_MAP[normalizedUpper] || normalizedUpper;
-
-    const regex = new RegExp(`^${targetId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i');
-    const rawRegex = new RegExp(`^${rawId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i');
     const isObjectId = /^[0-9a-fA-F]{24}$/.test(rawId);
 
-    const query = {
+    // 1. Prioritize DIRECT match by exact employeeId, email, or phone
+    const exactRegex = new RegExp(`^${rawId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i');
+    let employee = await Employee.findOne({
       $or: [
-        { employeeId: regex },
-        { employeeId: rawRegex },
+        { employeeId: exactRegex },
         { email: rawId.toLowerCase() },
         { phone: rawId },
         ...(isObjectId ? [{ _id: rawId }] : [])
       ]
+    }).select('-password').lean();
+
+    if (employee) {
+      return res.json(employee);
+    }
+
+    // 2. Fallback to historical aliases ONLY if no current employee holds this exact ID
+    const LEGACY_ID_MAP = {
+      'TSMGS011': 'TSMG005',
+      'TSMGS012': 'TSMG009',
+      'TSMGS013': 'TSMG010',
+      'TSMGS014': 'TSMG011',
+      'TSMGS015': 'TSMG012',
     };
 
-    const employee = await Employee.findOne(query).select('-password').lean();
-    if (employee) {
-      res.json(employee);
-    } else {
-      res.status(404).json({ message: 'Employee record not found or invalid QR code' });
+    const targetId = LEGACY_ID_MAP[normalizedUpper];
+    if (targetId) {
+      employee = await Employee.findOne({
+        employeeId: new RegExp(`^${targetId}$`, 'i')
+      }).select('-password').lean();
+
+      if (employee) {
+        return res.json(employee);
+      }
     }
+
+    res.status(404).json({ message: 'Employee record not found or invalid QR code' });
   } catch (error) {
     console.error('Verify Employee Error:', error);
     res.status(500).json({ message: 'Server error during employee verification' });
   }
+};
+
+export const normalizeDepartment = (dept) => {
+  if (!dept) return 'COI (Center Of Information)';
+  const d = String(dept).trim().toLowerCase();
+  if (d.includes('coi') || d.includes('center of information') || d.includes('hr') || d.includes('telecalling')) {
+    return 'COI (Center Of Information)';
+  }
+  if (d.includes('sales') || d.includes('marketing')) {
+    return 'Sales And Marketing';
+  }
+  if (d.includes('software') || d.includes('dev') || d.includes('engineering') || d.includes('it')) {
+    return 'Software Development';
+  }
+  return dept;
 };
 
 // @desc    Create new employee
@@ -232,7 +243,7 @@ export const createEmployee = async (req, res) => {
     let employeeId = customId;
     if (!employeeId) {
       const count = await Employee.countDocuments();
-      employeeId = `TSMGS${(count + 1).toString().padStart(3, '0')}`;
+      employeeId = `TSMG${(count + 1).toString().padStart(3, '0')}`;
     }
     
     // Default password for new employees (can be changed later)
@@ -244,7 +255,7 @@ export const createEmployee = async (req, res) => {
       email: cleanEmail,
       password,
       phone: phone || '9876543210',
-      department,
+      department: normalizeDepartment(department),
       designation,
       joiningDate: safeParseDate(joiningDate) || new Date(),
       address,
@@ -260,15 +271,13 @@ export const createEmployee = async (req, res) => {
 
     const employee = await Employee.create(empData);
 
-    // Non-blocking async QR code generation in background
-    const host = req.get('host') || '';
-    const isLocal = host.includes('localhost') || host.includes('127.0.0.1');
-    const baseUrl = process.env.FRONTEND_URL || (isLocal ? 'http://localhost:5173' : 'https://ems.thesmgroups.com');
+    // Non-blocking async QR code generation in background with canonical permanent URL
+    const baseUrl = 'https://ems.thesmgroups.com';
     const verificationUrl = `${baseUrl}/verify/${employeeId}`;
     
     QRCode.toDataURL(verificationUrl, {
-      width: 335,
-      margin: 1,
+      width: 600,
+      margin: 3,
       color: { dark: '#000000', light: '#ffffff' },
       errorCorrectionLevel: 'H'
     }).then(qrDataUrl => {
@@ -305,7 +314,7 @@ export const updateEmployee = async (req, res) => {
     if (employee) {
       if (req.body.name !== undefined) employee.name = req.body.name.trim();
       if (req.body.phone !== undefined) employee.phone = req.body.phone.trim();
-      if (req.body.department !== undefined) employee.department = req.body.department;
+      if (req.body.department !== undefined) employee.department = normalizeDepartment(req.body.department);
       if (req.body.designation !== undefined) employee.designation = req.body.designation.trim();
       if (req.body.address !== undefined) employee.address = req.body.address;
       if (req.body.emergencyContact !== undefined) employee.emergencyContact = req.body.emergencyContact;
@@ -330,6 +339,19 @@ export const updateEmployee = async (req, res) => {
           return res.status(400).json({ message: 'Another employee with this Employee ID already exists' });
         }
         employee.employeeId = newEmpId;
+
+        // Auto-regenerate permanent QR for the new ID
+        try {
+          const baseUrl = 'https://ems.thesmgroups.com';
+          employee.qrCodeImage = await QRCode.toDataURL(`${baseUrl}/verify/${newEmpId}`, {
+            width: 600,
+            margin: 3,
+            color: { dark: '#000000', light: '#ffffff' },
+            errorCorrectionLevel: 'H'
+          });
+        } catch (qrErr) {
+          console.error('Failed to update QR on ID change:', qrErr);
+        }
       }
 
       // If a new ID card image is being uploaded, save base64 to DB and upload to Drive

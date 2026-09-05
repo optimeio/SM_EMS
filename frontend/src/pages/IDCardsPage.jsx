@@ -204,12 +204,28 @@ const IDCardsPage = () => {
     }
   };
 
+  const normalizeDept = (dept) => {
+    if (!dept) return 'COI (Center Of Information)';
+    const d = String(dept).trim().toLowerCase();
+    if (d.includes('coi') || d.includes('center of information') || d.includes('hr') || d.includes('telecalling')) {
+      return 'COI (Center Of Information)';
+    }
+    if (d.includes('sales') || d.includes('marketing')) {
+      return 'Sales And Marketing';
+    }
+    if (d.includes('software') || d.includes('dev') || d.includes('engineering') || d.includes('it')) {
+      return 'Software Development';
+    }
+    return dept;
+  };
+
   const filteredEmployees = employees.filter((emp) => {
+    const normDept = normalizeDept(emp.department);
     const matchesSearch =
       emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       emp.employeeId.toLowerCase().includes(searchTerm.toLowerCase()) ||
       emp.designation.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesDept = !selectedDept || selectedDept === 'All' || emp.department === selectedDept;
+    const matchesDept = !selectedDept || selectedDept === 'All' || normDept === selectedDept || emp.department === selectedDept;
     return matchesSearch && matchesDept;
   });
 
@@ -423,7 +439,7 @@ const IDCardsPage = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             {departments.map((dept) => {
-              const count = employees.filter((e) => e.department === dept).length;
+              const count = employees.filter((e) => normalizeDept(e.department) === dept).length;
               const style = getDepartmentBadgeStyle(dept);
               return (
                 <div
