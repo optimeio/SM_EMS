@@ -247,25 +247,6 @@ const IDCardsPage = () => {
 
         {isAdmin && (
           <div className="flex items-center gap-2.5 flex-wrap">
-            <button
-              onClick={generateAllQRs}
-              disabled={generatingAllQRs}
-              className="btn-primary text-xs bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold py-2.5 px-4 rounded-xl shadow-sm hover:shadow-md transition-all flex items-center gap-2"
-              title="Generate unique 335x335px QR code for all employees"
-            >
-              {generatingAllQRs ? (
-                <>
-                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                  <span>Generating QRs...</span>
-                </>
-              ) : (
-                <>
-                  <QrCode className="w-3.5 h-3.5" />
-                  <span>Generate All QR Codes</span>
-                </>
-              )}
-            </button>
-
             <a
               href={CANVA_EDIT_URL}
               target="_blank"
