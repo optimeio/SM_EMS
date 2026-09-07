@@ -52,55 +52,55 @@ const EmployeeDashboard = () => {
 
   return (
     <div className="space-y-6 animate-fade-in pb-12">
-      {/* Modern, Clean & Non-Truncated Welcome Box */}
-      <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-sm space-y-3.5">
+      {/* Sleek Midnight Slate Welcome Box */}
+      <div className="bg-slate-900 text-white rounded-2xl p-4 sm:p-5 border border-slate-800 shadow-md space-y-3.5 relative overflow-hidden">
         <div className="flex items-start justify-between gap-3">
-          <div className="flex items-center gap-3 min-w-0">
+          <div className="flex items-center gap-3.5 min-w-0">
             {user?.profilePhoto ? (
               <img 
                 src={user.profilePhoto} 
                 alt={user?.name} 
-                className="w-12 h-12 rounded-full object-cover border-2 border-slate-100 shadow-xs shrink-0" 
+                className="w-12 h-12 rounded-full object-cover border-2 border-slate-700 shadow-sm shrink-0" 
               />
             ) : (
-              <div className="w-12 h-12 rounded-full bg-slate-900 text-white font-black flex items-center justify-center text-sm border-2 border-slate-100 shrink-0">
+              <div className="w-12 h-12 rounded-full bg-slate-800 text-white font-black flex items-center justify-center text-sm border border-slate-700 shrink-0">
                 {user?.name?.[0]?.toUpperCase()}
               </div>
             )}
 
             <div className="min-w-0">
-              <h1 className="text-base sm:text-lg font-black text-slate-950 tracking-tight leading-snug truncate">
+              <h1 className="text-base sm:text-lg font-black text-white tracking-tight leading-snug truncate">
                 Welcome back, {user?.name}
               </h1>
-              <p className="text-xs font-bold text-slate-700 leading-tight">
+              <p className="text-xs font-bold text-slate-300 leading-tight">
                 {user?.designation || 'Staff Member'}
               </p>
-              <p className="text-[11px] text-slate-500 font-medium leading-tight mt-0.5">
-                {user?.department} • <span className="font-mono font-bold text-slate-700">ID: {user?.employeeId}</span>
+              <p className="text-[11px] text-slate-400 font-medium leading-tight mt-0.5">
+                {user?.department} • <span className="font-mono font-bold text-amber-400">ID: {user?.employeeId}</span>
               </p>
             </div>
           </div>
 
           <span className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold border shrink-0 inline-flex items-center gap-1.5 ${
             todayData && !todayData.checkOut 
-              ? 'bg-emerald-50 text-emerald-800 border-emerald-200' 
+              ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' 
               : todayData?.checkOut
-              ? 'bg-indigo-50 text-indigo-800 border-indigo-200'
-              : 'bg-amber-50 text-amber-800 border-amber-200'
+              ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30'
+              : 'bg-amber-500/20 text-amber-300 border-amber-500/30'
           }`}>
             <span className={`w-1.5 h-1.5 rounded-full ${
-              todayData && !todayData.checkOut ? 'bg-emerald-600 animate-pulse' : todayData?.checkOut ? 'bg-indigo-600' : 'bg-amber-600'
+              todayData && !todayData.checkOut ? 'bg-emerald-400 animate-pulse' : todayData?.checkOut ? 'bg-indigo-400' : 'bg-amber-400'
             }`} />
             {todayData && !todayData.checkOut ? 'On Duty' : todayData?.checkOut ? 'Shift Done' : 'Not Checked In'}
           </span>
         </div>
 
         {/* Action Controls Bar */}
-        <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
+        <div className="flex items-center gap-2 pt-2 border-t border-slate-800">
           {!todayData ? (
             <Link 
               to="/employee/attendance" 
-              className="btn-brand text-xs font-bold py-2 px-3.5 rounded-xl flex items-center justify-center gap-1.5 flex-1 sm:flex-none"
+              className="bg-[#DC2C2B] hover:bg-[#B91C1C] text-white text-xs font-bold py-2 px-3.5 rounded-xl flex items-center justify-center gap-1.5 flex-1 sm:flex-none shadow-sm transition-colors"
             >
               <CheckSquare className="w-3.5 h-3.5" />
               <span>Check In</span>
@@ -108,7 +108,7 @@ const EmployeeDashboard = () => {
           ) : !todayData.checkOut ? (
             <Link 
               to="/employee/attendance" 
-              className="btn-danger text-xs font-bold py-2 px-3.5 rounded-xl flex items-center justify-center gap-1.5 flex-1 sm:flex-none"
+              className="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold py-2 px-3.5 rounded-xl flex items-center justify-center gap-1.5 flex-1 sm:flex-none shadow-sm transition-colors"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span>Check Out</span>
@@ -116,21 +116,21 @@ const EmployeeDashboard = () => {
           ) : (
             <Link 
               to="/employee/attendance" 
-              className="btn-secondary text-xs font-bold py-2 px-3.5 rounded-xl flex items-center justify-center gap-1.5 flex-1 sm:flex-none"
+              className="bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-slate-700 text-xs font-bold py-2 px-3.5 rounded-xl flex items-center justify-center gap-1.5 flex-1 sm:flex-none transition-colors"
             >
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
               <span>Shift Done</span>
             </Link>
           )}
 
           <Link 
             to="/employee/tasks" 
-            className="btn-secondary text-xs font-extrabold py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 flex-1 sm:flex-none"
+            className="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-extrabold py-2 px-3.5 rounded-xl flex items-center justify-center gap-1.5 flex-1 sm:flex-none transition-colors"
           >
-            <CheckSquare className="w-3.5 h-3.5 text-slate-600" />
+            <CheckSquare className="w-3.5 h-3.5 text-slate-400" />
             <span>Tasks</span>
             {pendingCount > 0 && (
-              <span className="px-1.5 py-0.5 rounded-md bg-slate-200 text-slate-900 text-[10px] font-mono font-bold">
+              <span className="px-1.5 py-0.5 rounded-md bg-slate-700 text-amber-300 text-[10px] font-mono font-bold">
                 {pendingCount}
               </span>
             )}
@@ -139,9 +139,9 @@ const EmployeeDashboard = () => {
           <Link 
             to={`/verify/${user?.employeeId}`} 
             target="_blank" 
-            className="btn-secondary text-xs font-extrabold py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 flex-1 sm:flex-none"
+            className="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-extrabold py-2 px-3.5 rounded-xl flex items-center justify-center gap-1.5 flex-1 sm:flex-none transition-colors"
           >
-            <QrCode className="w-3.5 h-3.5 text-slate-600" />
+            <QrCode className="w-3.5 h-3.5 text-slate-400" />
             <span>ID Badge</span>
           </Link>
         </div>
