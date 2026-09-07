@@ -112,7 +112,51 @@ const EmployeeAttendance = () => {
     );
   };
 
-  const handleFileChange = (e) => {
+  const compressImage = (file, maxWidth = 1280, quality = 0.8) => {
+    return new Promise((resolve) => {
+      if (file.size < 300 * 1024) {
+        resolve(file);
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          canvas.toBlob((blob) => {
+            if (!blob) {
+              resolve(file);
+              return;
+            }
+            const compressedFile = new File([blob], file.name.replace(/\.[^/.]+$/, ".jpg"), {
+              type: 'image/jpeg',
+              lastModified: Date.now(),
+            });
+            resolve(compressedFile);
+          }, 'image/jpeg', quality);
+        };
+        img.onerror = () => resolve(file);
+        img.src = event.target.result;
+      };
+      reader.onerror = () => resolve(file);
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
     setError(null);
 
@@ -124,14 +168,17 @@ const EmployeeAttendance = () => {
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      setError('Photo file size exceeds 5 MB. Please select a smaller photo.');
-      return;
+    try {
+      // Automatically compress client-side to ~150KB for instant upload and viewing
+      const optimizedFile = await compressImage(file);
+      setSelectedFile(optimizedFile);
+      const objectUrl = URL.createObjectURL(optimizedFile);
+      setPreviewUrl(objectUrl);
+    } catch (err) {
+      setSelectedFile(file);
+      const objectUrl = URL.createObjectURL(file);
+      setPreviewUrl(objectUrl);
     }
-
-    setSelectedFile(file);
-    const objectUrl = URL.createObjectURL(file);
-    setPreviewUrl(objectUrl);
   };
 
   const handleClearPhoto = () => {

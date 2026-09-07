@@ -45,15 +45,17 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-template-1 text-slate-900 flex flex-col justify-between items-center selection:bg-slate-900 selection:text-white relative overflow-x-hidden p-4 sm:p-6">
+    <div className="min-h-screen bg-template-1 text-slate-900 flex flex-col justify-between items-center selection:bg-[#DC2C2B] selection:text-white relative overflow-x-hidden p-4 sm:p-6">
       
       {/* Main Container */}
       <main className="max-w-md w-full my-auto animate-fade-in py-6">
-        <div className="bg-white rounded-3xl p-7 sm:p-9 border-2 border-slate-300/90 shadow-2xl space-y-6 text-slate-900">
+        <div className="bg-white rounded-3xl p-7 sm:p-9 border-2 border-slate-300/90 shadow-2xl space-y-6 text-slate-900 relative overflow-hidden">
+          {/* Top Brand Accent Stripe */}
+          <div className="h-1.5 w-full bg-gradient-to-r from-[#DC2C2B] via-[#F87171] to-[#DC2C2B] absolute top-0 left-0" />
           
           {/* Brand Header Inside Login Card */}
           <div className="text-center space-y-3">
-            <div className="w-28 h-28 bg-white p-3 rounded-3xl border-2 border-slate-200/90 shadow-md inline-flex items-center justify-center">
+            <div className="w-28 h-28 bg-white p-3 rounded-3xl border-2 border-slate-200/90 hover:border-[#DC2C2B]/50 shadow-md hover:shadow-[0_0_22px_rgba(220,44,43,0.18)] transition-all inline-flex items-center justify-center">
               <img src={logoImg} alt="THE SM GROUPS" className="w-full h-full object-contain" />
             </div>
 

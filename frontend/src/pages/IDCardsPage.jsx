@@ -34,10 +34,20 @@ const CANVA_ACCOUNT_EMAIL = 'mbktechnology8@gmail.com';
 
 const IDCardsPage = () => {
   const { user } = useContext(AuthContext);
-  const isAdmin = user?.role === 'admin';
+  const getIsAdmin = () => {
+    if (user?.role === 'admin') return true;
+    try {
+      const stored = JSON.parse(localStorage.getItem('userInfo') || '{}');
+      return stored.role === 'admin';
+    } catch (e) {
+      return false;
+    }
+  };
+  const isAdmin = getIsAdmin();
 
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDept, setSelectedDept] = useState('All');
   const [showDeptCards, setShowDeptCards] = useState(false);
@@ -53,15 +63,21 @@ const IDCardsPage = () => {
   const fetchEmployees = async () => {
     try {
       setLoading(true);
-      if (isAdmin) {
+      setError(null);
+      const isUserAdmin = getIsAdmin();
+      if (isUserAdmin) {
         const { data } = await API.get('/employees?includeCards=true');
-        setEmployees(data);
+        const emps = Array.isArray(data) ? data : (data.employees || []);
+        setEmployees(emps);
       } else {
         const { data } = await API.get('/employees/me');
-        setEmployees([data]);
+        if (data) {
+          setEmployees([data]);
+        }
       }
     } catch (err) {
       console.error('Failed to load employee ID cards', err);
+      setError(err.response?.data?.message || 'Failed to load ID cards. Please click retry below.');
     } finally {
       setLoading(false);
     }
@@ -69,7 +85,7 @@ const IDCardsPage = () => {
 
   useEffect(() => {
     fetchEmployees();
-  }, [user]);
+  }, []);
 
   const [generatingAllQRs, setGeneratingAllQRs] = useState(false);
 
@@ -237,8 +253,8 @@ const IDCardsPage = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200/80">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-indigo-50 text-indigo-700 border border-indigo-200/60 uppercase tracking-wider inline-flex items-center gap-1.5">
-              <CreditCard className="w-3 h-3 text-indigo-500" /> Identity Credentials
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-[#FEF2F2] text-[#DC2C2B] border border-[#FECACA] uppercase tracking-wider inline-flex items-center gap-1.5 shadow-2xs">
+              <CreditCard className="w-3 h-3 text-[#DC2C2B]" /> Identity Credentials
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Corporate Digital ID Cards</h1>
@@ -253,7 +269,7 @@ const IDCardsPage = () => {
               rel="noopener noreferrer"
               className="btn-secondary text-xs bg-white hover:bg-slate-50 text-slate-800 border-slate-200/90 font-extrabold py-2.5 px-4 rounded-xl shadow-sm transition-all flex items-center gap-2"
             >
-              <ExternalLink className="w-3.5 h-3.5 text-indigo-500" />
+              <ExternalLink className="w-3.5 h-3.5 text-[#DC2C2B]" />
               Edit Canva Design
             </a>
             
@@ -311,8 +327,20 @@ const IDCardsPage = () => {
 
       {/* Content Area */}
       {loading ? (
-        <div className="flex justify-center py-16">
-          <div className="animate-spin rounded-full h-8 w-8 border-2 border-slate-900 border-t-transparent"></div>
+        <div className="py-20 flex flex-col items-center justify-center gap-3">
+          <LogoSpinner label="Loading Corporate ID Badges..." />
+          <p className="text-xs text-slate-500 font-bold">Fetching high-resolution ID cards & security QR assets...</p>
+        </div>
+      ) : error ? (
+        <div className="card-saas text-center py-12 px-4 space-y-3 bg-rose-50/70 border border-rose-200">
+          <p className="text-sm font-bold text-rose-800">{error}</p>
+          <button
+            onClick={() => fetchEmployees()}
+            className="btn-primary text-xs mx-auto flex items-center gap-2"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+            Retry Loading ID Cards
+          </button>
         </div>
       ) : !isAdmin && employees.length > 0 ? (
         /* Employee Read-only ID Card View */

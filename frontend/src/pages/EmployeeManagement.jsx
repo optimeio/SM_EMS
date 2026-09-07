@@ -198,7 +198,7 @@ const EmployeeManagement = () => {
 
   const fetchEmployees = async (pageNum = 1) => {
     try {
-      setLoading(true);
+      if (employees.length === 0) setLoading(true);
       const activeDept = departmentFilter !== 'All' ? departmentFilter : (selectedDept || 'All');
       const { data } = await API.get('/employees', {
         params: {
@@ -462,11 +462,11 @@ const EmployeeManagement = () => {
   return (
     <div className="space-y-6 animate-fade-in pb-12">
       {/* Page Header Container — 100% Ultra-Sharp High-Contrast Panel */}
-      <div className="bg-white border-2 border-slate-300 rounded-2xl p-6 sm:p-7 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-5 relative overflow-hidden">
+      <div className="bg-white border-2 border-slate-300 border-l-4 border-l-[#DC2C2B] rounded-2xl p-6 sm:p-7 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-5 relative overflow-hidden">
         <div className="space-y-2 z-10">
           <div className="flex items-center gap-2.5 flex-wrap">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-[11px] font-black tracking-wider uppercase bg-slate-950 text-white shadow-xs">
-              <Users className="w-3.5 h-3.5 text-indigo-400" />
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-[11px] font-black tracking-wider uppercase bg-[#DC2C2B] text-white shadow-sm shadow-[#DC2C2B]/20">
+              <Users className="w-3.5 h-3.5 text-white" />
               PERSONNEL DIRECTORY
             </span>
             <span className="text-slate-300 font-bold">•</span>
@@ -507,7 +507,7 @@ const EmployeeManagement = () => {
               resetForm();
               setShowAddModal(true);
             }}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-950 hover:bg-black text-white text-xs font-black rounded-xl shadow-md border border-slate-900 transition-all hover:scale-[1.02] active:scale-95"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#DC2C2B] hover:bg-[#C52221] text-white text-xs font-black rounded-xl shadow-md shadow-[#DC2C2B]/30 border border-[#B91C1C] transition-all hover:scale-[1.02] active:scale-95"
           >
             <Plus className="w-4 h-4 text-white" />
             <span>Add Employee</span>

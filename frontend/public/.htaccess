@@ -1,9 +1,25 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
+
+  # ─── Proxy /api/* requests to Render backend ───────────────────────────────
+  RewriteCond %{REQUEST_URI} ^/api/ [NC]
+  RewriteRule ^api/(.*)$ https://sm-ems.onrender.com/api/$1 [P,L,NC]
+
+  # ─── SPA fallback — serve index.html for all other routes ──────────────────
   RewriteRule ^index\.html$ - [L]
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteCond %{REQUEST_FILENAME} !-l
   RewriteRule . /index.html [L]
+</IfModule>
+
+# ─── Required for mod_proxy to work ──────────────────────────────────────────
+<IfModule mod_proxy.c>
+  ProxyRequests Off
+  ProxyPreserveHost Off
+  SSLProxyEngine On
+  SSLProxyVerify none
+  SSLProxyCheckPeerCN off
+  SSLProxyCheckPeerName off
 </IfModule>

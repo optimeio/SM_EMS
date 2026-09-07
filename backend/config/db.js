@@ -17,7 +17,7 @@ export const connectDB = async () => {
   const uri = process.env.MONGODB_URI || DIRECT_FALLBACK_URI;
   try {
     const conn = await mongoose.connect(uri, {
-      serverSelectionTimeoutMS: 3000,
+      serverSelectionTimeoutMS: 15000,
       socketTimeoutMS: 45000,
     });
     console.log(`MongoDB Connected: ${conn.connection.host}`);
@@ -25,7 +25,7 @@ export const connectDB = async () => {
     console.warn(`Primary MongoDB connection failed (${error.message}). Trying direct Atlas cluster failover...`);
     try {
       const conn = await mongoose.connect(DIRECT_FALLBACK_URI, {
-        serverSelectionTimeoutMS: 3000,
+        serverSelectionTimeoutMS: 15000,
         socketTimeoutMS: 45000,
       });
       console.log(`MongoDB Connected (Direct Failover): ${conn.connection.host}`);

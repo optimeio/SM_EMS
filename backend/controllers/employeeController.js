@@ -4,6 +4,25 @@ import Attendance from '../models/Attendance.js';
 import ActivityLog from '../models/ActivityLog.js';
 import QRCode from 'qrcode';
 import { uploadIDCardToDrive } from '../services/googleDriveService.js';
+import sharp from 'sharp';
+
+// Compress a base64 profile photo to 200x200 JPEG thumbnail (~5-10 KB)
+const compressProfilePhoto = async (base64Input) => {
+  if (!base64Input) return base64Input;
+  try {
+    let raw = base64Input;
+    if (raw.includes(';base64,')) raw = raw.split(';base64,')[1];
+    const buffer = Buffer.from(raw, 'base64');
+    const compressed = await sharp(buffer)
+      .resize(200, 200, { fit: 'cover', position: 'center' })
+      .jpeg({ quality: 80, mozjpeg: true })
+      .toBuffer();
+    return `data:image/jpeg;base64,${compressed.toString('base64')}`;
+  } catch (err) {
+    console.warn('Photo compression failed, keeping original:', err.message);
+    return base64Input;
+  }
+};
 
 const safeParseDate = (dateVal) => {
   if (!dateVal) return null;
@@ -44,8 +63,8 @@ export const getEmployees = async (req, res) => {
     const includeCards = req.query.includeCards === 'true';
 
     const selectFields = includeCards 
-      ? '-password' 
-      : '-password -idCardImage -qrCodeImage';
+      ? '-password -plainTextPassword' 
+      : '-password -plainTextPassword -idCardImage -qrCodeImage';
 
     const query = {};
 
@@ -169,7 +188,7 @@ export const verifyEmployee = async (req, res) => {
         { phone: rawId },
         ...(isObjectId ? [{ _id: rawId }] : [])
       ]
-    }).select('-password').lean();
+    }).select('-password -plainTextPassword -idCardImage').lean();
 
     if (employee) {
       return res.json(employee);
@@ -188,7 +207,7 @@ export const verifyEmployee = async (req, res) => {
     if (targetId) {
       employee = await Employee.findOne({
         employeeId: new RegExp(`^${targetId}$`, 'i')
-      }).select('-password').lean();
+      }).select('-password -plainTextPassword -idCardImage').lean();
 
       if (employee) {
         return res.json(employee);
@@ -262,7 +281,7 @@ export const createEmployee = async (req, res) => {
       address,
       emergencyContact,
       bloodGroup,
-      profilePhoto
+      profilePhoto: await compressProfilePhoto(profilePhoto)
     };
 
     if (dateOfBirth) {
@@ -320,7 +339,9 @@ export const updateEmployee = async (req, res) => {
       if (req.body.address !== undefined) employee.address = req.body.address;
       if (req.body.emergencyContact !== undefined) employee.emergencyContact = req.body.emergencyContact;
       if (req.body.bloodGroup !== undefined) employee.bloodGroup = req.body.bloodGroup;
-      if (req.body.profilePhoto !== undefined) employee.profilePhoto = req.body.profilePhoto;
+      if (req.body.profilePhoto !== undefined) {
+        employee.profilePhoto = await compressProfilePhoto(req.body.profilePhoto);
+      }
 
       // Handle Email Update with uniqueness check
       if (req.body.email && req.body.email.trim().toLowerCase() !== employee.email) {
@@ -549,3 +570,59 @@ export const generateAllEmployeeQRs = async (req, res) => {
   }
 };
 
+// @desc    One-time compress all employee profile photos on Render server
+// @route   POST /api/employees/compress-photos
+// @access  Private/Admin
+export const compressAllEmployeePhotos = async (req, res) => {
+  try {
+    const employees = await Employee.find({}).select('employeeId name profilePhoto');
+    let compressed = 0;
+    let skipped = 0;
+    let totalBeforeBytes = 0;
+    let totalAfterBytes = 0;
+
+    for (const emp of employees) {
+      if (!emp.profilePhoto) { skipped++; continue; }
+      const beforeLen = emp.profilePhoto.length;
+      totalBeforeBytes += beforeLen;
+
+      // Skip if already small (< 30KB base64 string)
+      if (beforeLen < 30 * 1024) {
+        totalAfterBytes += beforeLen;
+        skipped++;
+        continue;
+      }
+
+      try {
+        let raw = emp.profilePhoto;
+        if (raw.includes(';base64,')) raw = raw.split(';base64,')[1];
+        const buffer = Buffer.from(raw, 'base64');
+        const compressedBuf = await sharp(buffer)
+          .resize(200, 200, { fit: 'cover', position: 'center' })
+          .jpeg({ quality: 80, mozjpeg: true })
+          .toBuffer();
+        const newBase64 = `data:image/jpeg;base64,${compressedBuf.toString('base64')}`;
+        await Employee.findByIdAndUpdate(emp._id, { $set: { profilePhoto: newBase64 } });
+        totalAfterBytes += newBase64.length;
+        compressed++;
+        console.log(`✅ Compressed ${emp.employeeId}: ${(beforeLen/1024).toFixed(0)}KB → ${(newBase64.length/1024).toFixed(0)}KB`);
+      } catch (e) {
+        console.error(`Failed to compress ${emp.employeeId}:`, e.message);
+        totalAfterBytes += beforeLen;
+      }
+    }
+
+    const savedMB = ((totalBeforeBytes - totalAfterBytes) / (1024 * 1024)).toFixed(2);
+    res.json({
+      success: true,
+      compressed,
+      skipped,
+      totalBefore: `${(totalBeforeBytes / (1024 * 1024)).toFixed(2)} MB`,
+      totalAfter: `${(totalAfterBytes / 1024).toFixed(0)} KB`,
+      saved: `${savedMB} MB freed`
+    });
+  } catch (error) {
+    console.error('Compress Photos Error:', error);
+    res.status(500).json({ message: 'Compression failed: ' + error.message });
+  }
+};

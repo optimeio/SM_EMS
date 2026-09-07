@@ -265,8 +265,8 @@ const TaskManagement = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200/80">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-indigo-50 text-indigo-700 border border-indigo-200/60 uppercase tracking-wider inline-flex items-center gap-1.5">
-              <CheckSquare className="w-3 h-3 text-indigo-500" /> Deliverables & Tasks
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-[#FEF2F2] text-[#DC2C2B] border border-[#FECACA] uppercase tracking-wider inline-flex items-center gap-1.5 shadow-2xs">
+              <CheckSquare className="w-3 h-3 text-[#DC2C2B]" /> Deliverables & Tasks
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Task Management</h1>
@@ -280,7 +280,7 @@ const TaskManagement = () => {
           }}
           className="btn-primary text-xs bg-slate-900 hover:bg-black text-white font-extrabold py-2.5 px-4 rounded-xl shadow-sm hover:shadow-md transition-all flex items-center gap-2"
         >
-          <Plus className="w-4 h-4 text-white" />
+          <Plus className="w-4 h-4 text-[#DC2C2B]" />
           <span>Create Task</span>
         </button>
       </div>

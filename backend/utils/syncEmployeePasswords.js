@@ -23,20 +23,19 @@ export const syncAllEmployeePasswords = async () => {
       }
     }
 
-    // Migrate any legacy unhashed employee passwords or clean up plainTextPassword field
-    const employees = await Employee.find({});
+    // Migrate any legacy unhashed employee passwords using lean select & updateOne
+    const employees = await Employee.find({}).select('password plainTextPassword').lean();
     for (const emp of employees) {
-      let needsSave = false;
+      const updates = {};
       if (emp.password && !/^\$2[aby]\$/.test(emp.password)) {
-        emp.password = emp.password; // Triggers pre('save') bcrypt hashing
-        needsSave = true;
+        const salt = await bcrypt.genSalt(10);
+        updates.password = await bcrypt.hash(emp.password, salt);
       }
       if (!emp.plainTextPassword) {
-        emp.plainTextPassword = 'Password@123';
-        needsSave = true;
+        updates.plainTextPassword = 'Password@123';
       }
-      if (needsSave) {
-        await emp.save();
+      if (Object.keys(updates).length > 0) {
+        await Employee.updateOne({ _id: emp._id }, { $set: updates });
       }
     }
   } catch (error) {

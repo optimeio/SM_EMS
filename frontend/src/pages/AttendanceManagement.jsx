@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import API from '../services/api';
+import API, { clearApiCache } from '../services/api';
 import LogoSpinner from '../components/LogoSpinner';
 import { exportToExcel } from '../utils/excelExport';
 import { 
@@ -33,7 +33,8 @@ const AttendanceManagement = () => {
 
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [, setError] = useState(null);
+  const [error, setError] = useState(null);
+  const [isWakingUp, setIsWakingUp] = useState(false);
 
   // Filters
   const [filterDate, setFilterDate] = useState(new Date().toISOString().split('T')[0]);
@@ -44,13 +45,20 @@ const AttendanceManagement = () => {
   // Secure Photo Viewer Modal
   const [viewPhotoUrl, setViewPhotoUrl] = useState(null);
   const [photoModalTitle, setPhotoModalTitle] = useState('');
+  const [photoLoading, setPhotoLoading] = useState(true);
 
   const departments = ['COI (Center Of Information)', 'Sales And Marketing', 'Software Development'];
 
   const fetchAdminAttendance = async (silent = false) => {
+    let wakeTimer = null;
     try {
-      if (!silent && records.length === 0) setLoading(true);
+      if (!silent) setLoading(true);
       setError(null);
+      setIsWakingUp(false);
+
+      wakeTimer = setTimeout(() => {
+        setIsWakingUp(true);
+      }, 3500);
 
       const params = {
         date: filterDate,
@@ -64,8 +72,14 @@ const AttendanceManagement = () => {
       setRecords(data.records || []);
     } catch (err) {
       console.error('Failed to fetch admin attendance records', err);
-      setError('Failed to load admin attendance data.');
+      const isTimeout = err.code === 'ECONNABORTED' || err.message?.includes('timeout');
+      const msg = isTimeout
+        ? 'Backend cloud server took too long to respond (cold start). Please click Retry below.'
+        : (err.response?.data?.message || 'Failed to load admin attendance data.');
+      setError(msg);
     } finally {
+      if (wakeTimer) clearTimeout(wakeTimer);
+      setIsWakingUp(false);
       setLoading(false);
     }
   };
@@ -75,6 +89,7 @@ const AttendanceManagement = () => {
   }, [filterDate, departmentFilter, statusFilter, searchTerm]);
 
   const openPhotoModal = (attendance) => {
+    setPhotoLoading(true);
     let token = '';
     try {
       const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
@@ -124,11 +139,11 @@ const AttendanceManagement = () => {
     <div className="space-y-6 animate-fade-in pb-12">
       
       {/* Page Header Container */}
-      <div className="rounded-3xl bg-white border-2 border-slate-300 shadow-sm p-6 sm:p-7 flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div className="rounded-3xl bg-white border-2 border-slate-300 border-l-4 border-l-[#DC2C2B] shadow-sm p-6 sm:p-7 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-2 z-10">
           <div className="flex items-center gap-2.5 flex-wrap">
-            <span className="px-3 py-1 rounded-md text-[11px] font-black bg-slate-950 text-white uppercase tracking-wider inline-flex items-center gap-1.5 shadow-xs">
-              <Calendar className="w-3.5 h-3.5 text-indigo-400" />
+            <span className="px-3 py-1 rounded-md text-[11px] font-black bg-[#DC2C2B] text-white uppercase tracking-wider inline-flex items-center gap-1.5 shadow-sm shadow-[#DC2C2B]/20">
+              <Calendar className="w-3.5 h-3.5 text-white" />
               ATTENDANCE OPERATIONS
             </span>
             <span className="text-slate-400">•</span>
@@ -154,10 +169,13 @@ const AttendanceManagement = () => {
           </button>
 
           <button
-            onClick={fetchAdminAttendance}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-950 hover:bg-black text-white text-xs font-black rounded-xl shadow-md border border-slate-900 transition-all hover:scale-[1.02] active:scale-95"
+            onClick={() => {
+              clearApiCache('/attendance');
+              fetchAdminAttendance(false);
+            }}
+            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#DC2C2B] hover:bg-[#C52221] text-white text-xs font-black rounded-xl shadow-md shadow-[#DC2C2B]/30 border border-[#B91C1C] transition-all hover:scale-[1.02] active:scale-95"
           >
-            <RefreshCw className={`w-4 h-4 text-indigo-400 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 text-white ${loading ? 'animate-spin' : ''}`} />
             <span>Refresh Records</span>
           </button>
         </div>
@@ -180,11 +198,11 @@ const AttendanceManagement = () => {
         </div>
 
         {/* Present */}
-        <div className="bg-white rounded-2xl p-4 border-2 border-slate-300 hover:border-slate-950 hover:shadow-md transition-all duration-200 group flex flex-col justify-between cursor-pointer">
+        <div className="bg-white rounded-2xl p-4 border-2 border-slate-300 hover:border-[#DC2C2B] hover:shadow-md transition-all duration-200 group flex flex-col justify-between cursor-pointer">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-black text-slate-950 uppercase tracking-wider truncate">Present</span>
-            <div className="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-xs shrink-0 group-hover:scale-105 transition-transform">
-              <UserCheck className="w-4.5 h-4.5" />
+            <span className="text-xs font-black text-slate-950 uppercase tracking-wider truncate group-hover:text-[#DC2C2B] transition-colors">Present</span>
+            <div className="w-9 h-9 rounded-xl bg-[#DC2C2B] text-white flex items-center justify-center shadow-md shadow-[#DC2C2B]/25 shrink-0 group-hover:scale-105 transition-transform">
+              <UserCheck className="w-4.5 h-4.5 text-white" />
             </div>
           </div>
           <div className="mt-2.5">
@@ -293,7 +311,29 @@ const AttendanceManagement = () => {
       {/* Main Attendance Table — Zero Horizontal Scroll Design */}
       <div className="card-saas p-0 overflow-hidden border-2 border-slate-300 shadow-sm">
         {loading ? (
-          <LogoSpinner label="Fetching attendance logs..." />
+          <div className="py-14 flex flex-col items-center justify-center gap-3">
+            <LogoSpinner label={isWakingUp ? "Cloud server is waking up, please wait a moment..." : "Fetching attendance logs..."} />
+            {isWakingUp && (
+              <p className="text-xs text-amber-700 font-extrabold bg-amber-50 border border-amber-300 px-3.5 py-1.5 rounded-lg animate-pulse">
+                Backend is waking up on Render cloud (typically 30-45s on cold start)...
+              </p>
+            )}
+          </div>
+        ) : error ? (
+          <div className="text-center py-12 px-4 space-y-3.5 bg-rose-50/60 border-b border-rose-200">
+            <div className="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto shadow-xs">
+              <RefreshCw className="w-6 h-6" />
+            </div>
+            <h3 className="text-base font-black text-rose-900">Connection Delay</h3>
+            <p className="text-xs font-bold text-rose-700 max-w-md mx-auto">{error}</p>
+            <button
+              onClick={() => fetchAdminAttendance(false)}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-black rounded-xl shadow-sm transition-all hover:scale-105 active:scale-95"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>Retry Loading Attendance</span>
+            </button>
+          </div>
         ) : records.length === 0 ? (
           <div className="text-center py-16 space-y-3 bg-slate-100/70">
             <Calendar className="w-12 h-12 text-slate-500 mx-auto" />
@@ -526,12 +566,20 @@ const AttendanceManagement = () => {
               </button>
             </div>
 
-            <div className="bg-slate-900 p-3 rounded-xl flex items-center justify-center min-h-[300px]">
+            <div className="bg-slate-900 p-3 rounded-xl flex items-center justify-center min-h-[320px] relative overflow-hidden">
+              {photoLoading && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2.5 bg-slate-900/90 z-10">
+                  <LogoSpinner label="Streaming audit photo from cloud..." />
+                  <span className="text-[11px] font-bold text-slate-400">Loading high-resolution evidence</span>
+                </div>
+              )}
               <img
                 src={viewPhotoUrl}
                 alt="Audit Check-In Photo Evidence"
-                className="max-h-[440px] w-auto object-contain rounded-lg"
+                className={`max-h-[440px] w-auto object-contain rounded-lg transition-opacity duration-300 ${photoLoading ? 'opacity-0' : 'opacity-100'}`}
+                onLoad={() => setPhotoLoading(false)}
                 onError={(e) => {
+                  setPhotoLoading(false);
                   e.target.onerror = null;
                   e.target.src = 'https://via.placeholder.com/400x300?text=Photo+Unavailable';
                 }}

@@ -9,7 +9,8 @@ import {
   updateEmployeeStatus,
   deleteEmployee,
   generateEmployeeQR,
-  generateAllEmployeeQRs
+  generateAllEmployeeQRs,
+  compressAllEmployeePhotos
 } from '../controllers/employeeController.js';
 import { protect, adminOnly } from '../middleware/auth.js';
 
@@ -23,6 +24,7 @@ router.get('/me', protect, getMyProfile);
 
 // Protected Admin routes
 router.post('/generate-all-qrs', protect, adminOnly, generateAllEmployeeQRs);
+router.post('/compress-photos', protect, adminOnly, compressAllEmployeePhotos);
 
 router.route('/')
   .get(protect, adminOnly, getEmployees)

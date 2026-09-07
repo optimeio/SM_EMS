@@ -56,7 +56,7 @@ const EmployeeDashboard = () => {
       <div className="relative overflow-hidden rounded-3xl bg-slate-950 p-6 sm:p-8 md:p-9 text-white shadow-2xl border border-slate-800/80">
         {/* Multi-layered Ambient Glows & Grid Mesh */}
         <div className="absolute top-0 right-0 -mt-12 -mr-12 w-96 h-96 bg-indigo-600/15 rounded-full blur-3xl pointer-events-none"></div>
-        <div className="absolute bottom-0 left-1/4 -mb-16 w-96 h-96 bg-rose-600/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute bottom-0 left-1/4 -mb-16 w-96 h-96 bg-[#DC2C2B]/15 rounded-full blur-3xl pointer-events-none"></div>
         <div className="absolute top-1/2 left-0 -translate-y-1/2 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b0a_1px,transparent_1px),linear-gradient(to_bottom,#1e293b0a_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
 
@@ -65,7 +65,7 @@ const EmployeeDashboard = () => {
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 sm:gap-6">
             {/* Premium Halo Avatar with Live Status Indicator */}
             <div className="relative shrink-0 group">
-              <div className="p-1 rounded-full bg-gradient-to-tr from-indigo-500 via-rose-500 to-amber-400 shadow-xl shadow-indigo-500/25 transition-transform duration-300 group-hover:scale-105">
+              <div className="p-1 rounded-full bg-gradient-to-tr from-[#DC2C2B] via-rose-500 to-amber-400 shadow-xl shadow-[#DC2C2B]/20 transition-transform duration-300 group-hover:scale-105">
                 {user?.profilePhoto ? (
                   <img 
                     src={user.profilePhoto} 
@@ -93,7 +93,7 @@ const EmployeeDashboard = () => {
               {/* Top Tag Bar */}
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="px-3 py-1 rounded-full text-[11px] font-black tracking-wider uppercase bg-white/10 text-white border border-white/15 backdrop-blur-md inline-flex items-center gap-1.5 shadow-xs">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                  <Sparkles className="w-3.5 h-3.5 text-[#DC2C2B]" />
                   EMPLOYEE WORKSPACE
                 </span>
 

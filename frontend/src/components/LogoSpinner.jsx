@@ -9,15 +9,15 @@ const LogoSpinner = ({ fullScreen = false, label = 'Loading...' }) => {
         <img
           src={logoImg}
           alt="THE SM GROUPS"
-          className="w-16 h-16 sm:w-20 sm:h-20 object-contain animate-subtle-breath filter drop-shadow-sm"
+          className="w-16 h-16 sm:w-20 sm:h-20 object-contain animate-subtle-breath filter drop-shadow-[0_0_14px_rgba(220,44,43,0.25)]"
         />
       </div>
 
       {/* 3 Sequential Jumping Wave Dots (No Background) */}
       <div className="flex items-center gap-2 pt-2 h-6">
         <span className="w-2.5 h-2.5 rounded-full bg-slate-900 animate-dot-jump" style={{ animationDelay: '0s' }} />
-        <span className="w-2.5 h-2.5 rounded-full bg-rose-600 animate-dot-jump" style={{ animationDelay: '0.18s' }} />
-        <span className="w-2.5 h-2.5 rounded-full bg-indigo-600 animate-dot-jump" style={{ animationDelay: '0.36s' }} />
+        <span className="w-2.5 h-2.5 rounded-full bg-[#DC2C2B] animate-dot-jump shadow-[0_0_8px_rgba(220,44,43,0.4)]" style={{ animationDelay: '0.18s' }} />
+        <span className="w-2.5 h-2.5 rounded-full bg-slate-900 animate-dot-jump" style={{ animationDelay: '0.36s' }} />
       </div>
 
       {label && (

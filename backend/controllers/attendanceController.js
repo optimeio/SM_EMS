@@ -276,16 +276,31 @@ export const getAdminAttendance = async (req, res) => {
       query.status = status;
     }
 
-    const [recordsRaw, totalEmployees, todayAllRecords] = await Promise.all([
-      Attendance.find(query)
-        .populate('employee', 'name employeeId designation profilePhoto department')
-        .sort({ checkIn: -1 })
-        .lean(),
-      Employee.countDocuments({ status: 'Active' }),
-      Attendance.find({ date: filterDate }).select('status').lean()
+    const [recordsRaw, employeesList, todayAllRecords] = await Promise.all([
+      Attendance.find(query).sort({ checkIn: -1 }).lean(),
+      Employee.find({}).select('name employeeId designation department status').lean(),
+      Attendance.find({ date: filterDate }).select('status employeeId').lean()
     ]);
 
-    let records = recordsRaw;
+    const empMap = new Map();
+    for (const emp of employeesList) {
+      empMap.set(String(emp._id), emp);
+      if (emp.employeeId) empMap.set(emp.employeeId.toUpperCase(), emp);
+    }
+
+    let records = recordsRaw.map(r => {
+      const emp = empMap.get(String(r.employee)) || empMap.get((r.employeeId || '').toUpperCase()) || null;
+      return {
+        ...r,
+        employee: emp ? {
+          _id: emp._id,
+          name: emp.name,
+          employeeId: emp.employeeId,
+          designation: emp.designation,
+          department: emp.department
+        } : null
+      };
+    });
 
     // Optional Search Filter by Employee Name or ID
     if (search && search.trim()) {
@@ -296,6 +311,8 @@ export const getAdminAttendance = async (req, res) => {
       );
     }
 
+    const activeEmployees = employeesList.filter(e => e.status === 'Active');
+    const totalEmployees = activeEmployees.length || employeesList.length;
     const presentCount = todayAllRecords.length;
     const absentCount = Math.max(0, totalEmployees - presentCount);
     const workingCount = todayAllRecords.filter(r => r.status === 'Present').length;
@@ -314,7 +331,7 @@ export const getAdminAttendance = async (req, res) => {
     });
   } catch (error) {
     console.error('Admin Attendance Fetch Error:', error);
-    res.status(500).json({ message: 'Server error fetching admin attendance data.' });
+    res.status(500).json({ message: 'Server error fetching admin attendance data: ' + error.message });
   }
 };
 

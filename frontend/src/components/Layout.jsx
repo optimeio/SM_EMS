@@ -67,13 +67,13 @@ const Layout = ({ children }) => {
           {/* Header Branding */}
           <div className={`flex items-center ${isCollapsed ? 'flex-col gap-2 justify-center' : 'justify-between'} pb-4 mb-4 border-b border-slate-100`}>
             <div className="flex items-center gap-3 overflow-hidden">
-              <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 p-1 flex items-center justify-center shrink-0 shadow-sm hover:shadow-md transition-all">
+              <div className="w-12 h-12 rounded-2xl bg-white border-2 border-[#DC2C2B]/40 hover:border-[#DC2C2B] p-1 flex items-center justify-center shrink-0 shadow-sm hover:shadow-[0_0_16px_rgba(220,44,43,0.22)] transition-all">
                 <img src={logoImg} alt="THE SM GROUPS" className="w-10 h-10 object-contain" />
               </div>
               {!isCollapsed && (
                 <div className="truncate">
                   <h1 className="font-extrabold text-slate-900 text-base tracking-tight leading-none truncate">THE SM GROUPS</h1>
-                  <span className="text-xs text-slate-400 font-semibold mt-0.5 block">Enterprise Suite</span>
+                  <span className="text-xs text-[#DC2C2B] font-bold mt-0.5 block">Enterprise Suite</span>
                 </div>
               )}
             </div>
@@ -102,18 +102,19 @@ const Layout = ({ children }) => {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`flex items-center ${isCollapsed ? 'justify-center px-2 py-3' : 'justify-between px-3.5 py-3'} rounded-xl text-sm font-extrabold transition-all duration-150 ${
+                  className={`group flex items-center ${isCollapsed ? 'justify-center px-2 py-3' : 'justify-between px-3.5 py-3'} rounded-xl text-sm font-extrabold transition-all duration-150 relative overflow-hidden ${
                     isActive
-                      ? 'bg-slate-950 text-white shadow-sm'
-                      : 'text-slate-900 hover:bg-slate-100 hover:text-black border border-transparent hover:border-slate-200'
+                      ? 'bg-[#DC2C2B] text-white shadow-md shadow-[#DC2C2B]/25 border border-[#B91C1C]'
+                      : 'text-slate-700 hover:bg-red-50/70 hover:text-[#DC2C2B] border border-transparent hover:border-red-100/70'
                   }`}
                   title={isCollapsed ? link.name : undefined}
                 >
                   <div className="flex items-center gap-3.5">
-                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-800'}`} />
+                    <Icon className={`w-4 h-4 shrink-0 transition-colors ${isActive ? 'text-white' : 'text-slate-600 group-hover:text-[#DC2C2B]'}`} />
                     {!isCollapsed && <span className="truncate">{link.name}</span>}
                   </div>
-                  {!isCollapsed && isActive && <ChevronRight className="w-4 h-4 text-white/80" />}
+                  {!isCollapsed && isActive && <ChevronRight className="w-4 h-4 text-white/90" />}
+                  {!isCollapsed && !isActive && <ChevronRight className="w-4 h-4 text-transparent group-hover:text-[#DC2C2B]/50 transition-colors" />}
                 </Link>
               );
             })}
@@ -133,18 +134,18 @@ const Layout = ({ children }) => {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`flex items-center ${isCollapsed ? 'justify-center px-2 py-3' : 'justify-between px-3.5 py-3'} rounded-xl text-sm font-extrabold transition-all duration-150 ${
+                  className={`group flex items-center ${isCollapsed ? 'justify-center px-2 py-3' : 'justify-between px-3.5 py-3'} rounded-xl text-sm font-extrabold transition-all duration-150 relative overflow-hidden ${
                     isActive
-                      ? 'bg-slate-950 text-white shadow-sm'
-                      : 'text-slate-900 hover:bg-slate-100 hover:text-black border border-transparent hover:border-slate-200'
+                      ? 'bg-[#DC2C2B] text-white shadow-md shadow-[#DC2C2B]/25 border border-[#B91C1C]'
+                      : 'text-slate-700 hover:bg-red-50/70 hover:text-[#DC2C2B] border border-transparent hover:border-red-100/70'
                   }`}
                   title={isCollapsed ? link.name : undefined}
                 >
                   <div className="flex items-center gap-3">
-                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-800'}`} />
+                    <Icon className={`w-4 h-4 shrink-0 transition-colors ${isActive ? 'text-white' : 'text-slate-600 group-hover:text-[#DC2C2B]'}`} />
                     {!isCollapsed && <span className="truncate">{link.name}</span>}
                   </div>
-                  {!isCollapsed && <ExternalLink className="w-4 h-4 text-slate-700" />}
+                  {!isCollapsed && <ExternalLink className={`w-4 h-4 transition-colors ${isActive ? 'text-white/90' : 'text-slate-400 group-hover:text-[#DC2C2B]'}`} />}
                 </Link>
               );
             })}
@@ -197,12 +198,12 @@ const Layout = ({ children }) => {
       {/* Mobile Header Bar */}
       <header className="md:hidden bg-white border-b border-slate-200/80 px-4 py-3 sticky top-0 z-40 flex items-center justify-between shadow-xs">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-white border border-slate-200 rounded-2xl p-1 shadow-sm flex items-center justify-center shrink-0">
+          <div className="w-12 h-12 bg-white border-2 border-[#DC2C2B]/40 rounded-2xl p-1 shadow-sm flex items-center justify-center shrink-0">
             <img src={logoImg} alt="THE SM GROUPS" className="w-10 h-10 object-contain" />
           </div>
           <div>
             <span className="font-extrabold text-base text-slate-900 tracking-tight block leading-none">THE SM GROUPS</span>
-            <span className="text-xs text-slate-500 font-bold block mt-0.5">Enterprise Portal</span>
+            <span className="text-xs text-[#DC2C2B] font-bold block mt-0.5">Enterprise Portal</span>
           </div>
         </div>
 
@@ -259,17 +260,17 @@ const Layout = ({ children }) => {
                     key={link.path}
                     to={link.path}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center justify-between px-4 py-3.5 rounded-xl text-sm font-bold transition-all ${
+                    className={`flex items-center justify-between px-4 py-3.5 rounded-xl text-sm font-bold transition-all relative overflow-hidden ${
                       isActive
-                        ? 'bg-slate-900 text-white shadow-sm'
-                        : 'bg-slate-50 text-slate-800 border border-slate-200/70 hover:bg-slate-100'
+                        ? 'bg-[#DC2C2B] text-white shadow-md shadow-[#DC2C2B]/25 border border-[#B91C1C]'
+                        : 'bg-slate-50 text-slate-800 border border-slate-200/70 hover:bg-red-50 hover:text-[#DC2C2B]'
                     }`}
                   >
                     <div className="flex items-center gap-3.5">
                       <Icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-slate-500'}`} />
                       <span>{link.name}</span>
                     </div>
-                    {isActive && <ChevronRight className="w-5 h-5 text-slate-400" />}
+                    {isActive && <ChevronRight className="w-5 h-5 text-white/90" />}
                   </Link>
                 );
               })}
@@ -285,17 +286,17 @@ const Layout = ({ children }) => {
                     key={link.path}
                     to={link.path}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center justify-between px-4 py-3.5 rounded-xl text-sm font-bold transition-all ${
+                    className={`flex items-center justify-between px-4 py-3.5 rounded-xl text-sm font-bold transition-all relative overflow-hidden ${
                       isActive
-                        ? 'bg-slate-900 text-white shadow-xs'
-                        : 'bg-slate-50 text-slate-800 border border-slate-200/70 hover:bg-slate-100'
+                        ? 'bg-[#DC2C2B] text-white shadow-md shadow-[#DC2C2B]/25 border border-[#B91C1C]'
+                        : 'bg-slate-50 text-slate-800 border border-slate-200/70 hover:bg-red-50 hover:text-[#DC2C2B]'
                     }`}
                   >
                     <div className="flex items-center gap-3">
                       <Icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-slate-600'}`} />
                       <span>{link.name}</span>
                     </div>
-                    <ExternalLink className={`w-5 h-5 ${isActive ? 'text-white/70' : 'text-slate-400'}`} />
+                    <ExternalLink className={`w-5 h-5 ${isActive ? 'text-white/80' : 'text-slate-400'}`} />
                   </Link>
                 );
               })}

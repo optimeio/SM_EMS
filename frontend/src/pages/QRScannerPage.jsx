@@ -13,6 +13,7 @@ import {
   RefreshCw,
   Sparkles
 } from 'lucide-react';
+import logoImg from '../assets/sm_groups_logo.png';
 
 const QRScannerPage = () => {
   const navigate = useNavigate();
@@ -225,8 +226,14 @@ const QRScannerPage = () => {
       <div className="w-full max-w-md space-y-4 relative z-10 animate-fade-in">
         {/* Header */}
         <div className="flex items-center justify-between px-1">
-          <div className="flex items-center gap-2">
-            <img src="/sm_groups_logo.png" alt="THE SM GROUPS" className="h-8 object-contain" />
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-white border border-slate-200 p-1 flex items-center justify-center shadow-xs">
+              <img src={logoImg} alt="THE SM GROUPS" className="w-full h-full object-contain" />
+            </div>
+            <div>
+              <span className="font-extrabold text-sm text-slate-900 tracking-tight block leading-none">THE SM GROUPS</span>
+              <span className="text-[10px] text-slate-400 font-semibold block mt-0.5">Verification Portal</span>
+            </div>
           </div>
           <Link
             to="/login"
@@ -237,11 +244,14 @@ const QRScannerPage = () => {
         </div>
 
         {/* Scanner Card */}
-        <div className="card-saas p-6 space-y-5 animate-fade-in bg-white border border-slate-200/80 rounded-2xl shadow-sm">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div className="card-saas p-6 space-y-5 animate-fade-in bg-white border border-slate-200/80 rounded-2xl shadow-sm relative overflow-hidden">
+          {/* Top Brand Stripe */}
+          <div className="h-1.5 w-full bg-gradient-to-r from-[#DC2C2B] via-[#F87171] to-[#DC2C2B] absolute top-0 left-0" />
+          
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100 pt-1">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 bg-slate-900 text-white rounded-xl shrink-0 shadow-2xs">
-                <QrCode className="w-5 h-5" />
+              <div className="p-2.5 bg-slate-950 text-white rounded-xl shrink-0 shadow-2xs">
+                <QrCode className="w-5 h-5 text-[#DC2C2B]" />
               </div>
               <div>
                 <h2 className="font-bold text-base text-slate-900">Verify Employee Identity</h2>

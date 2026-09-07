@@ -95,11 +95,11 @@ const AdminDashboard = () => {
   return (
     <div className="space-y-6 animate-fade-in pb-12">
       {/* Header Container — 100% Ultra-Sharp High-Contrast Executive SaaS Panel */}
-      <div className="bg-white border-2 border-slate-300 rounded-2xl p-6 sm:p-7 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-5 relative overflow-hidden">
+      <div className="bg-white border-2 border-slate-300 border-l-4 border-l-[#DC2C2B] rounded-2xl p-6 sm:p-7 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-5 relative overflow-hidden">
         <div className="space-y-2 z-10">
           <div className="flex items-center gap-2.5 flex-wrap">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-[11px] font-black tracking-wider uppercase bg-slate-950 text-white shadow-xs">
-              <LayoutDashboard className="w-3.5 h-3.5 text-indigo-400" />
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-[11px] font-black tracking-wider uppercase bg-[#DC2C2B] text-white shadow-sm shadow-[#DC2C2B]/25">
+              <LayoutDashboard className="w-3.5 h-3.5 text-white" />
               EXECUTIVE DASHBOARD
             </span>
             <span className="text-slate-300 font-bold">•</span>
@@ -120,9 +120,9 @@ const AdminDashboard = () => {
         <div className="flex flex-wrap items-center gap-3 justify-start md:justify-end shrink-0 z-10">
           <Link 
             to="/admin/attendance" 
-            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-950 hover:bg-black text-white text-xs font-black rounded-xl shadow-md border border-slate-900 transition-all hover:scale-[1.02] active:scale-95"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#DC2C2B] hover:bg-[#C52221] text-white text-xs font-black rounded-xl shadow-md shadow-[#DC2C2B]/30 border border-[#B91C1C] transition-all hover:scale-[1.02] active:scale-95"
           >
-            <Calendar className="w-4 h-4 text-indigo-400" />
+            <Calendar className="w-4 h-4 text-white" />
             <span>Check Attendance</span>
           </Link>
 
@@ -147,11 +147,11 @@ const AdminDashboard = () => {
       {/* Top Row: Attendance & Workforce KPI Summary Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Present Today */}
-        <div className="bg-white rounded-2xl p-4 sm:p-5 border-2 border-slate-300 hover:border-slate-900 hover:shadow-md transition-all duration-200 group flex flex-col justify-between cursor-pointer">
+        <div className="bg-white rounded-2xl p-4 sm:p-5 border-2 border-slate-300 hover:border-[#DC2C2B] hover:shadow-md hover:shadow-[#DC2C2B]/10 transition-all duration-200 group flex flex-col justify-between cursor-pointer">
           <div className="flex items-center justify-between gap-1">
-            <span className="text-xs font-black text-slate-900 uppercase tracking-wider">Present Today</span>
-            <div className="w-9 h-9 rounded-xl bg-slate-950 text-white flex items-center justify-center shadow-sm shrink-0 group-hover:scale-105 transition-transform">
-              <UserCheck className="w-4.5 h-4.5 text-indigo-400" />
+            <span className="text-xs font-black text-slate-900 uppercase tracking-wider group-hover:text-[#DC2C2B] transition-colors">Present Today</span>
+            <div className="w-10 h-10 rounded-xl bg-[#DC2C2B] text-white flex items-center justify-center shadow-md shadow-[#DC2C2B]/30 shrink-0 group-hover:scale-105 transition-transform">
+              <UserCheck className="w-5 h-5 text-white" />
             </div>
           </div>
           <div className="mt-3">
@@ -159,7 +159,7 @@ const AdminDashboard = () => {
               {attendanceSummary?.presentCount || 0}
               <span className="text-xs font-bold text-slate-700 ml-1">/ {attendanceSummary?.totalEmployees || stats?.activeEmployees || 0}</span>
             </div>
-            <p className="text-xs font-bold text-slate-800 mt-1 truncate">{presentPercent}% checked in today</p>
+            <p className="text-xs font-bold text-[#DC2C2B] mt-1 truncate">{presentPercent}% checked in today</p>
           </div>
         </div>
 
@@ -214,11 +214,11 @@ const AdminDashboard = () => {
       </div>
 
       {/* Main Live Today's Attendance Table Card */}
-      <div className="bg-white rounded-2xl border-2 border-slate-300 shadow-sm p-5 sm:p-6 space-y-4">
+      <div className="bg-white border-2 border-slate-300 rounded-2xl p-5 sm:p-6 space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b-2 border-slate-200">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-slate-950 text-white rounded-xl shadow-xs">
-              <UserCheck className="w-5 h-5 text-indigo-400" />
+            <div className="p-2.5 bg-[#DC2C2B] text-white rounded-xl shadow-md shadow-[#DC2C2B]/25">
+              <UserCheck className="w-5 h-5 text-white" />
             </div>
             <div>
               <h2 className="text-base sm:text-lg font-black text-slate-950 tracking-tight">Today's Live Attendance</h2>
@@ -230,19 +230,19 @@ const AdminDashboard = () => {
             <div className="flex bg-slate-100 p-1 rounded-xl text-xs font-bold border border-slate-300">
               <button
                 onClick={() => setAttendanceFilter('All')}
-                className={`px-3 py-1.5 rounded-lg transition-all ${attendanceFilter === 'All' ? 'bg-slate-950 text-white font-black shadow-xs' : 'text-slate-800 hover:text-slate-950'}`}
+                className={`px-3 py-1.5 rounded-lg transition-all ${attendanceFilter === 'All' ? 'bg-[#DC2C2B] text-white font-black shadow-sm shadow-[#DC2C2B]/20' : 'text-slate-800 hover:text-slate-950'}`}
               >
                 All ({attendanceRecords.length})
               </button>
               <button
                 onClick={() => setAttendanceFilter('Present')}
-                className={`px-3 py-1.5 rounded-lg transition-all ${attendanceFilter === 'Present' ? 'bg-slate-950 text-white font-black shadow-xs' : 'text-slate-800 hover:text-slate-950'}`}
+                className={`px-3 py-1.5 rounded-lg transition-all ${attendanceFilter === 'Present' ? 'bg-[#DC2C2B] text-white font-black shadow-sm shadow-[#DC2C2B]/20' : 'text-slate-800 hover:text-slate-950'}`}
               >
                 Working ({attendanceSummary?.workingCount || 0})
               </button>
               <button
                 onClick={() => setAttendanceFilter('Checked Out')}
-                className={`px-3 py-1.5 rounded-lg transition-all ${attendanceFilter === 'Checked Out' ? 'bg-slate-950 text-white font-black shadow-xs' : 'text-slate-800 hover:text-slate-950'}`}
+                className={`px-3 py-1.5 rounded-lg transition-all ${attendanceFilter === 'Checked Out' ? 'bg-[#DC2C2B] text-white font-black shadow-sm shadow-[#DC2C2B]/20' : 'text-slate-800 hover:text-slate-950'}`}
               >
                 Checked Out ({attendanceSummary?.checkedOutCount || 0})
               </button>
@@ -250,9 +250,9 @@ const AdminDashboard = () => {
 
             <Link
               to="/admin/attendance"
-              className="text-xs font-black text-slate-950 hover:text-indigo-600 flex items-center gap-1 pl-2 border-l-2 border-slate-300"
+              className="text-xs font-black text-[#DC2C2B] hover:text-[#B91C1C] transition-colors flex items-center gap-1 pl-2 border-l-2 border-slate-300"
             >
-              Full Log <ArrowRight className="w-3.5 h-3.5" />
+              Full Log <ArrowRight className="w-3.5 h-3.5 text-[#DC2C2B]" />
             </Link>
           </div>
         </div>
@@ -437,11 +437,13 @@ const AdminDashboard = () => {
       <div className="card-saas p-5 space-y-4 border-2 border-slate-300">
         <div className="flex items-center justify-between pb-3 border-b-2 border-slate-200">
           <div className="flex items-center gap-2">
-            <Activity className="w-4.5 h-4.5 text-slate-950" />
+            <div className="p-1.5 bg-[#DC2C2B] text-white rounded-lg shadow-sm shadow-[#DC2C2B]/20">
+              <Activity className="w-4 h-4 text-white" />
+            </div>
             <h3 className="font-black text-sm text-slate-950 uppercase tracking-wider">Recent Activity Logs</h3>
           </div>
-          <Link to="/admin/logs" className="text-xs text-slate-950 font-black hover:text-indigo-600 flex items-center gap-1">
-            Full Audit <ArrowUpRight className="w-3.5 h-3.5" />
+          <Link to="/admin/logs" className="text-xs text-[#DC2C2B] hover:text-[#B91C1C] font-black flex items-center gap-1 transition-colors">
+            Full Audit <ArrowUpRight className="w-3.5 h-3.5 text-[#DC2C2B]" />
           </Link>
         </div>
 

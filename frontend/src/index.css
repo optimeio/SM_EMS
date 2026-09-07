@@ -10,7 +10,7 @@
     text-rendering: optimizeLegibility;
   }
   body {
-    @apply bg-slate-100/70 text-slate-950 selection:bg-slate-950 selection:text-white;
+    @apply bg-slate-100/70 text-slate-950 selection:bg-[#DC2C2B] selection:text-white;
     font-family: 'Inter', 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     text-rendering: optimizeLegibility;
     overflow-x: hidden;
@@ -49,12 +49,12 @@
   }
 
   .btn-brand {
-    @apply bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white font-bold py-2.5 px-4 rounded-xl text-base sm:text-sm shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 active:scale-[0.98] active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-red-500/20 inline-flex items-center justify-center gap-2;
+    @apply bg-gradient-to-r from-[#DC2C2B] to-[#C52221] hover:from-[#C52221] hover:to-[#A91B1A] text-white font-bold py-2.5 px-4 rounded-xl text-base sm:text-sm shadow-sm hover:shadow-brand hover:-translate-y-0.5 transition-all duration-200 active:scale-[0.98] active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-[#DC2C2B]/30 inline-flex items-center justify-center gap-2;
   }
 
   /* Input fields with crisp focus glow */
   .input-field, .input-saas {
-    @apply bg-white border-2 border-slate-300 text-slate-950 placeholder:text-slate-500 rounded-xl px-4 py-2.5 text-base sm:text-sm font-bold focus:outline-none focus:ring-2 focus:ring-slate-900/20 focus:border-slate-950 transition-all duration-200 shadow-sm hover:border-slate-400;
+    @apply bg-white border-2 border-slate-300 text-slate-950 placeholder:text-slate-500 rounded-xl px-4 py-2.5 text-base sm:text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#DC2C2B]/20 focus:border-[#DC2C2B] transition-all duration-200 shadow-sm hover:border-slate-400;
   }
 
   /* Premium High-Contrast Cards with Smooth Micro-Elevations */
