@@ -228,29 +228,40 @@ const Layout = ({ children }) => {
         </div>
       </header>
 
-      {/* Mobile Drawer Overlay */}
+      {/* Mobile Drawer / Slide-Up Bottom Sheet Overlay */}
       {mobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex flex-col">
-          {/* Top Bar inside Drawer for explicit close */}
-          <div className="bg-white px-4 py-3 border-b border-slate-200 flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 bg-white border border-slate-200 rounded-lg p-1 flex items-center justify-center shrink-0">
-                <img src={logoImg} alt="THE SM GROUPS" className="w-full h-full object-contain" />
-              </div>
-              <span className="font-extrabold text-base text-slate-900">THE SM GROUPS</span>
-            </div>
-            <button
-              onClick={() => setMobileMenuOpen(false)}
-              className="p-2 text-slate-500 hover:text-slate-900 rounded-xl bg-slate-100"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
+        <div 
+          className="md:hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex flex-col justify-end transition-opacity duration-200"
+          onClick={() => setMobileMenuOpen(false)}
+        >
+          <div 
+            className="bg-white rounded-t-3xl p-5 space-y-4 max-h-[85vh] overflow-y-auto shadow-2xl animate-slide-up border-t border-slate-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Grab handle indicator */}
+            <div className="w-12 h-1 bg-slate-300 rounded-full mx-auto -mt-1 mb-2" />
 
-          <div className="bg-white flex-1 p-4 overflow-y-auto space-y-4 shadow-xl">
-            <nav className="space-y-2">
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2.5">
-                {isAdmin ? 'Admin Console' : 'Workspace Navigation'}
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 bg-white border border-slate-200/80 rounded-xl p-1 flex items-center justify-center shrink-0 shadow-2xs">
+                  <img src={logoImg} alt="THE SM GROUPS" className="w-full h-full object-contain" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-sm text-slate-900 leading-tight">THE SM GROUPS</h3>
+                  <p className="text-[10px] text-[#DC2C2B] font-bold uppercase tracking-wider">Enterprise Navigation</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-1.5 text-slate-400 hover:text-slate-900 rounded-xl bg-slate-100/80"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <nav className="space-y-1.5">
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2">
+                {isAdmin ? 'All Admin Pages' : 'Workspace Options'}
               </p>
               {links.map((link) => {
                 const Icon = link.icon;
@@ -260,23 +271,23 @@ const Layout = ({ children }) => {
                     key={link.path}
                     to={link.path}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center justify-between px-4 py-3.5 rounded-xl text-sm font-bold transition-all relative overflow-hidden ${
+                    className={`flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-extrabold transition-all ${
                       isActive
-                        ? 'bg-[#DC2C2B] text-white shadow-md shadow-[#DC2C2B]/25 border border-[#B91C1C]'
-                        : 'bg-slate-50 text-slate-800 border border-slate-200/70 hover:bg-red-50 hover:text-[#DC2C2B]'
+                        ? 'bg-[#DC2C2B] text-white shadow-md shadow-[#DC2C2B]/20 border border-[#B91C1C]'
+                        : 'bg-slate-50 text-slate-800 border border-slate-200/60 hover:bg-red-50 hover:text-[#DC2C2B]'
                     }`}
                   >
-                    <div className="flex items-center gap-3.5">
-                      <Icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-slate-500'}`} />
+                    <div className="flex items-center gap-3">
+                      <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-600'}`} />
                       <span>{link.name}</span>
                     </div>
-                    {isActive && <ChevronRight className="w-5 h-5 text-white/90" />}
+                    {isActive && <ChevronRight className="w-4 h-4 text-white/90" />}
                   </Link>
                 );
               })}
 
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-6 mb-2.5">
-                Utilities
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider pt-3 mb-2">
+                Utilities & Tools
               </p>
               {publicLinks.map((link) => {
                 const Icon = link.icon;
@@ -286,29 +297,29 @@ const Layout = ({ children }) => {
                     key={link.path}
                     to={link.path}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center justify-between px-4 py-3.5 rounded-xl text-sm font-bold transition-all relative overflow-hidden ${
+                    className={`flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-extrabold transition-all ${
                       isActive
-                        ? 'bg-[#DC2C2B] text-white shadow-md shadow-[#DC2C2B]/25 border border-[#B91C1C]'
-                        : 'bg-slate-50 text-slate-800 border border-slate-200/70 hover:bg-red-50 hover:text-[#DC2C2B]'
+                        ? 'bg-[#DC2C2B] text-white shadow-md shadow-[#DC2C2B]/20 border border-[#B91C1C]'
+                        : 'bg-slate-50 text-slate-800 border border-slate-200/60 hover:bg-red-50 hover:text-[#DC2C2B]'
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <Icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-slate-600'}`} />
+                      <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-600'}`} />
                       <span>{link.name}</span>
                     </div>
-                    <ExternalLink className={`w-5 h-5 ${isActive ? 'text-white/80' : 'text-slate-400'}`} />
+                    <ExternalLink className={`w-4 h-4 ${isActive ? 'text-white/80' : 'text-slate-400'}`} />
                   </Link>
                 );
               })}
             </nav>
 
-            <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xs shadow-2xs">
+            <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-full bg-slate-950 text-white flex items-center justify-center font-black text-xs">
                   {user?.name ? user.name[0].toUpperCase() : 'U'}
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-slate-900">{user?.name}</p>
+                  <p className="text-xs font-bold text-slate-900 leading-tight">{user?.name}</p>
                   <p className="text-[10px] text-slate-500 capitalize">{user?.role} Account</p>
                 </div>
               </div>
@@ -317,9 +328,9 @@ const Layout = ({ children }) => {
                   setMobileMenuOpen(false);
                   handleLogout();
                 }}
-                className="flex items-center gap-2 px-3 py-2 bg-rose-50 border border-rose-200/60 text-rose-600 rounded-xl text-xs font-bold"
+                className="flex items-center gap-1.5 px-3 py-2 bg-rose-50 border border-rose-200 text-rose-600 rounded-xl text-xs font-extrabold"
               >
-                <LogOut className="w-4 h-4" />
+                <LogOut className="w-3.5 h-3.5" />
                 Logout
               </button>
             </div>
@@ -328,9 +339,140 @@ const Layout = ({ children }) => {
       )}
 
       {/* Main Content Area */}
-      <main className="flex-1 p-3.5 sm:p-5 md:p-6 overflow-y-auto overflow-x-hidden min-w-0 max-w-7xl mx-auto w-full md:h-full">
+      <main className="flex-1 p-3.5 sm:p-5 md:p-6 overflow-y-auto overflow-x-hidden min-w-0 max-w-7xl mx-auto w-full md:h-full pb-20 md:pb-6">
         {children}
       </main>
+
+      {/* Modern Fixed Mobile Bottom Tab Bar */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/90 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] px-1.5 py-1.5 flex items-center justify-around select-none">
+        {isAdmin ? (
+          <>
+            {/* Admin Bottom Tabs: 4 primary + More */}
+            <Link
+              to="/admin"
+              className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl flex-1 transition-all ${
+                location.pathname === '/admin'
+                  ? 'text-[#DC2C2B] font-extrabold bg-red-50/80 scale-[1.02]'
+                  : 'text-slate-500 hover:text-slate-900 font-semibold'
+              }`}
+            >
+              <LayoutDashboard className={`w-5 h-5 ${location.pathname === '/admin' ? 'text-[#DC2C2B]' : 'text-slate-500'}`} />
+              <span className="text-[10px] tracking-tight mt-0.5 leading-none">Dashboard</span>
+            </Link>
+
+            <Link
+              to="/admin/employees"
+              className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl flex-1 transition-all ${
+                location.pathname === '/admin/employees'
+                  ? 'text-[#DC2C2B] font-extrabold bg-red-50/80 scale-[1.02]'
+                  : 'text-slate-500 hover:text-slate-900 font-semibold'
+              }`}
+            >
+              <Users className={`w-5 h-5 ${location.pathname === '/admin/employees' ? 'text-[#DC2C2B]' : 'text-slate-500'}`} />
+              <span className="text-[10px] tracking-tight mt-0.5 leading-none">Employees</span>
+            </Link>
+
+            <Link
+              to="/admin/attendance"
+              className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl flex-1 transition-all ${
+                location.pathname === '/admin/attendance'
+                  ? 'text-[#DC2C2B] font-extrabold bg-red-50/80 scale-[1.02]'
+                  : 'text-slate-500 hover:text-slate-900 font-semibold'
+              }`}
+            >
+              <Calendar className={`w-5 h-5 ${location.pathname === '/admin/attendance' ? 'text-[#DC2C2B]' : 'text-slate-500'}`} />
+              <span className="text-[10px] tracking-tight mt-0.5 leading-none">Attendance</span>
+            </Link>
+
+            <Link
+              to="/admin/tasks"
+              className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl flex-1 transition-all ${
+                location.pathname === '/admin/tasks'
+                  ? 'text-[#DC2C2B] font-extrabold bg-red-50/80 scale-[1.02]'
+                  : 'text-slate-500 hover:text-slate-900 font-semibold'
+              }`}
+            >
+              <CheckSquare className={`w-5 h-5 ${location.pathname === '/admin/tasks' ? 'text-[#DC2C2B]' : 'text-slate-500'}`} />
+              <span className="text-[10px] tracking-tight mt-0.5 leading-none">Tasks</span>
+            </Link>
+
+            <button
+              onClick={() => setMobileMenuOpen(true)}
+              className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl flex-1 transition-all ${
+                ['/admin/id-cards', '/admin/performance', '/admin/logs', '/scan'].includes(location.pathname) || mobileMenuOpen
+                  ? 'text-[#DC2C2B] font-extrabold bg-red-50/80'
+                  : 'text-slate-500 hover:text-slate-900 font-semibold'
+              }`}
+            >
+              <Menu className={`w-5 h-5 ${['/admin/id-cards', '/admin/performance', '/admin/logs', '/scan'].includes(location.pathname) || mobileMenuOpen ? 'text-[#DC2C2B]' : 'text-slate-500'}`} />
+              <span className="text-[10px] tracking-tight mt-0.5 leading-none">More</span>
+            </button>
+          </>
+        ) : (
+          <>
+            {/* Employee Bottom Tabs: All 5 tabs */}
+            <Link
+              to="/employee"
+              className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl flex-1 transition-all ${
+                location.pathname === '/employee'
+                  ? 'text-[#DC2C2B] font-extrabold bg-red-50/80 scale-[1.02]'
+                  : 'text-slate-500 hover:text-slate-900 font-semibold'
+              }`}
+            >
+              <LayoutDashboard className={`w-5 h-5 ${location.pathname === '/employee' ? 'text-[#DC2C2B]' : 'text-slate-500'}`} />
+              <span className="text-[10px] tracking-tight mt-0.5 leading-none">Dashboard</span>
+            </Link>
+
+            <Link
+              to="/employee/attendance"
+              className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl flex-1 transition-all ${
+                location.pathname === '/employee/attendance'
+                  ? 'text-[#DC2C2B] font-extrabold bg-red-50/80 scale-[1.02]'
+                  : 'text-slate-500 hover:text-slate-900 font-semibold'
+              }`}
+            >
+              <Calendar className={`w-5 h-5 ${location.pathname === '/employee/attendance' ? 'text-[#DC2C2B]' : 'text-slate-500'}`} />
+              <span className="text-[10px] tracking-tight mt-0.5 leading-none">Attendance</span>
+            </Link>
+
+            <Link
+              to="/employee/id-card"
+              className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl flex-1 transition-all ${
+                location.pathname === '/employee/id-card'
+                  ? 'text-[#DC2C2B] font-extrabold bg-red-50/80 scale-[1.02]'
+                  : 'text-slate-500 hover:text-slate-900 font-semibold'
+              }`}
+            >
+              <CreditCard className={`w-5 h-5 ${location.pathname === '/employee/id-card' ? 'text-[#DC2C2B]' : 'text-slate-500'}`} />
+              <span className="text-[10px] tracking-tight mt-0.5 leading-none">ID Card</span>
+            </Link>
+
+            <Link
+              to="/employee/tasks"
+              className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl flex-1 transition-all ${
+                location.pathname === '/employee/tasks'
+                  ? 'text-[#DC2C2B] font-extrabold bg-red-50/80 scale-[1.02]'
+                  : 'text-slate-500 hover:text-slate-900 font-semibold'
+              }`}
+            >
+              <CheckSquare className={`w-5 h-5 ${location.pathname === '/employee/tasks' ? 'text-[#DC2C2B]' : 'text-slate-500'}`} />
+              <span className="text-[10px] tracking-tight mt-0.5 leading-none">My Tasks</span>
+            </Link>
+
+            <Link
+              to="/employee/profile"
+              className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl flex-1 transition-all ${
+                location.pathname === '/employee/profile'
+                  ? 'text-[#DC2C2B] font-extrabold bg-red-50/80 scale-[1.02]'
+                  : 'text-slate-500 hover:text-slate-900 font-semibold'
+              }`}
+            >
+              <UserIcon className={`w-5 h-5 ${location.pathname === '/employee/profile' ? 'text-[#DC2C2B]' : 'text-slate-500'}`} />
+              <span className="text-[10px] tracking-tight mt-0.5 leading-none">Profile</span>
+            </Link>
+          </>
+        )}
+      </div>
     </div>
   );
 };
