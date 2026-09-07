@@ -22,8 +22,9 @@ const getApiBaseUrl = () => {
 const baseURL = getApiBaseUrl();
 
 
-// In-Memory Fast Cache Store for Instant Page Switching
+// In-Memory Fast Cache Store & In-Flight Request Deduplication
 const apiCache = new Map();
+const pendingRequests = new Map();
 const CACHE_TTL = 3 * 60 * 1000; // 3 minutes cache validity
 
 export const clearApiCache = (pattern) => {
@@ -35,6 +36,24 @@ export const clearApiCache = (pattern) => {
         apiCache.delete(key);
       }
     }
+  }
+};
+
+// Target invalidation by endpoint area
+const invalidateRelatedCaches = (url = '') => {
+  if (url.includes('/employees')) {
+    clearApiCache('/employees');
+    clearApiCache('/dashboard');
+    clearApiCache('/performance');
+  } else if (url.includes('/attendance')) {
+    clearApiCache('/attendance');
+    clearApiCache('/dashboard');
+  } else if (url.includes('/tasks')) {
+    clearApiCache('/tasks');
+    clearApiCache('/dashboard');
+    clearApiCache('/performance');
+  } else {
+    clearApiCache();
   }
 };
 
@@ -51,7 +70,7 @@ const getCacheKey = (config) => {
   return `${method}:${url}:${params}`;
 };
 
-// Add auth token to requests and check in-memory fast cache
+// Add auth token to requests, check fast cache, and deduplicate in-flight requests
 API.interceptors.request.use((config) => {
   const user = JSON.parse(localStorage.getItem('userInfo'));
   if (user && user.token) {
@@ -83,7 +102,7 @@ API.interceptors.request.use((config) => {
   return Promise.reject(error);
 });
 
-// Interceptor to handle responses, caching, automatic retries, and session expiration safely
+// Interceptor to handle responses, caching, targeted invalidation, retries, and deduplication
 API.interceptors.response.use(
   (response) => {
     const config = response.config;
@@ -99,9 +118,9 @@ API.interceptors.response.use(
       });
     }
 
-    // Any mutating action (POST, PUT, DELETE, PATCH) automatically clears the cache
+    // Targeted mutating action (POST, PUT, DELETE, PATCH) invalidates affected areas
     if (['post', 'put', 'patch', 'delete'].includes(method)) {
-      clearApiCache();
+      invalidateRelatedCaches(config?.url || '');
     }
 
     return response;

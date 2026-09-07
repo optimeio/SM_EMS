@@ -6,30 +6,48 @@ import Task from '../models/Task.js';
 // @access  Private/Admin
 export const getDashboardStats = async (req, res) => {
   try {
-    const [
-      totalEmployees,
-      activeEmployees,
-      inactiveEmployees,
-      totalTasks,
-      pendingTasks,
-      inProgressTasks,
-      completedTasks,
-      completedTaskData
-    ] = await Promise.all([
-      Employee.countDocuments(),
-      Employee.countDocuments({ status: 'Active' }),
-      Employee.countDocuments({ status: 'Inactive' }),
-      Task.countDocuments(),
-      Task.countDocuments({ status: 'Pending' }),
-      Task.countDocuments({ status: 'In Progress' }),
-      Task.countDocuments({ status: 'Completed' }),
+    const [empStats, taskStats] = await Promise.all([
+      Employee.aggregate([
+        { $group: { _id: '$status', count: { $sum: 1 } } }
+      ]),
       Task.aggregate([
-        { $match: { status: 'Completed' } },
-        { $group: { _id: null, totalPoints: { $sum: '$points' } } }
+        {
+          $group: {
+            _id: '$status',
+            count: { $sum: 1 },
+            totalPoints: {
+              $sum: { $cond: [{ $eq: ['$status', 'Completed'] }, '$points', 0] }
+            }
+          }
+        }
       ])
     ]);
 
-    const totalPoints = completedTaskData.length > 0 ? completedTaskData[0].totalPoints : 0;
+    let activeEmployees = 0;
+    let inactiveEmployees = 0;
+    let totalEmployees = 0;
+
+    for (const item of empStats) {
+      totalEmployees += item.count;
+      if (item._id === 'Active') activeEmployees = item.count;
+      if (item._id === 'Inactive') inactiveEmployees = item.count;
+    }
+
+    let totalTasks = 0;
+    let pendingTasks = 0;
+    let inProgressTasks = 0;
+    let completedTasks = 0;
+    let totalPoints = 0;
+
+    for (const item of taskStats) {
+      totalTasks += item.count;
+      if (item._id === 'Pending') pendingTasks = item.count;
+      if (item._id === 'In Progress') inProgressTasks = item.count;
+      if (item._id === 'Completed') {
+        completedTasks = item.count;
+        totalPoints = item.totalPoints || 0;
+      }
+    }
 
     res.json({
       totalEmployees,
@@ -42,7 +60,8 @@ export const getDashboardStats = async (req, res) => {
       totalPoints
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('Dashboard Stats Error:', error);
+    res.status(500).json({ message: 'Server error fetching dashboard stats' });
   }
 };
 

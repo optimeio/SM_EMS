@@ -34,35 +34,39 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     let isMounted = true;
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const [statsRes, activityRes, attendanceRes] = await Promise.allSettled([
-          API.get('/dashboard/stats'),
-          API.get('/activity-logs'),
-          API.get('/attendance/admin')
-        ]);
-
-        if (!isMounted) return;
-
-        if (statsRes.status === 'fulfilled' && statsRes.value?.data) {
-          setStats(statsRes.value.data);
+    
+    // Load stats independently for instant render
+    API.get('/dashboard/stats')
+      .then(res => {
+        if (isMounted && res.data) {
+          setStats(res.data);
+          setLoading(false);
         }
-        if (activityRes.status === 'fulfilled' && Array.isArray(activityRes.value?.data)) {
-          setActivities(activityRes.value.data.slice(0, 5));
-        }
-        if (attendanceRes.status === 'fulfilled' && attendanceRes.value?.data) {
-          setAttendanceSummary(attendanceRes.value.data.summary);
-          setAttendanceRecords(attendanceRes.value.data.records || []);
-        }
-      } catch (err) {
-        console.error('Failed to load admin dashboard data', err);
-      } finally {
+      })
+      .catch(err => console.error('Failed to load dashboard stats', err))
+      .finally(() => {
         if (isMounted) setLoading(false);
-      }
-    };
+      });
 
-    fetchData();
+    // Load recent activities with limit=10
+    API.get('/activity-logs', { params: { limit: 10 } })
+      .then(res => {
+        if (isMounted && Array.isArray(res.data)) {
+          setActivities(res.data.slice(0, 5));
+        }
+      })
+      .catch(err => console.error('Failed to load activity logs', err));
+
+    // Load attendance summary
+    API.get('/attendance/admin')
+      .then(res => {
+        if (isMounted && res.data) {
+          setAttendanceSummary(res.data.summary);
+          setAttendanceRecords(res.data.records || []);
+        }
+      })
+      .catch(err => console.error('Failed to load attendance summary', err));
+
     return () => { isMounted = false; };
   }, []);
 

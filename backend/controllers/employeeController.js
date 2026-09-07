@@ -63,7 +63,7 @@ export const getEmployees = async (req, res) => {
     const includeCards = req.query.includeCards === 'true';
 
     const selectFields = includeCards 
-      ? '-password -plainTextPassword' 
+      ? '-password -plainTextPassword -idCardImage' 
       : '-password -plainTextPassword -idCardImage -qrCodeImage';
 
     const query = {};

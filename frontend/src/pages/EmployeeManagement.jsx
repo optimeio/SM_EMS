@@ -53,10 +53,18 @@ const EmployeeManagement = () => {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [departmentFilter, setDepartmentFilter] = useState('All');
   const [selectedDept, setSelectedDept] = useState('All');
   const [showDeptCards, setShowDeptCards] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   // Pagination states
   const [page, setPage] = useState(1);
@@ -204,7 +212,7 @@ const EmployeeManagement = () => {
         params: {
           page: pageNum,
           limit,
-          search: searchTerm,
+          search: debouncedSearchTerm,
           status: statusFilter,
           department: activeDept
         }
@@ -228,7 +236,7 @@ const EmployeeManagement = () => {
 
   useEffect(() => {
     fetchEmployees(1);
-  }, [searchTerm, statusFilter, departmentFilter, selectedDept, limit]);
+  }, [debouncedSearchTerm, statusFilter, departmentFilter, selectedDept, limit]);
 
   useEffect(() => {
     if (searchParams.get('add') === 'true') {

@@ -41,6 +41,14 @@ const AttendanceManagement = () => {
   const [departmentFilter, setDepartmentFilter] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   // Secure Photo Viewer Modal
   const [viewPhotoUrl, setViewPhotoUrl] = useState(null);
@@ -64,7 +72,7 @@ const AttendanceManagement = () => {
         date: filterDate,
         department: departmentFilter,
         status: statusFilter,
-        search: searchTerm
+        search: debouncedSearchTerm
       };
 
       const { data } = await API.get('/attendance/admin', { params });
@@ -86,7 +94,7 @@ const AttendanceManagement = () => {
 
   useEffect(() => {
     fetchAdminAttendance();
-  }, [filterDate, departmentFilter, statusFilter, searchTerm]);
+  }, [filterDate, departmentFilter, statusFilter, debouncedSearchTerm]);
 
   const openPhotoModal = (attendance) => {
     setPhotoLoading(true);

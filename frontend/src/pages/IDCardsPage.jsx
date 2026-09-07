@@ -49,10 +49,50 @@ const IDCardsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [selectedDept, setSelectedDept] = useState('All');
   const [showDeptCards, setShowDeptCards] = useState(false);
   const [selectedEmp, setSelectedEmp] = useState(null);
   const [generatingQR, setGeneratingQR] = useState(null);
+
+  // Pagination States for ID Badges
+  const [page, setPage] = useState(1);
+  const [limit] = useState(12);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalEmployees, setTotalEmployees] = useState(0);
+
+  // Search Debounce (400ms)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  // On-Demand single card image store
+  const [cardImages, setCardImages] = useState({});
+  const [loadingCardId, setLoadingCardId] = useState(null);
+
+  const handleLoadCardImage = async (emp) => {
+    if (emp.idCardImage) {
+      setCardImages(prev => ({ ...prev, [emp._id]: emp.idCardImage }));
+      return emp.idCardImage;
+    }
+    if (cardImages[emp._id]) return cardImages[emp._id];
+    try {
+      setLoadingCardId(emp._id);
+      const { data } = await API.get(`/employees/${emp._id}`);
+      if (data && data.idCardImage) {
+        setCardImages(prev => ({ ...prev, [emp._id]: data.idCardImage }));
+        return data.idCardImage;
+      }
+    } catch (err) {
+      console.error('Failed to load employee card image', err);
+    } finally {
+      setLoadingCardId(null);
+    }
+    return null;
+  };
 
   // Upload finished ID Card modal state
   const [uploadEmp, setUploadEmp] = useState(null);
@@ -60,19 +100,38 @@ const IDCardsPage = () => {
   const [uploadError, setUploadError] = useState(null);
   const [uploadSuccess, setUploadSuccess] = useState(null);
 
-  const fetchEmployees = async () => {
+  const fetchEmployees = async (pageNum = page) => {
     try {
       setLoading(true);
       setError(null);
       const isUserAdmin = getIsAdmin();
       if (isUserAdmin) {
-        const { data } = await API.get('/employees?includeCards=true');
-        const emps = Array.isArray(data) ? data : (data.employees || []);
-        setEmployees(emps);
+        const activeDept = selectedDept !== 'All' ? selectedDept : '';
+        const { data } = await API.get('/employees', {
+          params: {
+            page: pageNum,
+            limit: 12,
+            includeCards: 'true',
+            search: debouncedSearchTerm,
+            department: activeDept
+          }
+        });
+        if (data && data.employees) {
+          setEmployees(data.employees);
+          setTotalPages(data.pages || 1);
+          setTotalEmployees(data.total || data.employees.length);
+          setPage(data.page || 1);
+        } else if (Array.isArray(data)) {
+          setEmployees(data);
+          setTotalPages(1);
+          setTotalEmployees(data.length);
+        }
       } else {
         const { data } = await API.get('/employees/me');
         if (data) {
           setEmployees([data]);
+          setTotalEmployees(1);
+          setTotalPages(1);
         }
       }
     } catch (err) {
@@ -84,8 +143,8 @@ const IDCardsPage = () => {
   };
 
   useEffect(() => {
-    fetchEmployees();
-  }, []);
+    fetchEmployees(page);
+  }, [page, debouncedSearchTerm, selectedDept]);
 
   const [generatingAllQRs, setGeneratingAllQRs] = useState(false);
 
@@ -591,7 +650,7 @@ const IDCardsPage = () => {
                   </div>
                 </div>
 
-                {emp.idCardImage ? (
+                {(emp.idCardImage || cardImages[emp._id]) ? (
                   <div className="space-y-2 p-3 bg-slate-50 border border-slate-200/60 rounded-xl">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
@@ -610,26 +669,34 @@ const IDCardsPage = () => {
 
                     <div className="rounded-lg border border-slate-200 bg-white p-1.5 text-center">
                       <img
-                        src={emp.idCardImage}
+                        src={emp.idCardImage || cardImages[emp._id]}
                         alt={`${emp.name} ID Card`}
                         className="w-full h-auto max-h-48 object-contain mx-auto rounded"
                       />
                     </div>
 
                     <a
-                      href={emp.idCardImage}
+                      href={emp.idCardImage || cardImages[emp._id]}
                       download={`${emp.employeeId}_Official_ID_Card.png`}
-                      className="btn-primary text-xs w-full py-2"
+                      className="btn-primary text-xs w-full py-2 flex items-center justify-center gap-2"
                     >
                       <Download className="w-3.5 h-3.5" />
                       Download Official ID Card
                     </a>
                   </div>
                 ) : (
-                  <div className="p-3 bg-slate-50 border border-slate-200/60 rounded-xl text-center">
-                    <span className="text-xs text-slate-500 font-medium">
-                      Official Canva ID Card Pending Upload
-                    </span>
+                  <div className="p-3 bg-slate-50 border border-slate-200/60 rounded-xl text-center space-y-2">
+                    <button
+                      onClick={() => handleLoadCardImage(emp)}
+                      disabled={loadingCardId === emp._id}
+                      className="btn-secondary text-xs w-full py-2 flex items-center justify-center gap-2"
+                    >
+                      {loadingCardId === emp._id ? (
+                        <><RefreshCw className="w-3.5 h-3.5 animate-spin" /> Loading Card Graphic...</>
+                      ) : (
+                        <><FileImage className="w-3.5 h-3.5 text-indigo-600" /> Load / View Official ID Card</>
+                      )}
+                    </button>
                   </div>
                 )}
 
@@ -719,6 +786,35 @@ const IDCardsPage = () => {
             </div>
           ))}
           </div>
+
+          {/* Pagination Bar for ID Badges */}
+          {totalPages > 1 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-white border border-slate-200/80 rounded-2xl shadow-2xs">
+              <span className="text-xs font-semibold text-slate-500">
+                Showing page <strong className="text-slate-900 font-bold">{page}</strong> of <strong className="text-slate-900 font-bold">{totalPages}</strong> ({totalEmployees} Total Badges)
+              </span>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  disabled={page <= 1}
+                  className="px-3.5 py-2 text-xs font-bold rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  Previous
+                </button>
+                <span className="px-3 py-1.5 text-xs font-mono font-bold bg-slate-100 rounded-lg text-slate-700">
+                  {page} / {totalPages}
+                </span>
+                <button
+                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  disabled={page >= totalPages}
+                  className="px-3.5 py-2 text-xs font-bold rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

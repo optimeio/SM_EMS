@@ -44,5 +44,6 @@ const taskSchema = new mongoose.Schema({
 
 taskSchema.index({ assignedTo: 1, status: 1 });
 taskSchema.index({ status: 1 });
+taskSchema.index({ createdAt: -1 });
 
 export default mongoose.model('Task', taskSchema);

@@ -58,5 +58,7 @@ const attendanceSchema = new mongoose.Schema({
 
 // Enforce strictly ONE check-in per employee per day
 attendanceSchema.index({ employeeId: 1, date: 1 }, { unique: true });
+attendanceSchema.index({ date: 1, department: 1, status: 1 });
+attendanceSchema.index({ date: 1, checkIn: -1 });
 
 export default mongoose.model('Attendance', attendanceSchema);

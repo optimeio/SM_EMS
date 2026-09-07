@@ -262,10 +262,9 @@ export const getMyAttendanceHistory = async (req, res) => {
 export const getAdminAttendance = async (req, res) => {
   try {
     const { date, department, search, status } = req.query;
-
     const filterDate = date || new Date().toISOString().split('T')[0];
 
-    // Build Mongoose query
+    // Build Mongoose query for Attendance records
     const query = { date: filterDate };
 
     if (department && department !== 'All') {
@@ -276,20 +275,48 @@ export const getAdminAttendance = async (req, res) => {
       query.status = status;
     }
 
-    const [recordsRaw, employeesList, todayAllRecords] = await Promise.all([
-      Attendance.find(query).sort({ checkIn: -1 }).lean(),
-      Employee.find({}).select('name employeeId designation department status').lean(),
-      Attendance.find({ date: filterDate }).select('status employeeId').lean()
-    ]);
+    // Handle search query at MongoDB level
+    if (search && search.trim()) {
+      const q = search.trim();
+      const searchRegex = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+      
+      const matchedEmps = await Employee.find({
+        $or: [
+          { name: searchRegex },
+          { employeeId: searchRegex },
+          { designation: searchRegex }
+        ]
+      }).select('_id employeeId').lean();
 
-    const empMap = new Map();
-    for (const emp of employeesList) {
-      empMap.set(String(emp._id), emp);
-      if (emp.employeeId) empMap.set(emp.employeeId.toUpperCase(), emp);
+      const empObjectIds = matchedEmps.map(e => e._id);
+      const empStringIds = matchedEmps.map(e => e.employeeId);
+
+      query.$or = [
+        { employee: { $in: empObjectIds } },
+        { employeeId: { $in: empStringIds } },
+        { employeeId: searchRegex }
+      ];
     }
 
-    let records = recordsRaw.map(r => {
-      const emp = empMap.get(String(r.employee)) || empMap.get((r.employeeId || '').toUpperCase()) || null;
+    // Execute queries in parallel
+    const [recordsRaw, totalEmployeesCount, statusCounts] = await Promise.all([
+      Attendance.find(query)
+        .populate('employee', 'name employeeId designation department')
+        .sort({ checkIn: -1 })
+        .lean(),
+      Employee.countDocuments({ status: 'Active' }),
+      Attendance.aggregate([
+        { $match: { date: filterDate } },
+        { $group: { _id: '$status', count: { $sum: 1 } } }
+      ])
+    ]);
+
+    // Format records to maintain 100% backward compatibility
+    const records = recordsRaw.map(r => {
+      let emp = r.employee;
+      if (!emp || typeof emp !== 'object' || !emp.name) {
+        emp = null;
+      }
       return {
         ...r,
         employee: emp ? {
@@ -302,21 +329,19 @@ export const getAdminAttendance = async (req, res) => {
       };
     });
 
-    // Optional Search Filter by Employee Name or ID
-    if (search && search.trim()) {
-      const q = search.trim().toLowerCase();
-      records = records.filter(r => 
-        (r.employeeId && r.employeeId.toLowerCase().includes(q)) ||
-        (r.employee?.name && r.employee.name.toLowerCase().includes(q))
-      );
+    // Compute summary stats from aggregation
+    let presentCount = 0;
+    let workingCount = 0;
+    let checkedOutCount = 0;
+
+    for (const item of statusCounts) {
+      presentCount += item.count;
+      if (item._id === 'Present') workingCount = item.count;
+      if (item._id === 'Checked Out') checkedOutCount = item.count;
     }
 
-    const activeEmployees = employeesList.filter(e => e.status === 'Active');
-    const totalEmployees = activeEmployees.length || employeesList.length;
-    const presentCount = todayAllRecords.length;
+    const totalEmployees = totalEmployeesCount || 0;
     const absentCount = Math.max(0, totalEmployees - presentCount);
-    const workingCount = todayAllRecords.filter(r => r.status === 'Present').length;
-    const checkedOutCount = todayAllRecords.filter(r => r.status === 'Checked Out').length;
 
     res.json({
       summary: {
