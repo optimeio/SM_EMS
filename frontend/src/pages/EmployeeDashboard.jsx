@@ -52,123 +52,80 @@ const EmployeeDashboard = () => {
 
   return (
     <div className="space-y-6 animate-fade-in pb-12">
-      {/* Human-Crafted Enterprise Welcome Card */}
-      <div className="bg-white rounded-2xl p-6 sm:p-7 border-2 border-slate-300 shadow-sm flex flex-col xl:flex-row xl:items-center justify-between gap-6 relative overflow-hidden">
-        {/* Left Status Bar Accent */}
-        <div className="absolute top-0 left-0 bottom-0 w-1.5 bg-[#DC2C2B]" />
+      {/* Compact Minimal Employee Welcome Header Row */}
+      <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5">
+          {user?.profilePhoto ? (
+            <img 
+              src={user.profilePhoto} 
+              alt={user?.name} 
+              className="w-12 h-12 rounded-full object-cover border border-slate-200 shrink-0" 
+            />
+          ) : (
+            <div className="w-12 h-12 rounded-full bg-slate-900 text-white font-black flex items-center justify-center text-base border border-slate-200 shrink-0">
+              {user?.name?.[0]?.toUpperCase()}
+            </div>
+          )}
 
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 sm:gap-6 pl-2">
-          {/* Clean Corporate Profile Avatar */}
-          <div className="relative shrink-0">
-            {user?.profilePhoto ? (
-              <img 
-                src={user.profilePhoto} 
-                alt={user?.name} 
-                className="w-18 h-18 sm:w-20 sm:h-20 rounded-full object-cover bg-slate-100 border-2 border-slate-200 shadow-sm" 
-              />
-            ) : (
-              <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-full bg-slate-900 text-white font-black flex items-center justify-center text-2xl border-2 border-slate-200 shadow-sm">
-                {user?.name?.[0]?.toUpperCase()}
-              </div>
-            )}
-
-            {/* Status dot */}
-            <span className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white ring-1 ring-slate-200" title="Active Account" />
-          </div>
-
-          {/* User Meta Information */}
-          <div className="space-y-2">
+          <div className="space-y-0.5">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200 inline-flex items-center gap-1.5">
-                <Sparkles className="w-3 h-3 text-[#DC2C2B]" />
-                Employee Workspace
-              </span>
-
-              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-600 border border-slate-200 inline-flex items-center gap-1.5">
-                <Calendar className="w-3 h-3 text-slate-500" />
-                {new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
-              </span>
-
-              <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-extrabold border inline-flex items-center gap-1.5 ${
+              <h1 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
+                Welcome back, {user?.name}
+              </h1>
+              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border inline-flex items-center gap-1 ${
                 todayData && !todayData.checkOut 
-                  ? 'bg-emerald-50 text-emerald-800 border-emerald-300' 
+                  ? 'bg-emerald-50 text-emerald-800 border-emerald-200' 
                   : todayData?.checkOut
-                  ? 'bg-indigo-50 text-indigo-800 border-indigo-300'
-                  : 'bg-amber-50 text-amber-800 border-amber-300'
+                  ? 'bg-indigo-50 text-indigo-800 border-indigo-200'
+                  : 'bg-amber-50 text-amber-800 border-amber-200'
               }`}>
-                <span className={`w-2 h-2 rounded-full ${
+                <span className={`w-1.5 h-1.5 rounded-full ${
                   todayData && !todayData.checkOut ? 'bg-emerald-600 animate-pulse' : todayData?.checkOut ? 'bg-indigo-600' : 'bg-amber-600'
                 }`} />
-                {todayData && !todayData.checkOut ? 'On Duty (Active)' : todayData?.checkOut ? 'Shift Completed' : 'Not Checked In'}
+                {todayData && !todayData.checkOut ? 'On Duty' : todayData?.checkOut ? 'Shift Done' : 'Not Checked In'}
               </span>
             </div>
 
-            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-snug">
-              Welcome back, <span className="text-[#DC2C2B]">{user?.name}!</span>
-            </h1>
-
-            <div className="flex items-center gap-2 flex-wrap text-xs">
-              <span className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-800 font-bold border border-slate-200/80">
-                {user?.designation || 'Staff Member'}
-              </span>
-              <span className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-800 font-bold border border-slate-200/80 inline-flex items-center gap-1.5">
-                <Building2 className="w-3.5 h-3.5 text-slate-500" />
-                {user?.department || 'Operations'} Department
-              </span>
-              <span className="px-2.5 py-1 rounded-lg bg-slate-900 text-white font-mono font-extrabold">
-                ID: {user?.employeeId}
-              </span>
-            </div>
+            <p className="text-xs text-slate-500 font-bold truncate">
+              {user?.designation || 'Staff'} • {user?.department || 'Operations'} • <span className="font-mono text-slate-700 font-black">ID: {user?.employeeId}</span>
+            </p>
           </div>
         </div>
 
-        {/* Right Action Control Suite */}
-        <div className="flex items-center gap-2.5 flex-wrap xl:flex-nowrap pt-3 xl:pt-0 border-t xl:border-t-0 border-slate-200 shrink-0 pl-2 xl:pl-0">
+        {/* Action Controls */}
+        <div className="flex items-center gap-2 shrink-0">
           {!todayData ? (
             <Link 
               to="/employee/attendance" 
-              className="btn-brand text-xs font-black py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 w-full sm:w-auto"
+              className="btn-brand text-xs font-bold py-2 px-3.5 rounded-xl flex items-center gap-1.5"
             >
-              <CheckSquare className="w-4 h-4" />
-              <span>Check In Shift</span>
+              <CheckSquare className="w-3.5 h-3.5" />
+              <span>Check In</span>
             </Link>
           ) : !todayData.checkOut ? (
             <Link 
               to="/employee/attendance" 
-              className="btn-danger text-xs font-black py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 w-full sm:w-auto"
+              className="btn-danger text-xs font-bold py-2 px-3.5 rounded-xl flex items-center gap-1.5"
             >
-              <LogOut className="w-4 h-4" />
-              <span>Check Out Shift</span>
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Check Out</span>
             </Link>
           ) : (
             <Link 
               to="/employee/attendance" 
-              className="btn-secondary text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 w-full sm:w-auto"
+              className="btn-secondary text-xs font-bold py-2 px-3.5 rounded-xl flex items-center gap-1.5"
             >
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              <span>Shift Completed</span>
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Shift Done</span>
             </Link>
           )}
 
           <Link 
-            to="/employee/tasks" 
-            className="btn-secondary text-xs font-extrabold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 flex-1 sm:flex-none"
-          >
-            <CheckSquare className="w-4 h-4 text-slate-600" />
-            <span>My Tasks</span>
-            {pendingCount > 0 && (
-              <span className="px-1.5 py-0.5 rounded-md bg-slate-200 text-slate-900 text-[10px] font-mono font-bold">
-                {pendingCount}
-              </span>
-            )}
-          </Link>
-
-          <Link 
             to={`/verify/${user?.employeeId}`} 
             target="_blank" 
-            className="btn-secondary text-xs font-extrabold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 flex-1 sm:flex-none"
+            className="btn-secondary text-xs font-extrabold py-2 px-3.5 rounded-xl flex items-center gap-1.5"
           >
-            <QrCode className="w-4 h-4 text-slate-600" />
+            <QrCode className="w-3.5 h-3.5 text-slate-600" />
             <span>ID Badge</span>
           </Link>
         </div>
