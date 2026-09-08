@@ -559,6 +559,11 @@ const EmployeeAttendance = () => {
                 <p className="text-sm sm:text-xl font-bold text-slate-700 tabular-nums truncate">
                   {todayData.checkOut ? formatTime(todayData.checkOut) : '-- : --'}
                 </p>
+                {todayData.isAutoCheckedOut && (
+                  <span className="inline-block text-[10px] font-extrabold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 mt-1">
+                    Auto Checked Out (7:30 PM)
+                  </span>
+                )}
               </div>
 
               {/* Total Working Hours */}
@@ -642,6 +647,11 @@ const EmployeeAttendance = () => {
                           <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
                           {record.status}
                         </span>
+                        {record.isAutoCheckedOut && (
+                          <span className="block text-[10px] font-extrabold text-amber-700 mt-0.5">
+                            Auto (7:30 PM)
+                          </span>
+                        )}
                       </td>
                       <td className="font-mono text-xs font-bold text-emerald-700">{formatTime(record.checkIn)}</td>
                       <td className="font-mono text-xs text-slate-700 font-bold">{formatTime(record.checkOut)}</td>
@@ -685,7 +695,7 @@ const EmployeeAttendance = () => {
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-xs text-slate-900 font-mono">{record.date}</span>
                     <span className={record.status === 'Present' ? 'badge-success text-[11px]' : 'badge-neutral text-[11px]'}>
-                      {record.status}
+                      {record.status} {record.isAutoCheckedOut && '(Auto 7:30 PM)'}
                     </span>
                   </div>
 

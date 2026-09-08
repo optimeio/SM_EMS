@@ -7,7 +7,8 @@ import {
   getTodayAttendance,
   getMyAttendanceHistory,
   getAdminAttendance,
-  getAttendancePhoto
+  getAttendancePhoto,
+  triggerAutoCheckout
 } from '../controllers/attendanceController.js';
 
 const router = express.Router();
@@ -38,5 +39,6 @@ router.get('/photo/:attendanceId', protect, getAttendancePhoto);
 
 // Admin Routes
 router.get('/admin', protect, adminOnly, getAdminAttendance);
+router.post('/auto-checkout', protect, adminOnly, triggerAutoCheckout);
 
 export default router;

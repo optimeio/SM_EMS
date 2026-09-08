@@ -19,10 +19,12 @@ import canvaRoutes from './routes/canvaRoutes.js';
 import attendanceRoutes from './routes/attendanceRoutes.js';
 
 import { syncAllEmployeePasswords } from './utils/syncEmployeePasswords.js';
+import { initAutoCheckoutScheduler } from './services/autoCheckoutScheduler.js';
 
-// Connect to database and sync passwords
+// Connect to database and sync passwords & start auto checkout scheduler
 connectDB().then(() => {
   syncAllEmployeePasswords();
+  initAutoCheckoutScheduler();
 });
 
 const app = express();

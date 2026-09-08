@@ -51,6 +51,13 @@ const attendanceSchema = new mongoose.Schema({
     lat: { type: Number },
     lng: { type: Number },
     address: { type: String }
+  },
+  isAutoCheckedOut: {
+    type: Boolean,
+    default: false
+  },
+  checkOutNotes: {
+    type: String
   }
 }, {
   timestamps: true

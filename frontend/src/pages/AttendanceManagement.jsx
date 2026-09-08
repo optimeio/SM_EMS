@@ -143,6 +143,19 @@ const AttendanceManagement = () => {
     exportToExcel(dataToExport, `Attendance_Report_${filterDate || 'Today'}`, 'Attendance');
   };
 
+  const handleTriggerAutoCheckout = async () => {
+    try {
+      setLoading(true);
+      const { data } = await API.post('/attendance/auto-checkout');
+      clearApiCache('/attendance');
+      fetchAdminAttendance(false);
+    } catch (err) {
+      console.error('Failed to trigger auto check-out:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-6 animate-fade-in pb-12">
       
@@ -167,6 +180,15 @@ const AttendanceManagement = () => {
         </div>
 
         <div className="flex items-center gap-2.5 flex-wrap z-10 shrink-0">
+          <button
+            onClick={handleTriggerAutoCheckout}
+            className="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 bg-amber-50 hover:bg-amber-100 text-amber-900 border-2 border-amber-300 text-xs font-black rounded-xl shadow-xs transition-all hover:scale-[1.02] active:scale-95"
+            title="Auto Check Out employees pending past 7:30 PM"
+          >
+            <Clock className="w-4 h-4 text-amber-700" />
+            <span>Run Auto Check-Out</span>
+          </button>
+
           <button
             onClick={handleExportAttendanceExcel}
             className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-950 text-xs font-extrabold rounded-xl border-2 border-slate-300 shadow-xs transition-all hover:scale-[1.02] active:scale-95"
@@ -446,9 +468,16 @@ const AttendanceManagement = () => {
                               Present
                             </span>
                           ) : (
-                            <span className="badge-neutral text-xs">
-                              Checked Out
-                            </span>
+                            <div>
+                              <span className="badge-neutral text-xs">
+                                Checked Out
+                              </span>
+                              {r.isAutoCheckedOut && (
+                                <span className="block text-[10px] font-extrabold text-amber-700 mt-0.5">
+                                  Auto (7:30 PM)
+                                </span>
+                              )}
+                            </div>
                           )}
                         </td>
 
@@ -505,7 +534,7 @@ const AttendanceManagement = () => {
 
                       <span className={r.status === 'Present' ? 'badge-success text-xs shrink-0' : 'badge-neutral text-xs shrink-0'}>
                         {r.status === 'Present' && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>}
-                        {r.status}
+                        {r.status} {r.isAutoCheckedOut && '(Auto 7:30 PM)'}
                       </span>
                     </div>
 

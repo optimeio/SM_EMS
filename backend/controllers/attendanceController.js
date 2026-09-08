@@ -1,6 +1,7 @@
 import Attendance from '../models/Attendance.js';
 import Employee from '../models/Employee.js';
 import { uploadCheckInPhoto, getPhotoStream } from '../services/googleDriveService.js';
+import { processAutoCheckout } from '../services/autoCheckoutScheduler.js';
 import path from 'path';
 
 /**
@@ -204,6 +205,7 @@ export const checkOut = async (req, res) => {
  */
 export const getTodayAttendance = async (req, res) => {
   try {
+    await processAutoCheckout();
     const emp = await findEmployeeFromUser(req.user);
     if (!emp) {
       return res.status(404).json({ message: 'Employee profile not found.' });
@@ -240,6 +242,7 @@ export const getTodayAttendance = async (req, res) => {
  */
 export const getMyAttendanceHistory = async (req, res) => {
   try {
+    await processAutoCheckout();
     const emp = await findEmployeeFromUser(req.user);
     if (!emp) {
       return res.status(404).json({ message: 'Employee profile not found.' });
@@ -261,6 +264,7 @@ export const getMyAttendanceHistory = async (req, res) => {
  */
 export const getAdminAttendance = async (req, res) => {
   try {
+    await processAutoCheckout();
     const { date, department, search, status } = req.query;
     const filterDate = date || new Date().toISOString().split('T')[0];
 
@@ -381,5 +385,23 @@ export const getAttendancePhoto = async (req, res) => {
   } catch (error) {
     console.error('Photo Stream Error:', error.message);
     res.status(404).json({ message: 'Attendance photo not found.' });
+  }
+};
+
+/**
+ * @desc    Manually trigger auto checkout (Admin or Webhook)
+ * @route   POST /api/attendance/auto-checkout
+ * @access  Private (Admin Only)
+ */
+export const triggerAutoCheckout = async (req, res) => {
+  try {
+    const result = await processAutoCheckout();
+    res.json({
+      success: true,
+      ...result
+    });
+  } catch (error) {
+    console.error('Trigger Auto Checkout Error:', error);
+    res.status(500).json({ message: 'Error running auto checkout: ' + error.message });
   }
 };
