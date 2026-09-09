@@ -2,6 +2,7 @@ import Attendance from '../models/Attendance.js';
 import Employee from '../models/Employee.js';
 import { uploadCheckInPhoto, getPhotoStream } from '../services/googleDriveService.js';
 import { processAutoCheckout } from '../services/autoCheckoutScheduler.js';
+import { getISTDateString, calculateWorkingHours } from '../utils/dateUtils.js';
 import path from 'path';
 
 /**
@@ -9,22 +10,11 @@ import path from 'path';
  */
 const formatTimeAMPM = (date) => {
   return new Date(date).toLocaleTimeString('en-US', {
+    timeZone: 'Asia/Kolkata',
     hour: '2-digit',
     minute: '2-digit',
     hour12: true
   });
-};
-
-/**
- * Calculate working hours string (e.g., "8h 53m")
- */
-const calculateWorkingHours = (checkIn, checkOut) => {
-  const diffMs = new Date(checkOut) - new Date(checkIn);
-  if (diffMs <= 0) return '0h 0m';
-  const totalMinutes = Math.floor(diffMs / (1000 * 60));
-  const hours = Math.floor(totalMinutes / 60);
-  const minutes = totalMinutes % 60;
-  return `${hours}h ${minutes}m`;
 };
 
 /**
@@ -57,9 +47,9 @@ export const checkIn = async (req, res) => {
       return res.status(404).json({ message: 'Employee profile not found in database.' });
     }
 
-    // Determine official server date (YYYY-MM-DD)
+    // Determine official server date in IST (YYYY-MM-DD)
     const now = new Date();
-    const dateStr = now.toISOString().split('T')[0];
+    const dateStr = getISTDateString(now);
 
     // Check if employee has already checked in today
     const existingRecord = await Attendance.findOne({ employeeId: emp.employeeId, date: dateStr });
@@ -150,7 +140,7 @@ export const checkOut = async (req, res) => {
     }
 
     const now = new Date();
-    const dateStr = now.toISOString().split('T')[0];
+    const dateStr = getISTDateString(now);
 
     const empIdStr = (emp.employeeId || '').trim();
     const attendance = await Attendance.findOne({ 
@@ -211,7 +201,7 @@ export const getTodayAttendance = async (req, res) => {
       return res.status(404).json({ message: 'Employee profile not found.' });
     }
 
-    const dateStr = new Date().toISOString().split('T')[0];
+    const dateStr = getISTDateString(new Date());
     const empIdStr = (emp.employeeId || '').trim();
     const attendance = await Attendance.findOne({ 
       employeeId: { $in: [empIdStr, empIdStr.toUpperCase(), empIdStr.toLowerCase()] },
@@ -266,7 +256,7 @@ export const getAdminAttendance = async (req, res) => {
   try {
     await processAutoCheckout();
     const { date, department, search, status } = req.query;
-    const filterDate = date || new Date().toISOString().split('T')[0];
+    const filterDate = date || getISTDateString(new Date());
 
     // Build Mongoose query for Attendance records
     const query = { date: filterDate };
