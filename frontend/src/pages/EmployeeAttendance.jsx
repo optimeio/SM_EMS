@@ -17,7 +17,8 @@ import {
   Building2,
   Check,
   Camera,
-  MapPin
+  MapPin,
+  AlertTriangle
 } from 'lucide-react';
 
 const EmployeeAttendance = () => {
@@ -41,6 +42,9 @@ const EmployeeAttendance = () => {
 
   // Photo viewer modal state
   const [viewPhotoUrl, setViewPhotoUrl] = useState(null);
+
+  // Check-out confirmation modal state
+  const [showCheckOutConfirm, setShowCheckOutConfirm] = useState(false);
 
   const fetchAttendanceData = async () => {
     try {
@@ -223,6 +227,17 @@ const EmployeeAttendance = () => {
     }
   };
 
+  const calculateElapsedShiftTime = (checkInDate) => {
+    if (!checkInDate) return '--';
+    const start = new Date(checkInDate).getTime();
+    const now = new Date().getTime();
+    const diffMs = Math.max(0, now - start);
+    const diffMins = Math.floor(diffMs / 60000);
+    const hours = Math.floor(diffMins / 60);
+    const mins = diffMins % 60;
+    return `${hours}h ${mins}m`;
+  };
+
   const handleCheckOutSubmit = async () => {
     try {
       setSubmitting(true);
@@ -233,10 +248,12 @@ const EmployeeAttendance = () => {
       });
       setSuccessMsg('Checked out successfully!');
       setTodayData(data.attendance);
+      setShowCheckOutConfirm(false);
       fetchAttendanceData();
     } catch (err) {
       console.error('Check-out error:', err);
       setError(err.response?.data?.message || 'Failed to check out. Please try again.');
+      setShowCheckOutConfirm(false);
     } finally {
       setSubmitting(false);
     }
@@ -587,21 +604,13 @@ const EmployeeAttendance = () => {
             {!todayData.checkOut && (
               <div className="pt-2">
                 <button
-                  onClick={handleCheckOutSubmit}
+                  type="button"
+                  onClick={() => setShowCheckOutConfirm(true)}
                   disabled={submitting}
                   className="btn-primary text-sm font-semibold w-full py-3.5 rounded-xl flex items-center justify-center gap-2.5 shadow-xs hover:shadow-md transition-all active:scale-[0.99]"
                 >
-                  {submitting ? (
-                    <>
-                      <RefreshCw className="w-4 h-4 animate-spin" />
-                      Checking Out...
-                    </>
-                  ) : (
-                    <>
-                      <LogOutIcon className="w-4 h-4 text-rose-300" />
-                      Check Out Now
-                    </>
-                  )}
+                  <LogOutIcon className="w-4 h-4 text-rose-300" />
+                  Check Out Now
                 </button>
               </div>
             )}
@@ -741,6 +750,114 @@ const EmployeeAttendance = () => {
           </div>
         )}
       </div>
+
+      {/* Check-Out Confirmation Modal */}
+      {showCheckOutConfirm && createPortal(
+        <div className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 max-w-md w-full relative space-y-5 shadow-2xl my-auto animate-scale-up">
+            
+            {/* Header / Warning Icon */}
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-200 flex items-center justify-center shrink-0 shadow-xs text-rose-600">
+                  <AlertTriangle className="w-6 h-6" />
+                </div>
+                <div>
+                  <h4 className="font-extrabold text-slate-950 text-lg leading-tight">Confirm Check-Out</h4>
+                  <p className="text-xs text-slate-500 font-semibold mt-0.5">Are you ready to end your shift?</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowCheckOutConfirm(false)}
+                disabled={submitting}
+                className="p-1.5 text-slate-400 hover:text-slate-900 rounded-xl hover:bg-slate-100 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Warning Message Box */}
+            <div className="p-3.5 bg-amber-50/90 border border-amber-200/90 rounded-2xl text-xs text-amber-900 space-y-1">
+              <div className="font-bold flex items-center gap-1.5">
+                <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                <span>Important Attendance Notice</span>
+              </div>
+              <p className="text-[11px] text-amber-800 leading-relaxed font-medium pl-5.5">
+                Once checked out, your working hours for today will be finalized and you cannot re-check in until tomorrow.
+              </p>
+            </div>
+
+            {/* Shift Summary Card */}
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2.5">
+              <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Shift Summary</span>
+              
+              <div className="grid grid-cols-3 gap-2">
+                <div className="bg-white p-2.5 rounded-xl border border-slate-200/80">
+                  <span className="text-[10px] text-slate-400 font-bold block uppercase">Check In</span>
+                  <span className="font-extrabold text-xs text-emerald-700 font-mono mt-0.5 block">
+                    {formatTime(todayData?.checkIn)}
+                  </span>
+                </div>
+
+                <div className="bg-white p-2.5 rounded-xl border border-slate-200/80">
+                  <span className="text-[10px] text-slate-400 font-bold block uppercase">Check Out</span>
+                  <span className="font-extrabold text-xs text-slate-900 font-mono mt-0.5 block">
+                    {formatTime(new Date())}
+                  </span>
+                </div>
+
+                <div className="bg-white p-2.5 rounded-xl border border-slate-200/80">
+                  <span className="text-[10px] text-slate-400 font-bold block uppercase">Duration</span>
+                  <span className="font-extrabold text-xs text-indigo-700 font-mono mt-0.5 block">
+                    {calculateElapsedShiftTime(todayData?.checkIn)}
+                  </span>
+                </div>
+              </div>
+
+              {location?.address && (
+                <div className="pt-1 flex items-start gap-1.5 text-[11px] text-slate-600 font-medium">
+                  <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0 mt-0.5" />
+                  <span className="truncate">{location.address}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center gap-3 pt-1">
+              <button
+                type="button"
+                onClick={() => setShowCheckOutConfirm(false)}
+                disabled={submitting}
+                className="btn-secondary flex-1 py-3 text-xs font-extrabold justify-center"
+              >
+                Cancel / Keep Working
+              </button>
+
+              <button
+                type="button"
+                onClick={handleCheckOutSubmit}
+                disabled={submitting}
+                className="bg-rose-600 hover:bg-rose-700 text-white flex-1 py-3 px-4 rounded-xl text-xs font-black shadow-md shadow-rose-600/20 flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50"
+              >
+                {submitting ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin text-white" />
+                    <span>Checking Out...</span>
+                  </>
+                ) : (
+                  <>
+                    <LogOutIcon className="w-4 h-4 text-white" />
+                    <span>Yes, Check Out</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+          </div>
+        </div>,
+        document.body
+      )}
 
       {/* Photo Viewer Modal */}
       {viewPhotoUrl && createPortal(
